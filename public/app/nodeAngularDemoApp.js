@@ -20,15 +20,15 @@ angular.module('nodeAngularDemoApp', ['apiServices', 'ui.router']).
                     }
                 }
             }).
-            state('users', {
-                url : '/users',
-                templateUrl: 'partials/users',
-                controller: 'UsersCtrl'
+            state('superheroes', {
+                url : '/superheroes',
+                templateUrl: 'partials/superheroes',
+                controller: 'SuperheroesCtrl'
             }).
-            state('user', {
-                url : '/users/:name',
-                templateUrl : '/static/app/htmlTemplates/user.html',
-                controller : 'UserDetailController'
+            state('superhero', {
+                url : '/superheroes/:id',
+                templateUrl : '/static/app/htmlTemplates/superhero.html',
+                controller : 'SuperheroDetailController'
             });
         $locationProvider.html5Mode(true);
     }]).run(['$rootScope', '$location', '$log', function($rootScope, $location, $log){

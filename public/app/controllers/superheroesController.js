@@ -1,22 +1,21 @@
 (function(){
-    angular.module('nodeAngularDemoApp').controller('UsersCtrl', [
+    angular.module('nodeAngularDemoApp').controller('SuperheroesCtrl', [
         '$rootScope', '$scope', '$http', '$state', 'superheroService',
         function($rootScope, $scope, $http, $state, superheroService){
 
-            $scope.users = [];
+            $scope.superheroes = [];
 
             $scope.init = function(){
-                $scope.pageTitle = 'Welcome to the Users info page';
+                $scope.pageTitle = 'Welcome to the Superhero info page';
                 superheroService.getAll().then(function(res){
-                    $scope.users = res;
+                    $scope.superheroes = res;
                 }, function(err){
                     console.log(err.status);
                 })
             };
 
             $scope.viewDetails = function(id){
-                //$location.path('/user/' + name);
-                $state.go('user', { id: id });
+                $state.go('superhero', { id: id });
             };
 
             $scope.linkHome = function(){

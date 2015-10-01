@@ -1,13 +1,13 @@
 (function(){
-    angular.module('nodeAngularDemoApp').controller('UserDetailController', [
+    angular.module('nodeAngularDemoApp').controller('SuperheroDetailController', [
         '$rootScope', '$scope', '$http', '$state', '$stateParams',
         function($rootScope, $scope, $http, $state, $stateParams){
 
-            $scope.user = {};
+            $scope.superhero = {};
 
             $scope.init = function(){
-                $http.get('/api/users/' + $stateParams.name).then(function(res){
-                    $scope.user = res.data;
+                $http.get('/api/superheroes/' + $stateParams.id).then(function(res){
+                    $scope.superhero = res.data;
                 }, function(err){
                     console.log(err.status);
                 })
