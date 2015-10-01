@@ -15,8 +15,8 @@ angular.module('nodeAngularDemoApp', ['apiServices', 'ui.router']).
                     data2 : 'myData2'
                 },
                 resolve : {
-                    myUsers : function(userService){
-                        return userService.getAll();
+                    myUsers : function(superheroService){
+                        return superheroService.getAll();
                     }
                 }
             }).

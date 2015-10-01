@@ -1,6 +1,7 @@
 var express = require('express'),
     bodyParser = require('body-parser'),
-    usersAPI = require('./server/routes/usersAPI.js');
+    usersAPI = require('./server/routes/usersAPI.js'),
+    superheroAPI = require('./server/routes/superheroAPI.js');
 
 var app = express();
 
@@ -30,6 +31,7 @@ app.get('/partials/:name', function(req, res){
 //API
 app.get('/api/users', usersAPI.getAll);
 app.get('/api/users/:name', usersAPI.getByName);
+app.get('/api/superheroes', superheroAPI.getAll);
 
 // redirect all others to the index (HTML5 history)
 app.get('*', function(req, res){
