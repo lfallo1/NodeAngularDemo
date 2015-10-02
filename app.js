@@ -13,6 +13,7 @@ app.set('view options', {
 });
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
+app.use('/shimage', express.static(__dirname + '/public/images/sh/'));
 app.use('/bower', express.static(__dirname + '/public/vendor/'));
 app.use('/static', express.static(__dirname + '/public/'));
 
@@ -22,6 +23,11 @@ app.get('/', function(req, res){
  res.render('index');
 });
 
+app.get('/partials/modals/:name', function(req, res){
+    var name = req.params.name;
+    res.render('partials/modals/' + name);
+});
+
 app.get('/partials/:name', function(req, res){
  var name = req.params.name;
  res.render('partials/' + name);
@@ -29,6 +35,7 @@ app.get('/partials/:name', function(req, res){
 
 //API
 app.get('/api/superheroes', superheroAPI.getAll);
+app.get('/api/superheroes/:id', superheroAPI.getById);
 
 // redirect all others to the index (HTML5 history)
 app.get('*', function(req, res){

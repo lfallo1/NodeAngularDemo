@@ -1,8 +1,9 @@
-h1 {{pageTitle}}
-
-div
-    ul
-        li(ng-repeat='user in users')
-            span {{user.name}} - {{user.age}}
-
-a(href='', ng-click='linkMembers()') Members
+.container
+    .jumbotron
+        h1 {{pageTitle}}
+        p {{welcomeText}}
+        div
+            img(src='static/images/banner2.jpg', alt='banner.jpg', width=500)
+            hr
+        div
+            a.btn.btn-primary.btn-lg(href='', role='button', ng-click='linkMembers()') Enter

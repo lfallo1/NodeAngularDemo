@@ -14,7 +14,7 @@ module.exports.getAll = function (req, res, next) {
     res.json(results);
 };
 
-module.exports.getById = function(req,res, next){
+module.exports.getById = function(req, res, next){
     var superhero = {};
 
     for(var i = 0; i < results.length; i++){

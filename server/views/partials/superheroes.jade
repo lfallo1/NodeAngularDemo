@@ -1,10 +1,9 @@
-h1 {{pageTitle}}
-h4 {{userStatsMain}} {{userStatsExtra}}
-hr
-h4 {{addlInfo}}
-div
-    ul
-        li(ng-repeat='superhero in superheroes')
+h1.page-header {{pageTitle}}
+.container-fluid
+    h4 There are {{superheroes.length}} superheroes ({{activeCount()}} active) in the Justice League
+    ul.list-group
+        li.list-group-item(ng-repeat='superhero in superheroes')
             span
-                a(href='', ng-click='viewDetails(superhero._id)') {{superhero.name}} - {{user.alias}}
-a(href='', ng-click='linkHome()') Home
+                a.btn-link(href='', ng-click='openSuperheroDetailsModal(superhero._id)') {{superhero.name}} - {{superhero.alias}}
+    a.btn-link(href='', ng-click='linkHome()') Home
+div

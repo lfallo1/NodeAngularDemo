@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('nodeAngularDemoApp', ['apiServices', 'ui.router']).
+angular.module('nodeAngularDemoApp', ['apiServices', 'ui.router', 'ui.bootstrap',]).
     config(['$stateProvider', '$locationProvider', '$urlRouterProvider', function($stateProvider, $locationProvider, $urlRouterProvider) {
 
         $urlRouterProvider.otherwise('/');
@@ -13,17 +13,17 @@ angular.module('nodeAngularDemoApp', ['apiServices', 'ui.router']).
                 myData : {
                     data1 : 'myData',
                     data2 : 'myData2'
-                },
-                resolve : {
-                    myUsers : function(superheroService){
-                        return superheroService.getAll();
-                    }
                 }
             }).
             state('superheroes', {
                 url : '/superheroes',
                 templateUrl: 'partials/superheroes',
-                controller: 'SuperheroesCtrl'
+                controller: 'SuperheroesCtrl',
+                resolve : {
+                    superheroList : function(superheroService){
+                        return superheroService.getAll();
+                    }
+                }
             }).
             state('superhero', {
                 url : '/superheroes/:id',

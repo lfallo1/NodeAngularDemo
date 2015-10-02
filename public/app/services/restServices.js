@@ -4,7 +4,8 @@
 
     restServices.factory('superheroService', ['$http', '$q', '$log', '$timeout', function($http, $q, $log, $timeout) {
         return {
-            getAll : getAll
+            getAll : getAll,
+            getById : getById
         };
 
         function getAll() {
@@ -18,7 +19,20 @@
             });
 
             return deferred.promise;
-        }
+        };
+
+        function getById(id){
+            var deferred = $q.defer();
+
+            $http.get('api/superheroes/' + id).then(function (response) {
+                deferred.resolve(response.data);
+            }).catch(function (response) {
+                $log.error(response.statusText);
+                return $q.reject('Error retrieving superheroes');
+            });
+
+            return deferred.promise;
+        };
     }]);
 
 })();

@@ -1,16 +1,16 @@
 (function(){
     angular.module('nodeAngularDemoApp').controller('HomeCtrl', [
-        '$rootScope', '$scope', '$state', '$log', 'myUsers',
-        function($rootScope, $scope, $state, $log, myUsers){
+        '$rootScope', '$scope', '$state', '$log',
+        function($rootScope, $scope, $state, $log){
 
             $scope.init = function(){
-                $scope.pageTitle = 'Welcome to the Home Page';
+                $scope.pageTitle = 'Justice Agency Official Home';
+                $scope.welcomeText = 'Welcome to the home of the Justice Agency, our world\'s mighty protectors and upholders of justice'
                 $log.debug($state.current.myData.data1 + ' ' + $state.current.myData.data2);
-                $log.debug(myUsers);
             };
 
             $scope.linkMembers = function(){
-                $state.go('users');
+                $state.go('superheroes');
             };
 
             $scope.init();

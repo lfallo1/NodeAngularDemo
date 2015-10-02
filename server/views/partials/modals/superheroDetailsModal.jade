@@ -1,0 +1,13 @@
+html
+   body
+      .row
+         .modal-header
+            h4 {{superhero.name}} {{superhero.alias}}
+               small (Active:{{superhero.isActive}})
+               span.btn.btn-link(ng-click='showSuperheroDetailsPage(superhero._id)') Click to view profile
+         .modal-body
+            .modal-content
+               div Superhero details placeholder
+         .modal-footer
+            button.btn.btn-default(ng-click='ok()') Close
+
