@@ -27,7 +27,7 @@ angular.module('nodeAngularDemoApp', ['apiServices', 'ui.router', 'ui.bootstrap'
             }).
             state('superhero', {
                 url : '/superheroes/:id',
-                templateUrl : '/static/app/htmlTemplates/superhero.html',
+                templateUrl : 'partials/superhero',
                 controller : 'SuperheroDetailController'
             });
         $locationProvider.html5Mode(true);

@@ -6,7 +6,7 @@
             $scope.superheroes = superheroList;
 
             $scope.init = function(){
-                $scope.pageTitle = 'Welcome to the Superhero info page';
+                $scope.pageTitle = 'Welcome to the Info page';
             };
 
             $scope.activeCount = function(){

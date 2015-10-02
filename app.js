@@ -16,6 +16,12 @@ app.use(bodyParser.urlencoded());
 app.use('/shimage', express.static(__dirname + '/public/images/sh/'));
 app.use('/bower', express.static(__dirname + '/public/vendor/'));
 app.use('/static', express.static(__dirname + '/public/'));
+app.use('/htmlTemplates', express.static(__dirname + '/public/app/htmlTemplates'));
+
+app.use(function(req, res, next){
+    console.log('intercepting request...');
+    next();
+});
 
 // Routes
 

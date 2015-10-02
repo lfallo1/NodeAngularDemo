@@ -4,8 +4,8 @@
         function($rootScope, $scope, $state, $log){
 
             $scope.init = function(){
-                $scope.pageTitle = 'Justice Agency Official Home';
-                $scope.welcomeText = 'Welcome to the home of the Justice Agency, our world\'s mighty protectors and upholders of justice'
+                $scope.pageTitle = 'Website Official Home';
+                $scope.welcomeText = 'This is where some cool subtext might go'
                 $log.debug($state.current.myData.data1 + ' ' + $state.current.myData.data2);
             };
 
