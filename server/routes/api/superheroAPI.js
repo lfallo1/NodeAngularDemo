@@ -1,8 +1,10 @@
+var express = require('express');
+var router = express.Router();
 var fs = require('fs');
 var path = require('path');
 
 var results = {};
-fs.readFile(path.join(__dirname, '../json/superhero.json'), 'utf8', function (err, data) {
+fs.readFile(path.join(__dirname, '../../json/superhero.json'), 'utf8', function (err, data) {
     if (err) {
         throw err;
     } else {
@@ -10,11 +12,11 @@ fs.readFile(path.join(__dirname, '../json/superhero.json'), 'utf8', function (er
     }
 });
 
-module.exports.getAll = function (req, res, next) {
+router.get('/', function (req, res, next) {
     res.json(results);
-};
+});
 
-module.exports.getById = function(req, res, next){
+router.get('/:id', function(req, res, next){
     var superhero = {};
 
     for(var i = 0; i < results.length; i++){
@@ -25,4 +27,6 @@ module.exports.getById = function(req, res, next){
     }
 
     res.json(superhero);
-};
+});
+
+module.exports = router;

@@ -29,6 +29,11 @@ angular.module('nodeAngularDemoApp', ['apiServices', 'ui.router', 'ui.bootstrap'
                 url : '/superheroes/:id',
                 templateUrl : 'partials/superhero',
                 controller : 'SuperheroDetailController'
+            }).
+            state('createSuperhero',{
+                url : '/superhero/create',
+                templateUrl : '/partials/superhero/create',
+                controller : 'SuperheroDetailController'
             });
         $locationProvider.html5Mode(true);
     }]).run(['$rootScope', '$location', '$log', function($rootScope, $location, $log){

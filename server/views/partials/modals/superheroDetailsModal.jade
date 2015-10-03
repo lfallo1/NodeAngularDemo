@@ -7,7 +7,9 @@ html
                span.btn.btn-link(ng-click='showSuperheroDetailsPage(superhero._id)') Click to view profile
          .modal-body
             .modal-content
-               div Details placeholder
+               img(ng-src='{{superhero.picture}}', alt='superheroImage.jpg', width=300)
+               div
+                  small {{superhero.about}}
          .modal-footer
             button.btn.btn-default(ng-click='ok()') Close
 
