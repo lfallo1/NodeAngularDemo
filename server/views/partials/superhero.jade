@@ -1,5 +1,6 @@
-h2 JADE
+//- initialize server side variables
+div(ng-init='initServerValues(#{JSON.stringify(myParam)})')
+h2 JADE {{myParam}}
 strong {{superhero.name}} - {{superhero.alias}}
 br
 a(href='', ng-click='linkHome()') Home
-
