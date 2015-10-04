@@ -2,9 +2,9 @@ angular.module('nodeAngularDemoApp').controller('SuperheroDetailsModalCtrl', ['$
 
     $scope.superhero = superhero;
 
-    $scope.showSuperheroDetailsPage = function(id){
+    $scope.showSuperheroDetailsPage = function(alias){
         $modalInstance.close('ok');
-        $state.go('superhero', {id : id});
+        $state.go('superhero', {alias : alias});
     }
 
     $scope.ok = function () {

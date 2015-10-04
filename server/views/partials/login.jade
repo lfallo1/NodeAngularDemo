@@ -1,0 +1,11 @@
+h1 Login
+p Please login below
+div.alert.alert-danger(ng-show='errorMsg') {{errorMsg}}
+form
+   .form-group
+      label Username
+      input.form-control(name='user', type='text', ng-model='user.username')
+   .form-group
+      label Password
+      input.form-control(name='pwd', type='password' ng-model='user.password')
+   input.btn.btn-default(name='submit', type='submit',value='Login', ng-click='login()')

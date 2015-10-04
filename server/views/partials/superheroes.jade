@@ -4,7 +4,7 @@ h1.page-header {{pageTitle}}
     ul.list-group
         li.list-group-item(ng-repeat='superhero in superheroes')
             span
-                a.btn-link(href='', ng-click='openSuperheroDetailsModal(superhero._id)') {{superhero.name}} - {{superhero.alias}}
+                a.btn-link(href='', ng-click='openSuperheroDetailsModal(superhero.alias)') {{superhero.name}} - {{superhero.alias}}
     a.btn-link(ui-sref='createSuperhero') Create Superhero
     br
     a.btn-link(href='', ng-click='linkHome()') Home

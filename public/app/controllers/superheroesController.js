@@ -1,25 +1,30 @@
 (function(){
     angular.module('nodeAngularDemoApp').controller('SuperheroesCtrl', [
-        '$rootScope', '$scope', '$http', '$state', '$modal', '$log', 'superheroService', 'superheroList',
-        function($rootScope, $scope, $http, $state, $modal, $log, superheroService, superheroList){
+        '$rootScope', '$scope', '$http', '$state', '$modal', '$log', 'superheroService',
+        function($rootScope, $scope, $http, $state, $modal, $log, superheroService){
 
-            $scope.superheroes = superheroList;
+            $scope.superheroes = [];
 
             $scope.init = function(){
                 $scope.pageTitle = 'Welcome to the Info page';
+                superheroService.getAll().then(function(data){
+                    $scope.superheroes = data;
+                }, function(err){
+                    $log.error(err);
+                })
             };
 
             $scope.activeCount = function(){
                 return $scope.superheroes.filter(function(s){return s.isActive;}).length;
             };
 
-            $scope.openSuperheroDetailsModal = function(id){
+            $scope.openSuperheroDetailsModal = function(alias){
                 var modalInstance = $modal.open({
                     templateUrl: 'partials/modals/superheroDetailsModal',
                     controller: 'SuperheroDetailsModalCtrl',
                     resolve: {
                         superhero: function () {
-                            return superheroService.getById(id);
+                            return superheroService.getByAlias(alias);
                         }
                     }
                 });
@@ -33,8 +38,8 @@
                 });
             }
 
-            $scope.viewDetailsLink = function(id){
-                $state.go('superhero', { id: id });
+            $scope.viewDetailsLink = function(alias){
+                $state.go('superhero', { alias: alias });
             };
 
             $scope.linkHome = function(){
