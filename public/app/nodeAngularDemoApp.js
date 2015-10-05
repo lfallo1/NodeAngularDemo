@@ -54,7 +54,7 @@ angular.module('nodeAngularDemoApp', ['apiServices', 'ui.router', 'ui.bootstrap'
                 }
             }).
             state('superhero', {
-                url : '/superheroes/:alias',
+                url : '/superheroes/:id',
                 templateUrl : 'partials/superhero',
                 controller : 'SuperheroDetailController',
                 resolve : {

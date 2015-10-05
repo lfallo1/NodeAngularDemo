@@ -9,8 +9,8 @@ router.get('/', function (req, res, next) {
     })
 });
 
-router.get('/:alias', function(req, res, next) {
-    Superhero.getSuperheroByAlias(req.params.alias, function (err, superhero) {
+router.get('/:id', function(req, res, next) {
+    Superhero.getSuperheroById(req.params.id, function (err, superhero) {
         if (err) {
             res.send(err);
         }

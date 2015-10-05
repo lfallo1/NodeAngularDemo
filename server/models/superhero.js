@@ -40,6 +40,10 @@ module.exports.getAllSuperheroes = function(callback){
     Superhero.find(callback);
 };
 
+module.exports.getSuperheroById = function(id, callback){
+    Superhero.findById(id, callback);
+}
+
 module.exports.getSuperheroByAlias = function(alias, callback){
     var query = {alias : alias};
     Superhero.findOne(query, callback);

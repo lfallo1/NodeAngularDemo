@@ -5,7 +5,7 @@
     restServices.factory('superheroService', ['$http', '$q', '$log', '$timeout', function($http, $q, $log, $timeout) {
         return {
             getAll : getAll,
-            getByAlias : getByAlias
+            getById : getById
         };
 
         function getAll() {
@@ -21,14 +21,14 @@
             return deferred.promise;
         };
 
-        function getByAlias(alias){
+        function getById(id){
             var deferred = $q.defer();
 
-            $http.get('api/superheroes/' + alias).then(function (response) {
+            $http.get('api/superheroes/' + id).then(function (response) {
                 deferred.resolve(response.data);
             }).catch(function (response) {
                 $log.error(response.statusText);
-                return $q.reject('Error retrieving superheroes');
+                return $q.reject('Error retrieving superhero');
             });
 
             return deferred.promise;

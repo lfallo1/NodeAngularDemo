@@ -10,7 +10,7 @@
             $scope.superhero = {};
 
             $scope.init = function(){
-                superheroService.getByAlias($stateParams.alias).then(function(res){
+                superheroService.getById($stateParams.id).then(function(res){
                     $scope.superhero = res;
                 }, function(err){
                     console.log(err.status);

@@ -4,12 +4,12 @@ html
          .modal-header
             h4 {{superhero.name}} {{superhero.alias}}
                small (Active:{{superhero.isActive}})
-               span.btn.btn-link(ng-click='showSuperheroDetailsPage(superhero.alias)') Click to view profile
+               span.btn.btn-link(ng-click='showSuperheroDetailsPage(superhero._id)') Click to view profile
          .modal-body
             .modal-content
                img(src='noImage.png', alt='superheroImage.jpg', width=300)
                div
-                  small {{superhero.about}}
+                  small Description placeholder
          .modal-footer
             button.btn.btn-default(ng-click='ok()') Close
 

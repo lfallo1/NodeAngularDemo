@@ -18,13 +18,13 @@
                 return $scope.superheroes.filter(function(s){return s.isActive;}).length;
             };
 
-            $scope.openSuperheroDetailsModal = function(alias){
+            $scope.openSuperheroDetailsModal = function(id){
                 var modalInstance = $modal.open({
                     templateUrl: 'partials/modals/superheroDetailsModal',
                     controller: 'SuperheroDetailsModalCtrl',
                     resolve: {
                         superhero: function () {
-                            return superheroService.getByAlias(alias);
+                            return superheroService.getById(id);
                         }
                     }
                 });
@@ -36,10 +36,6 @@
                     $log.debug('Superhero details modal closed (CANCEL)');
                     //Handle 'failure' / cancel clicked
                 });
-            }
-
-            $scope.viewDetailsLink = function(alias){
-                $state.go('superhero', { alias: alias });
             };
 
             $scope.linkHome = function(){
