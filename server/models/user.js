@@ -44,12 +44,11 @@ module.exports.getUserByUsername = function(username, callback){
 }
 
 module.exports.createUser = function(newUser, callback) {
-    newUser.save(callback);
-    //bcrypt.hash(newUser.password, 10, function(err, hash){
-    //	if(err) throw err;
-    //	// Set hashed pw
-    //	newUser.password = hash;
-    //	// Create User
-    //	newUser.save(callback);
-    //});
+    bcrypt.hash(newUser.password, 10, function(err, hash){
+    	if(err) throw err;
+    	// Set hashed pw
+    	newUser.password = hash;
+    	// Create User
+    	newUser.save(callback);
+    });
 }

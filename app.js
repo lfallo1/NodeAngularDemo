@@ -28,6 +28,11 @@ var app = express();
 //Connect to db
 mongoose.connect('mongodb://localhost/superherodb');
 
+var conn = mongoose.connection;
+conn.once('open', function(){
+   console.log('connected to mongo succesfully');
+});
+
 // Configuration
 
 app.set('views', __dirname + '/server/views');
