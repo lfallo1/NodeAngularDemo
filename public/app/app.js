@@ -25,8 +25,8 @@ angular.module('youtubeSearchApp', ['ui.router','ngRoute', 'ngAnimate', 'toaster
     }]).run(['$rootScope', '$log', 'AuthService', function($rootScope, $log, AuthService){
 
         //live
-        //$rootScope.clientId = "613015363976-vt1eeel6upnq26k2haupepbdtpd2bjgj.apps.googleusercontent.com";
-        //$rootScope.authCallbackUrl = "http://www.youtubeagent.io/oauthcallback";
+        $rootScope.clientId = "613015363976-vt1eeel6upnq26k2haupepbdtpd2bjgj.apps.googleusercontent.com";
+        $rootScope.authCallbackUrl = "http://www.youtubeagent.io/oauthcallback";
 
         //local
         $rootScope.clientId = "613015363976-0aodg2ib3dmv8m2g7gmknnglg29cmir9.apps.googleusercontent.com";
