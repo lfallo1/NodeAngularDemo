@@ -6,6 +6,11 @@
         '$rootScope', '$scope', '$http', '$q', '$log', '$timeout', '$location', 'TimeService', 'toaster', '$window', '$uibModal', 'AuthService', 'PlaylistService', '$sce', 'CountriesService',
         function($rootScope, $scope, $http, $q, $log, $timeout, $location, TimeService, toaster, $window, $modal, AuthService, PlaylistService, $sce, CountriesService){
 
+            var youtubeSearchBase = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=';
+            var youtubeVideoBase = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=';
+            var popularByCountryBase = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&maxResults=50&chart=mostPopular&regionCode=';
+            var youtubeVideoCategoriesBase = 'https://www.googleapis.com/youtube/v3/videoCategories?part=snippet&regionCode=';
+
             /**
              * set playlistService scope variable so the view can access service methods directly instead of creating redundant
              * intermediary methods
@@ -247,10 +252,11 @@
 
                 //for each sort order type, execute the GET request.  doing this so that more results are returned.
                 for (var i = 0; i < sortOrders.length; i++) {
-                    var token = sortOrders[i].token ? 'pageToken=' + sortOrders[i].token + '&' : '';
-                    promises.push($http.get("https://www.googleapis.com/youtube/v3/search?" + token + "key=" + apikey + "&part=snippet&q=" + $scope.searchParam + "&type=video&maxResults=50" +
-                        dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + safeSearch +
-                        "&order=" + sortOrders[i].order + related));
+                    var token = sortOrders[i].token ? '&pageToken=' + sortOrders[i].token : '';
+
+                    promises.push($http.post('api/youtube/get', {'url' : youtubeSearchBase + $scope.searchParam + "&type=video&maxResults=50" +
+                    dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + safeSearch +
+                    "&order=" + sortOrders[i].order + related  + token}));
                 }
 
                 //wait for all requests to complete
@@ -268,12 +274,8 @@
                     for (var i = 0; i < res.length; i++) {
 
                         //set next page tokens
-                        var order = res[i].config.url.substring(res[i].config.url.lastIndexOf("=") + 1);
                         for (var j = 0; j < sortOrders.length; j++) {
-                            if (sortOrders[j].order === order) {
-                                sortOrders[j].token = res[i].data.nextPageToken;
-                                break;
-                            }
+                            sortOrders[j].token = res[0].data.nextPageToken;
                         }
 
                         //get all items from response
@@ -311,7 +313,8 @@
                         }
 
                         //create a promise with list of video id's for the batch request
-                        promises.push($http.get('https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=' + idList.toString() + '&key=' + apikey));
+                        var payload = {'url' : youtubeVideoBase + idList.toString()};
+                        promises.push($http.post('api/youtube/get', payload));
                     }
 
                     if(promises.length === 0){
@@ -394,8 +397,8 @@
 
             $scope.updateCategories = function(){
                 var deferred = $q.defer();
-                var url = 'https://www.googleapis.com/youtube/v3/videoCategories?part=snippet&regionCode='+ $scope.selectedCountry['alpha-2'] +'&key=' + apikey;
-                $http.get(url).then(function(res){
+                var payload = {url : youtubeVideoCategoriesBase + $scope.selectedCountry['alpha-2']};
+                $http.post('api/youtube/get', payload).then(function(res){
                     $scope.videoCategories = res.data.items.filter(function(d){
                         if(d.snippet.assignable){
                             return d;
@@ -434,10 +437,11 @@
                 token = token ? '&pageToken=' + token : '';
 
                 var promises = [];
-                promises.push($http.get('https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&maxResults=50&chart=mostPopular&regionCode=' + countryAlphaCode + token + '&key=' + apikey));
+                var payload = {url : popularByCountryBase + countryAlphaCode + token};
+                promises.push($http.post('api/youtube/get', payload));
                 for(var i = 0; i < $scope.videoCategories.length - 1; i++){
-                    var url = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&maxResults=50&chart=mostPopular&regionCode=' + countryAlphaCode + '&videoCategoryId=' + $scope.videoCategories[i].id + token + '&key=' + apikey;
-                    promises.push($http.get(url));
+                    payload = {url : popularByCountryBase + countryAlphaCode + '&videoCategoryId=' + $scope.videoCategories[i].id + token};
+                    promises.push($http.post('api/youtube/get',payload));
                 }
 
                 //wait for all requests to complete
@@ -503,7 +507,9 @@
                         }
 
                         //create a promise with list of video id's for the batch request
-                        promises.push($http.get('https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=' + idList.toString() + '&key=' + apikey));
+
+                        var payload = {'url' : youtubeVideoBase + idList.toString()};
+                        promises.push($http.post('api/youtube/get', payload));
                     }
 
                     if(promises.length === 0){
@@ -545,8 +551,8 @@
                 token = token ? '&pageToken=' + token : '';
                 category = category || '';
 
-                var url = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&maxResults=50&chart=mostPopular&regionCode=' + countryAlphaCode + '&videoCategoryId=' + category + token + '&key=' + apikey;
-                $http.get(url).then(function(res){
+                var payload = {'url' : popularByCountryBase + countryAlphaCode + '&videoCategoryId=' + category + token};
+                $http.post('api/youtube/get', payload).then(function(res){
                     var nextPageToken = res.data.nextPageToken;
 
                     if(res.data.items.length > 0){
@@ -586,7 +592,8 @@
                             }
 
                             //create a promise with list of video id's for the batch request
-                            promises.push($http.get('https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=' + idList.toString() + '&key=' + apikey));
+                            var payload = {'url' : youtubeVideoBase + idList.toString()};
+                            promises.push($http.post('api/youtube/get', payload));
                         }
 
                         if(promises.length === 0){

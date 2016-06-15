@@ -2,6 +2,7 @@ var express = require('express'),
     bodyParser = require('body-parser');
 
 var countriesAPI = require('./server/services/countriesAPI.js');
+var youtubeAPI = require('./server/services/youtubeAPI.js');
 
 var app = express();
 
@@ -30,8 +31,9 @@ app.get('/partials/:name', function(req, res){
     res.render('partial/' + name);
 });
 
-//API
+//Endpoints
 app.use('/api/countries', countriesAPI.getAll);
+app.use('/api/youtube/get', youtubeAPI.get);
 
 // redirect all others to the index (HTML5 history)
 app.get('*', function(req, res){
