@@ -5,18 +5,21 @@ var http = require('request-promise');
 
 var apiKey = 'AIzaSyAdvomXbhYg3GeBGymbPVBg-aRJeIOfFyQ';
 
+var _options = {};
+
 module.exports.get = function (req, res, next) {
 
     var options = {
         uri: req.body.url + '&key=' + apiKey,
         json: true // Automatically parses the JSON string in the response
     };
-
+_options = options;
     http(options).then(function (data) {
         res.json(data)
     })
     .catch(function (err) {
-        res.status('500').send('Unable to retrieve data');
+            err.xtra = _options;
+        res.status('500').send(err);
     });
 };
 
