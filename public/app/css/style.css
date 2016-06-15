@@ -145,7 +145,7 @@ body{
 #search-results-header{
     font-size: 24px;
     font-weight: bold;
-    margin-top: 4px;
+    margin-top: 35px;
     color: #01579B ;
 }
 
@@ -256,7 +256,7 @@ body{
 
 .playlist-item{
     text-align: center;
-    background: #2196F3  ;
+    background: #01579B  ;
     padding: 8px;
     font-weight: bold;
     font-size: 16px;
@@ -404,8 +404,10 @@ body{
 }
 
 #date-range-header{
-    margin-bottom: 8px;
+    margin-bottom: 25px;
     font-weight: bolder;
+    font-size: 24px;
+    color: #01579B ;
 }
 
 #countries-dropdown-textmode-wrapper{
@@ -422,4 +424,42 @@ body{
 
 #extended-search-wrapper .btn{
     margin-right: 7px;
+}
+
+#category-wrapper-title{
+    margin-bottom: -10px;
+}
+
+#category-select-options-wrapper select{
+    margin-top: 5px;
+    width: 400px;
+}
+
+#duration-header, #safe-search-header, #category-wrapper-title{
+    margin-top: 20px;
+    font-weight: bolder;
+    font-size: 18px;
+}
+
+#safe-search-wrapper{
+    margin-bottom: 25px;
+}
+
+.toggle-button{
+    background: white;
+    padding: 3px;
+    border-radius: 8px;
+    border: 1px solid;
+    font-size: 18px;
+}
+
+.toggle-button:hover{
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.filtered-results{
+    color: #ff5722;
+    font-weight: normal;
+    font-size: 20px;
 }

@@ -21,6 +21,15 @@
             var relatedPending = false;
             var iteration = 0;
 
+            var regionCode = '';
+            var related= '';
+            var videoDuration= '';
+            var videoCategoryId= '';
+            var safeSearch= '';
+
+            $scope.videoDurationOptions = ['any','long','medium','short'];
+            $scope.safeSearchOptions = ['moderate', 'none', 'strict'];
+
             /**
              * SortOption object
              * @param value
@@ -42,6 +51,9 @@
             var init = function(){
 
                 $scope.extendedSearch = false;
+                $scope.videoDuration = $scope.videoDurationOptions[0];
+                $scope.safeSearch = $scope.safeSearchOptions[0];
+                $scope.preSearchFiltersVisible = true;
 
                 $scope.sortField = {'value' : 'viewCount'};
 
@@ -52,7 +64,9 @@
                             return d;
                         }
                     })[0];
-                    $scope.updateCategories();
+                    $scope.updateCategories().then(function(){
+                        $scope.selectedCategory = $scope.videoCategories && $scope.videoCategories.length > 0 ? $scope.videoCategories[$scope.videoCategories.length - 1] : ALL_CATEGORIES;
+                    });
                 });
 
                 $scope.searchMode = $scope.TEXT_SEARCH;
@@ -72,7 +86,7 @@
             };
 
             $scope.setPlaying = function(video, val){
-              video.playing = val;
+                video.playing = val;
             };
 
             $scope.getIFrameSrc = function (videoId) {
@@ -145,6 +159,15 @@
 
                     $scope.wasInterrupted = undefined;
                     $scope.fetching = true;
+
+                    videoDuration = $scope.videoDuration ? '&videoDuration=' + $scope.videoDuration : '';
+                    safeSearch = $scope.safeSearch ? '&safeSearch=' + $scope.safeSearch : '';
+
+                    regionCode = $scope.selectedCountry ? '&regionCode=' + $scope.selectedCountry['alpha-2'] : '';
+                    videoCategoryId = ($scope.selectedCategory && $scope.selectedCategory.id && $scope.selectedCategory.id > 0) ? '&videoCategoryId=' + $scope.selectedCategory.id : '';
+                    if(!regionCode || !videoCategoryId){
+                        regionCode = videoCategoryId = '';
+                    }
 
                     //call the wrapper
                     fetchResultsWrapper(0);
@@ -220,15 +243,13 @@
 
                 var promises = [];
 
-                var regionCode = $scope.selectedCountry ? '&regionCode=' + $scope.selectedCountry['alpha-2'] : '';
-
-                var related = $scope.checkRelated && $scope.related ? '&relatedToVideoId=' + $scope.related : '';
+                related = $scope.checkRelated && $scope.related ? '&relatedToVideoId=' + $scope.related : '';
 
                 //for each sort order type, execute the GET request.  doing this so that more results are returned.
                 for (var i = 0; i < sortOrders.length; i++) {
                     var token = sortOrders[i].token ? 'pageToken=' + sortOrders[i].token + '&' : '';
                     promises.push($http.get("https://www.googleapis.com/youtube/v3/search?" + token + "key=" + apikey + "&part=snippet&q=" + $scope.searchParam + "&type=video&maxResults=50" +
-                        dateSmall + dateLarge + regionCode +
+                        dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + safeSearch +
                         "&order=" + sortOrders[i].order + related));
                 }
 
@@ -333,6 +354,18 @@
                                         }
                                     }
 
+                                    if(!isRelevant){
+                                        terms = data[count].snippet.title.toString().toLowerCase();
+                                        for(var i = 0; i < parts.length; i++){
+
+                                            //if for any term in our search, it does NOT exist in the videos's tags, then we consider it not a relevant match
+                                            if(terms.toLowerCase().indexOf(parts[i]) < 0){
+                                                isRelevant = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+
                                     //if relevant (terms are similar), then add to related list
                                     if(isRelevant){
                                         $scope.nextRelated.push(data[count].id);
@@ -360,6 +393,7 @@
             };
 
             $scope.updateCategories = function(){
+                var deferred = $q.defer();
                 var url = 'https://www.googleapis.com/youtube/v3/videoCategories?part=snippet&regionCode='+ $scope.selectedCountry['alpha-2'] +'&key=' + apikey;
                 $http.get(url).then(function(res){
                     $scope.videoCategories = res.data.items.filter(function(d){
@@ -369,7 +403,9 @@
                     });
                     $scope.videoCategories.push(ALL_CATEGORIES);
                     $scope.selectedCategory = $scope.videoCategories[0];
+                    deferred.resolve();
                 });
+                return deferred.promise;
             };
 
             $scope.searchPopular = function(){
@@ -655,6 +691,7 @@
                     if(((!$scope.minDislikes && $scope.minDislikes !== 0) || d.dislikes <= $scope.minDislikes) &&
                         (!$scope.minViews || d.viewCount >= $scope.minViews) &&
                         (!$scope.minRating || d.pctLikes >= $scope.minRating) &&
+                        (!$scope.maxDate || d.created >= $scope.maxDate) &&
                         (!$scope.minDate || d.created >= $scope.minDate) && durationFilter(d)){
                         return d;
                     }
@@ -679,6 +716,10 @@
 
                 return (isNaN($scope.longerThanFilter) || video.durationMinutes >= $scope.longerThanFilter) &&
                     (isNaN($scope.lessThanFilter) || !$scope.lessThanFilter || video.durationMinutes <= $scope.lessThanFilter)
+            };
+
+            $scope.setPreSearchFiltersVisible = function(val){
+                $scope.preSearchFiltersVisible = val;
             };
 
             init();
