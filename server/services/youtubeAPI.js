@@ -1,7 +1,9 @@
 var path = require('path');
 var http = require('request-promise');
 
-var apiKey = process.env.PORT ? 'AIzaSyAdvomXbhYg3GeBGymbPVBg-aRJeIOfFyQ' : 'AIzaSyB3v4vF0MIHB00iTr4lAxW2ONwZNmTR0HM';
+//var apiKey = process.env.PORT ? 'AIzaSyAdvomXbhYg3GeBGymbPVBg-aRJeIOfFyQ' : 'AIzaSyB3v4vF0MIHB00iTr4lAxW2ONwZNmTR0HM';
+
+var apiKey = 'AIzaSyAdvomXbhYg3GeBGymbPVBg-aRJeIOfFyQ';
 
 module.exports.get = function (req, res, next) {
 
