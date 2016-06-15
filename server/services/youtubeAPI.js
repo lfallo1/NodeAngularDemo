@@ -1,9 +1,7 @@
 var path = require('path');
 var http = require('request-promise');
 
-//var apiKey = process.env.PORT ? 'AIzaSyAdvomXbhYg3GeBGymbPVBg-aRJeIOfFyQ' : 'AIzaSyB3v4vF0MIHB00iTr4lAxW2ONwZNmTR0HM';
-
-var apiKey = 'AIzaSyAdvomXbhYg3GeBGymbPVBg-aRJeIOfFyQ';
+var apiKey = process.env.YOUTUBE_API_KEY || 'AIzaSyB3v4vF0MIHB00iTr4lAxW2ONwZNmTR0HM';
 
 module.exports.get = function (req, res, next) {
 
