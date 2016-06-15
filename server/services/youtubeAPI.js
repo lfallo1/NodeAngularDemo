@@ -11,10 +11,7 @@ module.exports.get = function (req, res, next) {
 
     var options = {
         uri: req.body.url + '&key=' + apiKey,
-        json: true,
-        headers: {
-            'Referrer': 'http://www.youtubeagent.io'
-        },
+        json: true
     };
 _options = options;
     http(options).then(function (data) {
