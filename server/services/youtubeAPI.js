@@ -1,5 +1,8 @@
 var path = require('path');
 var http = require('request-promise');
+var fs = require('fs');
+var youtubedl = require('ytdl');
+var ffmpeg = require('fluent-ffmpeg');
 
 var apiKey = process.env.YOUTUBE_API_KEY || 'AIzaSyB3v4vF0MIHB00iTr4lAxW2ONwZNmTR0HM';
 
@@ -20,6 +23,29 @@ _options = options;
     .catch(function (err) {
             err.xtra = _options;
         res.status('500').send(err);
+    });
+};
+
+module.exports.toMp3 = function(req, res, next){
+    var id = req.params.id;
+    var ytUrl = 'https://www.youtube.com/watch?v=' + id;
+    var stream = youtubedl(ytUrl);
+
+    var proc = new ffmpeg({source: stream});
+    proc.setFfmpegPath('/Users/lancefallon/bin/JDownloader 2.0/tools/mac/ffmpeg_10.6+/ffmpeg');
+    proc.withAudioCodec('libmp3lame')
+        .toFormat('mp3')
+        .output(__dirname + '/' + id + '.mp3')
+        .run();
+    proc.on('end', function() {
+        var file = fs.readFileSync(__dirname + '/' + id + '.mp3');
+        res.setHeader('Content-Length', file.length);
+        res.setHeader('Content-disposition', 'attachment; filename=' + id + '.mp3');
+        res.setHeader('Content-type', 'audio/mpeg');
+        res.write(file);
+        res.end('', function(){
+            fs.unlinkSync(__dirname + '/' + id + '.mp3');
+        });
     });
 };
 

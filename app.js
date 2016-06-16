@@ -34,6 +34,7 @@ app.get('/partials/:name', function(req, res){
 //Endpoints
 app.use('/api/countries', countriesAPI.getAll);
 app.use('/api/youtube/get', youtubeAPI.get);
+app.use('/api/youtube/mp3/:id', youtubeAPI.toMp3);
 
 // redirect all others to the index (HTML5 history)
 app.get('*', function(req, res){

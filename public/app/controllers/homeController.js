@@ -713,8 +713,8 @@
                     return true;
                 }
 
-                if($scope.longerThanFilter >= $scope.lessThanFilter || $scope.lessThanFilter < 0){
-                    $scope.lessThanFilter = '';
+                if($scope.longerThanFilter >= $scope.shorterThanFilter || $scope.shorterThanFilter < 0){
+                    $scope.shorterThanFilter = '';
                 }
 
                 if($scope.longerThanFilter < 0){
@@ -722,11 +722,15 @@
                 }
 
                 return (isNaN($scope.longerThanFilter) || video.durationMinutes >= $scope.longerThanFilter) &&
-                    (isNaN($scope.lessThanFilter) || !$scope.lessThanFilter || video.durationMinutes <= $scope.lessThanFilter)
+                    (isNaN($scope.shorterThanFilter) || !$scope.shorterThanFilter || video.durationMinutes <= $scope.shorterThanFilter)
             };
 
             $scope.setPreSearchFiltersVisible = function(val){
                 $scope.preSearchFiltersVisible = val;
+            };
+
+            $scope.disableDownload = function(video){
+              video.downloadDisabled = true;
             };
 
             init();

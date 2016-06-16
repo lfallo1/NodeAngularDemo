@@ -237,7 +237,6 @@ body{
 
 
 .add-playlist-button, .add-playlist-button:active{
-    margin-top: 14px;
     background: #01579B;
     border-color: #01579B;
 }
@@ -462,4 +461,20 @@ body{
     color: #ff5722;
     font-weight: normal;
     font-size: 20px;
+}
+
+.download-mp3 {
+    margin-bottom: 5px;
+}
+
+.download-mp3 .glyphicon{
+    margin-right: 10px;
+}
+
+.download-mp3 .btn{
+    padding: 6px;
+}
+
+.video-buttons{
+    margin-top: 14px;
 }

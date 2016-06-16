@@ -160,8 +160,8 @@
                         <td class="filter-label"><span class="glyphicon glyphicon-time"></span>Duration</td>
                         <td class="filter-input">
                             <div id="duration-range-wrapper">
-                                <input ng-model="longerThanFilter" type="number" class="form-control" placeholder="> (mins)" ng-blur="filter()"/>
-                                <input ng-model="lessThanFilter" type="number" class="form-control" placeholder="< (mins)" ng-blur="filter()" />
+                                <input ng-model="longerThanFilter" ng-blur="filter()" type="number" class="form-control" placeholder="> (mins)" ng-blur="filter()"/>
+                                <input ng-model="shorterThanFilter" ng-blur="filter()" type="number" class="form-control" placeholder="< (mins)" ng-blur="filter()" />
                             </div>
                         </td>
                     </tr>
@@ -202,7 +202,15 @@
                         <div class="view-count"><small>Views</small> {{video.viewCount}}</div>
                         <div class="likes"><small>Likes</small> {{video.likes}}</div>
                         <div class="dislikes"><small>Dislikes</small> {{video.dislikes}}</div>
-                        <div ng-if="AuthService.isLoggedIn()" class="add-playlist-button btn btn-success" ng-click="playlistService.addToPlaylist(video)"><span class="glyphicon glyphicon-plus"></span> Add to Playlist</div>
+                        <div class="video-buttons row">
+                            <div class="col-md-12">
+                                <div class="download-mp3"><a class="btn btn-default" ng-show="!video.downloadDisabled" target="_self" href="api/youtube/mp3/{{video.videoId}}" download="{{video.videoId + '.mp3'}}" ng-click="disableDownload(video)"><span class="glyphicon glyphicon-headphones"></span>Download mp3</a></div>
+                                <div class="download-mp3"><a class="btn btn-default" ng-show="video.downloadDisabled" disabled><span class="glyphicon glyphicon-headphones"></span>Download mp3</a></div>
+                            </div>
+                            <div class="col-md-12">
+                                <div ng-if="AuthService.isLoggedIn()" class="add-playlist-button btn btn-success" ng-click="playlistService.addToPlaylist(video)"><span class="glyphicon glyphicon-plus"></span> Add to Playlist</div>
+                            </div>
+                        </div>
 
                         <!--<div id="youtube-members-only" ng-if="AuthService.isLoggedIn()">-->
                         <!--<hr />-->
