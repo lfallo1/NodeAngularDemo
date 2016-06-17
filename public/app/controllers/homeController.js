@@ -733,6 +733,12 @@
               video.downloadDisabled = true;
             };
 
+            $scope.$watch(function () {
+                return $window.scrollY;
+            }, function (scrollY) {
+                $log.info(scrollY);
+            });
+
             init();
 
         }]);

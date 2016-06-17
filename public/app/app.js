@@ -22,7 +22,7 @@ angular.module('youtubeSearchApp', ['ui.router','ngRoute', 'ngAnimate', 'toaster
             });
 
         $locationProvider.html5Mode(true);
-    }]).run(['$rootScope', '$log', 'AuthService', function($rootScope, $log, AuthService){
+    }]).run(['$rootScope', '$log', '$document', 'AuthService', function($rootScope, $log, $document, AuthService){
 
         //live
         $rootScope.clientId = "613015363976-vt1eeel6upnq26k2haupepbdtpd2bjgj.apps.googleusercontent.com";
