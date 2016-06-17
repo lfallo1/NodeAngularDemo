@@ -5,6 +5,7 @@ var youtubedl = require('ytdl');
 var ffmpeg = require('fluent-ffmpeg');
 
 var apiKey = process.env.YOUTUBE_API_KEY || 'AIzaSyB3v4vF0MIHB00iTr4lAxW2ONwZNmTR0HM';
+var ffmpegLocation = process.env.FFMPEG || '/Users/lfallon/WebstormProjects/YoutubeAgent/NodeAngularDemo/server/jdownloader/ressourcen/tools/mac/ffmpeg_10.6+/ffmpeg';
 
 //var apiKey = 'AIzaSyAY8aVa_oVZya_-a53oyFikvs-RwJfNDuk';
 
@@ -34,7 +35,7 @@ module.exports.toMp3 = function(req, res, next){
     console.log(timestamp);
 
     var proc = new ffmpeg({source: stream});
-    proc.setFfmpegPath('../ffmpeg/bin/ffmpeg');
+    proc.setFfmpegPath(ffmpegLocation);
     proc.withAudioCodec('libmp3lame')
         .toFormat('mp3')
         .output(__dirname + '/' + id + timestamp + '.mp3')
