@@ -86,7 +86,7 @@
                 $scope.extendedSearch = false;
                 $scope.videoDuration = $scope.videoDurationOptions[0];
                 $scope.safeSearch = $scope.safeSearchOptions[0];
-                $scope.preSearchFiltersVisible = true;
+                $scope.preSearchFiltersVisible = $scope.sortVisible = $scope.filterVisible = true;
 
                 $scope.sortField = {'value' : 'viewCount'};
 
@@ -350,7 +350,7 @@
                         return;
                     }
 
-                    //wait for reequest to finish
+                    //wait for request to finish
                     $q.all(promises).then(function (res) {
 
                         var data = [];
@@ -545,7 +545,7 @@
                         return;
                     }
 
-                    //wait for reequest to finish
+                    //wait for request to finish
                     $q.all(promises).then(function (res) {
 
                         var data = [];
@@ -629,7 +629,7 @@
                             return;
                         }
 
-                        //wait for reequest to finish
+                        //wait for request to finish
                         $q.all(promises).then(function (res) {
 
                             var data = [];
@@ -755,6 +755,14 @@
 
             $scope.setPreSearchFiltersVisible = function(val){
                 $scope.preSearchFiltersVisible = val;
+            };
+
+            $scope.setFilterVisible = function(val){
+                $scope.filterVisible = val;
+            };
+
+            $scope.setSortVisible = function(val){
+                $scope.sortVisible = val;
             };
 
             $scope.disableDownload = function(video){
