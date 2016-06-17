@@ -4,7 +4,7 @@
 (function(){
     angular.module('youtubeSearchApp').controller('HomeCtrl', [
         '$rootScope', '$scope', '$http', '$q', '$log', '$timeout', '$location', 'TimeService', 'toaster', '$window', '$uibModal', 'AuthService', 'PlaylistService', '$sce', 'CountriesService',
-        function($rootScope, $scope, $http, $q, $log, $timeout, $location, TimeService, toaster, $window, $modal, AuthService, PlaylistService, $sce, CountriesService){
+        function($rootScope, $scope, $http, $q, $log, $timeout, $location, TimeService, toaster, $window, $uibModal, AuthService, PlaylistService, $sce, CountriesService){
 
             var youtubeSearchBase = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=';
             var youtubeVideoBase = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=';
@@ -22,6 +22,8 @@
             var sortOrders = [];
             $scope.TEXT_SEARCH = 1;
             $scope.POPULAR_SEARCH = 2;
+            $scope.WATCHLIST_MODAL_CTRL = 'WatchlistModalCtrl';
+            $scope.BULK_PLAYLIST_MODAL_CTRL = 'BulkPlaylistModalCtrl';
             var ALL_CATEGORIES = {'id' : '-1', 'snippet' : {'title' : 'Search All Categories'}};
             var relatedPending = false;
             var iteration = 0;
@@ -35,44 +37,48 @@
             $scope.videoDurationOptions = ['any','long','medium','short'];
             $scope.safeSearchOptions = ['moderate', 'none', 'strict'];
 
-            $scope.getSelectedVideos = function(){
-                return $scope.filteredResults.filter(function(d){
-                    if(d.isSelected){
+            $scope.isVideoInList = function(video, list){
+                return list.filter(function(d){
+                    if(d.videoId === video.videoId){
                         return d;
                     }
-                });
+                }).length > 0;
             };
 
-            $scope.getWatchlistVideos = function(){
-                return $scope.filteredResults.filter(function(d){
-                    if(d.watchlist){
-                        return d;
+            $scope.toggleVideoInList = function(video, list){
+                for(var i = 0; i < list.length; i++){
+                    if(list[i].videoId === video.videoId){
+                        list.splice(i,1);
+                        return;
                     }
-                });
-            };
-
-            $scope.saveMultipleToPlaylist = function(){
-                var videos = $scope.getSelectedVideos();
-                if(videos.length === 0){
-                    return;
                 }
-                $scope.savingToPlaylist = true;
-                $scope.playlistService.addMultipleToPlaylist(videos).then(function(){
-                    $scope.savingToPlaylist = false;
-                    for(var i = 0; i < $scope.filteredResults.length; i++){
-                        $scope.filteredResults[i].isSelected = false;
+                list.push(video);
+            };
+
+            $scope.openListManagerModal = function(list, controller, template){
+                var modalInstance = $uibModal.open({
+                    templateUrl: 'partials/' + template,
+                    controller: controller,
+                    backdrop: 'static',
+                    size: 'md',
+                    resolve: {
+                        content: function () {
+                            return {
+                                'list' : list
+                            }
+                        }
                     }
-                }, function(err){
-                    $scope.savingToPlaylist = false;
                 });
-            };
 
-            $scope.toggleVideoSelection = function(video){
-                video.isSelected = !video.isSelected;
-            };
-
-            $scope.toggleWatchlistItem = function(video){
-                video.watchlist = !video.watchlist;
+                //handle promise resolve/reject. data is the selected playlist
+                modalInstance.result.then(function (newList) {
+                    if(controller === $scope.WATCHLIST_MODAL_CTRL){
+                        $scope.watchlist = newList;
+                    }
+                    else if(controller === $scope.BULK_PLAYLIST_MODAL_CTRL){
+                        $scope.selectedVideos = newList;
+                    }
+                });
             };
 
             /**
@@ -99,6 +105,9 @@
                 $scope.videoDuration = $scope.videoDurationOptions[0];
                 $scope.safeSearch = $scope.safeSearchOptions[0];
                 $scope.preSearchFiltersVisible = $scope.sortVisible = $scope.filterVisible = true;
+
+                $scope.watchlist = [];
+                $scope.selectedVideos = [];
 
                 $scope.sortField = {'value' : 'viewCount'};
 

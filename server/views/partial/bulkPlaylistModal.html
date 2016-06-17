@@ -1,0 +1,18 @@
+<div id="bulkplaylist-modal-head" class="modal-header">
+    <div>Manage Watchlist</div>
+</div>
+<div id="bulkplaylist-modal-body" class="modal-body">
+    <table class="table table-responsive">
+        <tbody>
+        <tr ng-repeat="video in selectedVideos track by $index">
+            <td><a ng-href="{{'https://www.youtube.com/watch?v=' + video.videoId}}" target="_blank">{{video.title}}</a></td>
+            <td><span class="text-danger glyphicon glyphicon-remove" ng-click="remove($index)"></span></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+    <button ng-disabled="savingToPlaylist" class="btn btn-success" ng-click="save()">Save to Youtube Playlist</button>
+    <button ng-disabled="savingToPlaylist" class="btn btn-danger" ng-click="clear()">Clear List</button>
+    <button ng-disabled="savingToPlaylist" class="btn-link" ng-click="cancel()">Close</button>
+</div>

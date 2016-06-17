@@ -526,13 +526,13 @@ body{
     border-bottom-right-radius: 4px;
 }
 
-#save-selected-items button{
+#save-selected-items button, #watchlist button{
     height: 50px;
     width: 100%;
     margin-bottom: 4px;
 }
 
-#save-selected-items .btn{
+#save-selected-items .btn, #watchlist .btn{
     font-size: 16px;
     font-weight: bolder;
 }
@@ -557,19 +557,7 @@ body{
     opacity: 0.7;
 }
 
-#watchlist{
-    position: fixed;
-    width: 250px;
-    height: auto;;
-    left: 10px;
-    top: 50px;
-    border-radius: 8px;
-}
-
-#watchlist #watchlist-headder{
-    font-weight: bolder;
-    font-size: 18px;
-    color: white;
+#watchlist #watchlist-header{
     background: #01579B;
-    text-align: center;
+    color: white;
 }

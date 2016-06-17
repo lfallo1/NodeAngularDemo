@@ -5,7 +5,7 @@ var youtubedl = require('ytdl');
 var ffmpeg = require('fluent-ffmpeg');
 
 var apiKey = process.env.YOUTUBE_API_KEY || 'AIzaSyB3v4vF0MIHB00iTr4lAxW2ONwZNmTR0HM';
-var ffmpegLocation = process.env.FFMPEG || '/Users/lfallon/WebstormProjects/YoutubeAgent/NodeAngularDemo/server/ffmpeg/mac/ffmpeg_10.6+/ffmpeg';
+var ffmpegLocation = process.env.FFMPEG || '/Users/lancefallon/Documents/angularProjects/NodeAngularDemo/server/ffmpeg/mac/ffmpeg_10.6+/ffmpeg';
 
 //var apiKey = 'AIzaSyAY8aVa_oVZya_-a53oyFikvs-RwJfNDuk';
 
