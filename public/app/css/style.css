@@ -561,3 +561,22 @@ body{
     background: #01579B;
     color: white;
 }
+
+
+
+#bulkplaylist-modal-head, #watchlist-modal-head{
+    text-align: center;
+    font-size: 26px;
+    font-weight: bolder;
+    color: white;
+    background: #01579B;
+}
+
+#bulkplaylist-modal-body .glyphicon-remove:hover, #watchlist-modal-body .glyphicon-remove:hover{
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+#bulkplaylist-modal-body table, #watchlist-modal-body table{
+    margin: 0px auto;
+}
