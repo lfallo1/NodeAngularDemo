@@ -2,7 +2,7 @@
  * PlaylistService- Handle functionality related to creating / updating playlists
  */
 (function(){
-    angular.module('youtubeSearchApp').service('PlaylistService', ['$http', '$q', '$log', '$uibModal', 'toaster', 'AuthService', function($http, $q, $log, $uibModal, toaster, AuthService){
+    angular.module('youtubeSearchApp').service('PlaylistService', ['$http', '$q', '$log', '$uibModal', '$timeout', 'toaster', 'AuthService', function($http, $q, $log, $uibModal, $timeout, toaster, AuthService){
 
         var service = {};
 
@@ -92,10 +92,66 @@
                 return;
             }
 
-            /**
-             * load all playlists then open a modal, passing the list of playlists as content
-             */
+            choosePlaylist().then(function(selectedPlaylist){
+                saveVideoToPlaylist(video, selectedPlaylist).then(function(){
+                    toaster.pop('success', '', 'Awww yea, added to your playlist!');
+                }, function(err){
+                    toaster.pop('error', '', 'Bummer, something terrible happened and we could not add the video');
+                });
+            }, function(err){
+                $log.error('No playlist selected: ' + err);
+            });
+        };
+
+        service.addMultipleToPlaylist = function(videos){
+            var deferred = $q.defer();
+            if(!AuthService.isLoggedIn()){
+                deferred.reject();
+                return;
+            }
+
+            choosePlaylist().then(function(selectedPlaylist){
+
+                addMultipleToPlaylistWrapper(videos, selectedPlaylist).then(function(){
+                    toaster.pop('success', '', 'All selected videos have been added to your playlist!');
+                    deferred.resolve();
+                }, function(err){
+                    $log.error(err);
+                    toaster.pop('error', '', 'Bummer, something terrible happened and we could not save to your playlist');
+                    deferred.reject(err);
+                });
+            }, function(err){
+                deferred.reject();
+                $log.error('No playlist selected: ' + err);
+            });
+            return deferred.promise;
+        };
+
+        var addMultipleToPlaylistWrapper = function(videos, playlist, deferred){
+            var deferred = deferred || $q.defer();
+              if(videos && videos.length === 0){
+                  deferred.resolve();
+                  return;
+              }
+
+            saveVideoToPlaylist(videos[0], playlist).then(function(){
+                $timeout(function(){
+                    videos.splice(0,1);
+                    addMultipleToPlaylistWrapper(videos, playlist, deferred);
+                }, 1);
+            });
+
+            return deferred.promise;
+        };
+
+        var choosePlaylist = function(){
+
+            var deferred = $q.defer();
+
+            // load all playlists then open a modal, passing the list of playlists as content
             service.loadPlaylists().then(function(playlists){
+
+
 
                 var modalInstance = $uibModal.open({
                     templateUrl: 'partials/playlistModal.html',
@@ -112,22 +168,34 @@
 
                 //handle promise resolve/reject. data is the selected playlist
                 modalInstance.result.then(function (selectedPlaylist) {
-                    var token = gapi.auth2.getAuthInstance().currentUser.get().hg.access_token;
-                    var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&access_token=' + token;
-                    var playlistItemResource = generatePlaylistItemResource(video, selectedPlaylist);
-                    $http.post(url, playlistItemResource).then(function(res){
-                        $log.info(res);
-                        toaster.pop('success', '', 'Awww yea, added to your playlist!');
-                    }, function(err){
-                        $log.error(err);
-                        toaster.pop('error', '', 'Bummer, something terrible happened and we could not add the video');
-                    });
+                    deferred.resolve(selectedPlaylist);
                 }, function (err) {
-                    //TODO
-                    $log.error(err);
+                    $log.info('Modal dismissed without saving video to playlist');
+                    deferred.reject({msg : 'Modal dismissed without saving video to playlist'});
                 });
-            })
-        };
+
+            }, function(err){
+                toaster.pop('error', '', 'Having trouble loading your playlists. Try clicking the google signin button in the upper right and give it another shot.');
+                deferred.reject(err);
+            });
+
+            return deferred.promise;
+        }
+
+        var saveVideoToPlaylist = function(video, playlist){
+            var deferred = $q.defer();
+            var token = gapi.auth2.getAuthInstance().currentUser.get().hg.access_token;
+            var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&access_token=' + token;
+            var playlistItemResource = generatePlaylistItemResource(video, playlist);
+            $http.post(url, playlistItemResource).then(function(res){
+                $log.info(res);
+                deferred.resolve();
+            }, function(err){
+                $log.error(err);
+                deferred.reject();
+            });
+            return deferred.promise;
+        }
 
         return service;
     }]);

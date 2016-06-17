@@ -172,6 +172,9 @@
     </div>
 </div>
 <div ng-show="searchResults.length > 0" id="quick-filter" class="row">
+    <div id="save-selected-items" ng-show="getSelectedVideos().length > 0" class="col-md-12">
+        <button ng-disabled="savingToPlaylist" class="btn btn-success" ng-click="saveMultipleToPlaylist()"><span class="glyphicon glyphicon-floppy-disk"></span>Save selected items to playlist</button>
+    </div>
     <div class="col-md-12">
         <div id="quick-filter-title">
             <span class="glyphicon glyphicon-filter"></span>Quick filter
@@ -199,11 +202,15 @@
                     </div>
                     <div ng-if="!video.playing" class="play-video-button btn btn-default" ng-click="setPlaying(video, true)"><span class="glyphicon glyphicon-play"></span></div>
                     <div ng-if="video.playing" class="hide-video-button btn btn-default" ng-click="setPlaying(video, false)"><span class="glyphicon glyphicon-stop"></span></div>
+                    <button ng-if="!video.isSelected" class="select btn btn-info" ng-click="toggleVideoSelection(video)">Add to playlist queue</button>
+                    <button ng-if="video.isSelected" class="select btn btn-danger" ng-click="toggleVideoSelection(video)">Remove from queue</button>
                 </td>
                 <td>
                     <div class="video-details-container">
                         <a ng-href="{{'https://www.youtube.com/watch?v=' + video.videoId}}" target="_blank">
-                            <div class="videoTitle">{{video.title}}</div>
+                            <div class="videoTitle">
+                                {{video.title}}
+                            </div>
                         </a>
                         <div class="created"><a href="https://www.youtube.com/channel/{{video.channelId}}" target="_blank">{{video.channelTitle}}</a> - {{video.created | date:'MM-dd-yyyy'}}</div>
                         <div class="duration">{{video.duration}}</div>
@@ -217,7 +224,7 @@
                                 <div class="download-mp3"><a class="btn btn-success" ng-show="video.downloadDisabled" disabled><span class="glyphicon glyphicon-headphones"></span>Download mp3</a></div>
                             </div>
                             <div class="col-md-12">
-                                <div ng-if="AuthService.isLoggedIn()" class="add-playlist-button btn btn-success" ng-click="playlistService.addToPlaylist(video)"><span class="glyphicon glyphicon-plus"></span> Add to Playlist</div>
+                                <div ng-if="AuthService.isLoggedIn()" class="add-playlist-button btn btn-success" ng-click="playlistService.addToPlaylist(video)"><span class="glyphicon glyphicon-plus"></span> Youtube playlist</div>
                             </div>
                         </div>
 

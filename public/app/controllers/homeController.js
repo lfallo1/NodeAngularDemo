@@ -35,6 +35,34 @@
             $scope.videoDurationOptions = ['any','long','medium','short'];
             $scope.safeSearchOptions = ['moderate', 'none', 'strict'];
 
+            $scope.getSelectedVideos = function(){
+                return $scope.filteredResults.filter(function(d){
+                    if(d.isSelected){
+                        return d;
+                    }
+                });
+            };
+
+            $scope.saveMultipleToPlaylist = function(){
+                var videos = $scope.getSelectedVideos();
+                if(videos.length === 0){
+                    return;
+                }
+                $scope.savingToPlaylist = true;
+                $scope.playlistService.addMultipleToPlaylist(videos).then(function(){
+                    $scope.savingToPlaylist = false;
+                    for(var i = 0; i < $scope.filteredResults.length; i++){
+                        $scope.filteredResults[i].isSelected = false;
+                    }
+                }, function(err){
+                    $scope.savingToPlaylist = false;
+                });
+            };
+
+            $scope.toggleVideoSelection = function(video){
+                video.isSelected = !video.isSelected;
+            };
+
             /**
              * SortOption object
              * @param value
@@ -732,12 +760,6 @@
             $scope.disableDownload = function(video){
               video.downloadDisabled = true;
             };
-
-            $scope.$watch(function () {
-                return $window.scrollY;
-            }, function (scrollY) {
-                $log.info(scrollY);
-            });
 
             init();
 
