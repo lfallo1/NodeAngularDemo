@@ -43,6 +43,14 @@
                 });
             };
 
+            $scope.getWatchlistVideos = function(){
+                return $scope.filteredResults.filter(function(d){
+                    if(d.watchlist){
+                        return d;
+                    }
+                });
+            };
+
             $scope.saveMultipleToPlaylist = function(){
                 var videos = $scope.getSelectedVideos();
                 if(videos.length === 0){
@@ -61,6 +69,10 @@
 
             $scope.toggleVideoSelection = function(video){
                 video.isSelected = !video.isSelected;
+            };
+
+            $scope.toggleWatchlistItem = function(video){
+                video.watchlist = !video.watchlist;
             };
 
             /**

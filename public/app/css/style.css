@@ -551,3 +551,25 @@ body{
     cursor: pointer;
     opacity: 0.7;
 }
+
+.add-to-watchlist:hover{
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+#watchlist{
+    position: fixed;
+    width: 250px;
+    height: auto;;
+    left: 10px;
+    top: 50px;
+    border-radius: 8px;
+}
+
+#watchlist #watchlist-headder{
+    font-weight: bolder;
+    font-size: 18px;
+    color: white;
+    background: #01579B;
+    text-align: center;
+}

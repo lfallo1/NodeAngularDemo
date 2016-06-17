@@ -183,6 +183,22 @@
 </div>
 <!-- (end) SORT / POST-FILTERS  -->
 
+<!-- WATCH LIST -->
+<div id="watchlist" ng-show="getWatchlistVideos().length > 0">
+    <div id="watchlist-headder">
+        Watchlist
+    </div>
+
+    <div id="watchlist-contents" ng-repeat="video in getWatchlistVideos()">
+        <a ng-href="{{'https://www.youtube.com/watch?v=' + video.videoId}}" target="_blank">
+            <div class="videoTitle">
+                {{video.title}}
+            </div>
+        </a>
+    </div>
+</div>
+<!-- (END) WATCh LIST -->
+
 <!-- QUICK FILTERS -->
 <div ng-show="searchResults.length > 0" id="quick-filter" class="row">
     <div id="save-selected-items" ng-show="getSelectedVideos().length > 0 && AuthService.isLoggedIn()" class="col-md-12">
@@ -218,6 +234,8 @@
                     </div>
                     <div ng-if="!video.playing" class="play-video-button btn btn-default" ng-click="setPlaying(video, true)"><span class="glyphicon glyphicon-play"></span></div>
                     <div ng-if="video.playing" class="hide-video-button btn btn-default" ng-click="setPlaying(video, false)"><span class="glyphicon glyphicon-stop"></span></div>
+                    <div ng-if="!video.watchlist" class="add-to-watchlist text-info" ng-click="toggleWatchlistItem(video)"><span class="glyphicon glyphicon-plus"></span>Add to watchlist</div>
+                    <div ng-if="video.watchlist" class="add-to-watchlist text-danger" ng-click="toggleWatchlistItem(video)"><span class="glyphicon glyphicon-remove"></span>Remove from watchlist</div>
                     <div ng-if="!video.isSelected && AuthService.isLoggedIn()" class="add-to-multivid-playlist text-success" ng-click="toggleVideoSelection(video)"><span class="glyphicon glyphicon-plus"></span>Add to playlist queue</div>
                     <div ng-if="video.isSelected && AuthService.isLoggedIn()" class="add-to-multivid-playlist text-danger" ng-click="toggleVideoSelection(video)"><span class="glyphicon glyphicon-remove"></span>Remove from queue</div>
                 </td>
