@@ -7,6 +7,8 @@ var youtubeAPI = require('./server/services/youtubeAPI.js');
 var app = express();
 
 var port = process.env.PORT || 3000;
+var clientId = process.env.CLIENT_ID || "613015363976-0aodg2ib3dmv8m2g7gmknnglg29cmir9.apps.googleusercontent.com";
+var authCallbackUrl = process.env.AUTH_CALLBACK_URL || "http://localhost:3000/oauthcallback";
 
 // Configuration
 app.engine('html', require('ejs').renderFile);
@@ -35,6 +37,9 @@ app.get('/partials/:name', function(req, res){
 app.use('/api/countries', countriesAPI.getAll);
 app.use('/api/youtube/get', youtubeAPI.get);
 app.use('/api/youtube/mp3/:id', youtubeAPI.toMp3);
+app.use('/api/config', function(req,res,next){
+    res.json({'clientId' : clientId, 'authCallbackUrl' : authCallbackUrl});
+})
 
 // redirect all others to the index (HTML5 history)
 app.get('*', function(req, res){
