@@ -1025,6 +1025,13 @@ body{
     font-weight: bolder;
 }
 
-#results .select{
-    width: 100%;
+#results .add-to-multivid-playlist{
+    margin-top: 7px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+#results .add-to-multivid-playlist:hover{
+    cursor: pointer;
+    opacity: 0.7;
 }
