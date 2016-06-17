@@ -2,7 +2,7 @@ angular.module('youtubeSearchApp')
     .controller('BulkPlaylistModalCtrl', ["$scope", "$uibModalInstance", "$http", "content", "PlaylistService", function ($scope, $uibModalInstance, $http, content, PlaylistService) {
 
         $scope.init = function(){
-            $scope.selectedVideos = content.list
+            $scope.selectedVideos = content.list;
         };
         $scope.clear = function(){
             $scope.selectedVideos = [];
