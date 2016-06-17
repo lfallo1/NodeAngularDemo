@@ -172,13 +172,23 @@
     </div>
 </div>
 
-<!--ng-if="fetching"-->
-
+<div ng-show="searchResults.length > 0" id="quick-filter" class="row">
+    <div class="col-md-12">
+        <div id="quick-filter-title">
+            <span class="glyphicon glyphicon-filter"></span>Quick filter
+        </div>
+        <input type="text" class="form-control" ng-model="filterText" placeholder="Filter artist and title."/>
+        <div id="negate-filter-wrapper">
+            <input id="negateFilter" name="negateFilter" type="checkbox" ng-model="negateFilter" />
+            <span id="negate-filter-label">Negate</span>
+        </div>
+    </div>
+</div>
 <div id="results" class="row" ng-if="searchResults.length > 0">
     <div class="col-md-8 col-md-offset-2 text-center">
         <table class="table">
             <tbody>
-            <tr ng-repeat="video in filteredResults">
+            <tr ng-repeat="video in filteredResults | quickFilter:filterText:negateFilter">
                 <td>
                     <div ng-if="!video.playing" class="video-image-container">
                         <a ng-href="{{'https://www.youtube.com/watch?v=' + video.videoId}}" target="_blank">
@@ -204,8 +214,8 @@
                         <div class="dislikes"><small>Dislikes</small> {{video.dislikes}}</div>
                         <div class="video-buttons row">
                             <div class="col-md-12">
-                                <div class="download-mp3"><a class="btn btn-default" ng-show="!video.downloadDisabled" target="_self" href="api/youtube/mp3/{{video.videoId}}" download="{{video.videoId + '.mp3'}}" ng-click="disableDownload(video)"><span class="glyphicon glyphicon-headphones"></span>Download mp3</a></div>
-                                <div class="download-mp3"><a class="btn btn-default" ng-show="video.downloadDisabled" disabled><span class="glyphicon glyphicon-headphones"></span>Download mp3</a></div>
+                                <div class="download-mp3"><a class="btn btn-success" ng-show="!video.downloadDisabled" target="_self" href="api/youtube/mp3/{{video.videoId}}" download="{{video.videoId + '.mp3'}}" ng-click="disableDownload(video)"><span class="glyphicon glyphicon-headphones"></span>Download mp3</a></div>
+                                <div class="download-mp3"><a class="btn btn-success" ng-show="video.downloadDisabled" disabled><span class="glyphicon glyphicon-headphones"></span>Download mp3</a></div>
                             </div>
                             <div class="col-md-12">
                                 <div ng-if="AuthService.isLoggedIn()" class="add-playlist-button btn btn-success" ng-click="playlistService.addToPlaylist(video)"><span class="glyphicon glyphicon-plus"></span> Add to Playlist</div>
