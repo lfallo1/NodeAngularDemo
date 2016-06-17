@@ -172,7 +172,7 @@
     </div>
 </div>
 <div ng-show="searchResults.length > 0" id="quick-filter" class="row">
-    <div id="save-selected-items" ng-show="getSelectedVideos().length > 0" class="col-md-12">
+    <div id="save-selected-items" ng-show="getSelectedVideos().length > 0 && AuthService.isLoggedIn()" class="col-md-12">
         <button ng-disabled="savingToPlaylist" class="btn btn-success" ng-click="saveMultipleToPlaylist()"><span class="glyphicon glyphicon-floppy-disk"></span>Save selected items to playlist</button>
     </div>
     <div class="col-md-12">
@@ -202,8 +202,8 @@
                     </div>
                     <div ng-if="!video.playing" class="play-video-button btn btn-default" ng-click="setPlaying(video, true)"><span class="glyphicon glyphicon-play"></span></div>
                     <div ng-if="video.playing" class="hide-video-button btn btn-default" ng-click="setPlaying(video, false)"><span class="glyphicon glyphicon-stop"></span></div>
-                    <button ng-if="!video.isSelected" class="select btn btn-info" ng-click="toggleVideoSelection(video)">Add to playlist queue</button>
-                    <button ng-if="video.isSelected" class="select btn btn-danger" ng-click="toggleVideoSelection(video)">Remove from queue</button>
+                    <button ng-if="!video.isSelected && AuthService.isLoggedIn()" class="select btn btn-info" ng-click="toggleVideoSelection(video)">Add to playlist queue</button>
+                    <button ng-if="video.isSelected && AuthService.isLoggedIn()" class="select btn btn-danger" ng-click="toggleVideoSelection(video)">Remove from queue</button>
                 </td>
                 <td>
                     <div class="video-details-container">

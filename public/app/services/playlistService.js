@@ -112,6 +112,8 @@
 
             choosePlaylist().then(function(selectedPlaylist){
 
+                //call a wrapper that submits items via youtube api to a playlist.
+                //not saving in a promise array, because youtube craps out if you try to submit multiple playlist items without a delay
                 addMultipleToPlaylistWrapper(videos, selectedPlaylist).then(function(){
                     toaster.pop('success', '', 'All selected videos have been added to your playlist!');
                     deferred.resolve();
@@ -129,12 +131,18 @@
 
         var addMultipleToPlaylistWrapper = function(videos, playlist, deferred){
             var deferred = deferred || $q.defer();
+
+            //if no videos, then resolve
               if(videos && videos.length === 0){
                   deferred.resolve();
                   return;
               }
 
+            //save next video to playlist
             saveVideoToPlaylist(videos[0], playlist).then(function(){
+
+                //after item is saved, wait for 1ms (basically add to end of digest loop), then remove first item in list and call wrapper again with trimmed list.
+                //must be done this way for youtube to allow submissions of multiple playlist items. cannot use a simple promise array / $q.all approach
                 $timeout(function(){
                     videos.splice(0,1);
                     addMultipleToPlaylistWrapper(videos, playlist, deferred);
