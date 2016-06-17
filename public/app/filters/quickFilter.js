@@ -13,11 +13,12 @@ angular.module('youtubeSearchApp').filter('quickFilter', function() {
                 out.push(video);
             }
             else{
+                text = text.toLowerCase().trim();
                 if(negate){
-                    !(video.title.indexOf(text) > -1 || video.channelTitle.indexOf(text) > -1) ? out.push(video) : '';
+                    !(video.title.toLowerCase().indexOf(text) > -1 || video.channelTitle.toLowerCase().indexOf(text) > -1) ? out.push(video) : '';
                 }
                 else{
-                    video.title.indexOf(text) > -1 || video.channelTitle.indexOf(text) > -1 ? out.push(video) : '';
+                    video.title.toLowerCase().indexOf(text) > -1 || video.channelTitle.toLowerCase().indexOf(text) > -1 ? out.push(video) : '';
                 }
             }
         };
