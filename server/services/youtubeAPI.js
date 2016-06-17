@@ -30,21 +30,23 @@ module.exports.toMp3 = function(req, res, next){
     var id = req.params.id;
     var ytUrl = 'https://www.youtube.com/watch?v=' + id;
     var stream = youtubedl(ytUrl);
+    var timestamp = '_' + new Date().getTime();
+    console.log(timestamp);
 
     var proc = new ffmpeg({source: stream});
-    proc.setFfmpegPath('/Users/lancefallon/bin/JDownloader 2.0/tools/mac/ffmpeg_10.6+/ffmpeg');
+    proc.setFfmpegPath('../ffmpeg/bin/ffmpeg');
     proc.withAudioCodec('libmp3lame')
         .toFormat('mp3')
-        .output(__dirname + '/' + id + '.mp3')
+        .output(__dirname + '/' + id + timestamp + '.mp3')
         .run();
     proc.on('end', function() {
-        var file = fs.readFileSync(__dirname + '/' + id + '.mp3');
+        var file = fs.readFileSync(__dirname + '/' + id + timestamp + '.mp3');
         res.setHeader('Content-Length', file.length);
         res.setHeader('Content-disposition', 'attachment; filename=' + id + '.mp3');
         res.setHeader('Content-type', 'audio/mpeg');
         res.write(file);
         res.end('', function(){
-            fs.unlinkSync(__dirname + '/' + id + '.mp3');
+            fs.unlinkSync(__dirname + '/' + id + timestamp + '.mp3');
         });
     });
 };
