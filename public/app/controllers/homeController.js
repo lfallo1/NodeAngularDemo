@@ -139,6 +139,11 @@
                 $scope.sortField.value = $scope.sortOptions[0].value;
             };
 
+            $scope.reset = function(){
+                $scope.searchResults = [];
+                $scope.filteredResults = [];
+            };
+
             $scope.setPlaying = function(video, val){
                 video.playing = val;
             };

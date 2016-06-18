@@ -23,6 +23,7 @@
                     Total results: <span id="totalResults">{{searchResults.length}}</span><br />
                     <span class="filtered-results">Filtered results: {{filteredResults.length}}</span>
                 </div>
+                <div id="reset-results" class="btn btn-danger" ng-click="reset()">Reset results</div>
             </div>
         </div>
         <div ng-show="searchMode === POPULAR_SEARCH" id="search-popular-wrapper" class="row">
