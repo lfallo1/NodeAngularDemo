@@ -592,3 +592,23 @@ body{
     margin-top: -10px;
     color: #0D47A1
 }
+
+#selectedChannelsWrapper .button-list-item{
+    text-align: center;
+    padding: 4px 2px;
+    color: #0D47A1;
+    border: 1px solid #0D47A1;
+    border-radius: 5px;
+    margin-bottom: 1px;
+}
+
+#selectedChannelsWrapper .button-list-item .glyphicon{
+    margin-left: 10px;
+    font-size: 12px;
+    margin-left: 15px;
+}
+
+#selectedChannelsWrapper .button-list-item:hover{
+    cursor: pointer;
+    background: rgba(1,87,155,0.2);
+}

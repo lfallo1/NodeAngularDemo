@@ -149,6 +149,7 @@
                 $scope.hashedResults = {};
                 $scope.labels = [];
                 $scope.data = [ [],[] ];
+                $scope.tableData = [];
             };
 
             $scope.setPlaying = function(video, val){
@@ -185,7 +186,8 @@
             var stopSearch = function(msg, toasterType){
                 $scope.fetching = false;
                 toaster.pop(toasterType, '', msg);
-                $scope.prepareChart();
+                //$scope.prepareChart();
+                $scope.prepareTableData();
             };
 
             /**
@@ -225,6 +227,7 @@
                     $scope.searchResults = [];
                     $scope.hashedResults = {};
                     $scope.channelFilter = [];
+                    $scope.tableData = [];
 
                     $scope.wasInterrupted = undefined;
                     $scope.fetching = true;
@@ -279,7 +282,7 @@
                 }, function(err){
 
                     //if the related videos is empty, or search related videos is turned off then finish the search
-                    if($scope.nextRelated.length == 0 || !$scope.extendedSearch){
+                    if($scope.nextRelated.length == 0 || !$scope.extendedSearch || $scope.wasInterrupted){
                         stopSearch('Finished search', 'info');
                         relatedPending = false;
                         return;
@@ -762,51 +765,59 @@
                 }, 0);
             };
 
+            $scope.prepareTableData = function(){
+                $scope.tableData = [];
+                Object.keys($scope.hashedResults).forEach(function(v,i){
+                    var averageRating = 0;
+                    for(var i = 0; i < $scope.hashedResults[v].videos.length; i++){
+                        averageRating += ($scope.hashedResults[v].videos[i].viewCount / $scope.hashedResults[v].views) * $scope.hashedResults[v].videos[i].pctLikes;
+                    }
+                    $scope.hashedResults[v].averageRating = averageRating;
+                    $scope.tableData.push({'title' : v, 'channelSummary' : $scope.hashedResults[v]});
+                });
+            }
+
             $scope.prepareChart = function(){
                 var chartData = [];
-                Object.keys($scope.hashedResults).forEach(function(v,i){
-                    if(chartData.length < 20 && $scope.sum($scope.hashedResults[v].videos, 'pctLikes') > 0){
-                        chartData.push($scope.hashedResults[v]);
-                        chartData = chartData.sort(function(a,b){return a.views < b.views ? 1 : a.views > b.views ? -1 : 0;});
-                        chartData = chartData.sort(function(a,b){return a.count < b.count ? 1 : a.count > b.count ? -1 : 0;});
-                    }
-                    else{
-                        var counter = chartData.length - 1;
-                        var inserted = false;
-                        while(counter >= 0 && !inserted){
-                            if($scope.hashedResults[v].count > chartData[counter].count || ($scope.hashedResults[v].count === chartData[counter].count &&
-                                $scope.hashedResults[v].views > chartData[counter].views)){
-                                chartData.splice(counter,1,$scope.hashedResults[v]);
-                                chartData.splice(chartData.length-1, 1);
-                                chartData = chartData.sort(function(a,b){return a.views < b.views ? 1 : a.views > b.views ? -1 : 0;});
-                                chartData = chartData.sort(function(a,b){return a.count < b.count ? 1 : a.count > b.count ? -1 : 0;});
-                                inserted = true;
-                            }
-                            counter--;
-                        }
-                    }
-                });
-
-                $scope.labels = [];
-                $scope.data = [ [],[] ];
-                $scope.series = ['View Count', 'Rating'];
-                for(var i = 0; i < chartData.length; i++){
-                    $scope.labels.push(chartData[i].videos[0].channelTitle + ' ('+ chartData[i].count +')');
-                    $scope.data[0].push(($scope.sum(chartData[i].videos, 'viewCount') / 100000) / chartData[i].count);
-                    $scope.data[1].push(($scope.sum(chartData[i].videos, 'pctLikes')) / chartData[i].count);
-                }
-
-                $scope.chartOptions = {
-                    'barPercentage' : 0.4
-                };
-
-                $scope.onClick = function (points, evt) {
-                    var channelTitle = points[0].label.substring(0, points[0].label.indexOf('(')).trim().toLowerCase();
-                    if($scope.channelFilter.indexOf(channelTitle) < 0){
-                        $scope.channelFilter.push(channelTitle);
-                        $scope.filterByChannel();
-                    }
-                };
+                //Object.keys($scope.hashedResults).forEach(function(v,i){
+                //    if(chartData.length < 20 && $scope.sum($scope.hashedResults[v].videos, 'pctLikes') > 0){
+                //        chartData.push($scope.hashedResults[v]);
+                //        chartData = chartData.sort(function(a,b){return a.views < b.views ? 1 : a.views > b.views ? -1 : 0;});
+                //        chartData = chartData.sort(function(a,b){return a.count < b.count ? 1 : a.count > b.count ? -1 : 0;});
+                //    }
+                //    else{
+                //        var counter = chartData.length - 1;
+                //        var inserted = false;
+                //        while(counter >= 0 && !inserted){
+                //            if($scope.hashedResults[v].count > chartData[counter].count || ($scope.hashedResults[v].count === chartData[counter].count &&
+                //                $scope.hashedResults[v].views > chartData[counter].views)){
+                //                chartData.splice(counter,1,$scope.hashedResults[v]);
+                //                chartData.splice(chartData.length-1, 1);
+                //                chartData = chartData.sort(function(a,b){return a.views < b.views ? 1 : a.views > b.views ? -1 : 0;});
+                //                chartData = chartData.sort(function(a,b){return a.count < b.count ? 1 : a.count > b.count ? -1 : 0;});
+                //                inserted = true;
+                //            }
+                //            counter--;
+                //        }
+                //    }
+                //});
+                //
+                //$scope.labels = [];
+                //$scope.data = [ [],[] ];
+                //$scope.series = ['View Count', 'Rating'];
+                //for(var i = 0; i < chartData.length; i++){
+                //    $scope.labels.push(chartData[i].videos[0].channelTitle + ' ('+ chartData[i].count +')');
+                //    $scope.data[0].push(($scope.sum(chartData[i].videos, 'viewCount') / 100000) / chartData[i].count);
+                //    $scope.data[1].push(($scope.sum(chartData[i].videos, 'pctLikes')) / chartData[i].count);
+                //}
+                //
+                //$scope.onClick = function (points, evt) {
+                //    var channelTitle = points[0].label.substring(0, points[0].label.indexOf('(')).trim().toLowerCase();
+                //    if($scope.channelFilter.indexOf(channelTitle) < 0){
+                //        $scope.channelFilter.push(channelTitle);
+                //        $scope.filterByChannel();
+                //    }
+                //};
             };
 
             $scope.filterByChannel = function(){
@@ -822,6 +833,11 @@
                       }
                   }
               });
+            };
+
+            $scope.removeChannelFilter = function(idx){
+                $scope.channelFilter.splice(idx, 1);
+                $scope.filterByChannel();
             };
 
             $scope.sort = function(){

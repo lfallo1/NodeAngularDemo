@@ -52,7 +52,7 @@
 
 <!-- PRE-SEARCH FILTERS -->
 <div id="pre-search-wrapper" class="row">
-    <div ng-show="searchMode === TEXT_SEARCH" id="date-range-input-group-wrapper" class="col-md-4 col-md-offset-4">
+    <div ng-show="searchMode === TEXT_SEARCH" id="date-range-input-group-wrapper" class="col-md-4">
         <div id="date-range-header">Pre-Search Filters (Optional)
             <span ng-show="preSearchFiltersVisible" class="toggle-button glyphicon glyphicon-minus" ng-click="setPreSearchFiltersVisible(false)"></span>
             <span ng-show="!preSearchFiltersVisible" class="toggle-button glyphicon glyphicon-plus" ng-click="setPreSearchFiltersVisible(true)"></span>
@@ -120,7 +120,7 @@
 
 <!--SORT / POST-FILTERS -->
 <div class="row">
-    <div id="sort-and-filter" class="col-md-4 col-md-offset-4">
+    <div id="sort-and-filter" class="col-md-4">
         <div id="sort-options-container" class="row">
             <div class="col-md-12 sort-filter-header">
                 <div class="sort-filter-header-content"><span class="glyphicon glyphicon-sort"></span>Sort</div>
@@ -185,7 +185,7 @@
 <!-- (end) SORT / POST-FILTERS  -->
 
 <!-- FUSION CHARTS -->
-<div id="chart-area" class="row">
+<div id="chart-area" class="row" ng-if="data && data[0] && data[0].length > 0">
     <div class="col-md-6 col-md-offset-3 well well-lg">
         <div id="chart-heading">Top Channels in Results</div>
             <canvas id="line" class="chart chart-line" chart-data="data" chart-labels="labels" chart-options="chartOptions"
@@ -193,10 +193,43 @@
     </div>
 </div>
 
+<div id="summary-area" class="row" ng-if="tableData.length > 0">
+    <div class="col-md-6 col-md-offset-3 well well-lg">
+        <div id="summary-heading">Top Channels in Results</div>
+        <table class="table table-responsive table-hover">
+            <thead>
+                <tr>
+                    <th>Channel</th>
+                    <th>Videos in Results</th>
+                    <th>Avg Rating</th>
+                    <th>Avg Views Per Video</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="channel in tableData">
+                    <td>{{channel.title}}</td>
+                    <td>{{channel.channelSummary.count}}</td>
+                    <td>{{channel.channelSummary.averageRating}}</td>
+                    <td>{{channel.channelSummary.views / channel.channelSummary.count}}</td>
+                    <td><button class="btn btn-success btn-md">Add channel to filter</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <!-- (END) FUSION CHARTS -->
 
 <!-- QUICK FILTERS / WATCH LIST / BULK PLAYLIST -->
 <div id="quick-filter" class="row">
+
+    <div id="selectedChannelsWrapper" ng-show="channelFilter.length > 0" class="col-md-12">
+        <div class="button-list-item" ng-repeat="channel in channelFilter" ng-click="removeChannelFilter(idx)">
+            {{channel}}<span class="glyphicon glyphicon-remove"></span>
+        </div>
+    </div>
+
     <!-- WATCH LIST -->
     <div id="watchlist" ng-show="watchlist.length > 0" class="col-md-12">
         <button id="watchlist-header" class="btn btn-default" ng-click="openListManagerModal(watchlist, WATCHLIST_MODAL_CTRL, 'watchlistModal.html')">
