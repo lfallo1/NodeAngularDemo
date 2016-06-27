@@ -100,7 +100,7 @@ body{
     color: white;
 }
 
-.table, .panel, .thumbnail{
+.table, .thumbnail{
     border: none !important;
 }
 
@@ -147,12 +147,6 @@ body{
     margin-top: 35px;
     margin-bottom: -50px;
     color: #01579B ;
-}
-
-.panel-heading{
-    color: #00695C !important;
-    background: none !important;
-    border: none !important;
 }
 
 .isActive{
@@ -589,4 +583,12 @@ body{
 #reset-results{
     margin-top: 60px;
     font-size: 20px;
+}
+
+#chart-heading{
+    font-size: 28px;
+    text-align: center;
+    font-weight: bold;
+    margin-top: -10px;
+    color: #0D47A1
 }
