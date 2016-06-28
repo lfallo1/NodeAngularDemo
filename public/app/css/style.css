@@ -543,8 +543,7 @@ body{
 
 #results .add-to-multivid-playlist{
     margin-top: 5px;
-    font-weight: bold;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 #results .add-to-multivid-playlist:hover{
@@ -566,7 +565,7 @@ body{
 
 #bulkplaylist-modal-head, #watchlist-modal-head{
     text-align: center;
-    font-size: 32px;
+    font-size: 24px;
     font-weight: bolder;
     color: white;
     background: #01579B;
@@ -582,7 +581,7 @@ body{
 }
 
 #bulkplaylist-modal-body table td, #watchlist-modal-body table td{
-    font-size: 24px;
+    font-size: 16px;
     font-weight: bold;
 }
 
