@@ -207,9 +207,24 @@
 
     <!-- SEARCH RESULTS -->
     <div id="results" class="col-md-7 text-center" ng-if="searchResults.length > 0">
+        <ul class="pagination">
+            <li>
+                <a href="" aria-label="Previous" ng-click="previousPage()">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li ng-class="pagination.currentPage === page ? 'active' : ''" ng-repeat="i in getPages() track by $index">
+                <a href="" ng-click="gotoPage($index+1)">{{$index+1}}</a>
+            </li>
+            <li>
+                <a href="" aria-label="Next" ng-click="nextPage()">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
         <table class="table">
             <tbody>
-            <tr ng-repeat="video in filteredResults | quickFilter:filterText:negateFilter">
+            <tr ng-repeat="video in displayList">
                 <td>
                     <div ng-if="!video.playing" class="video-image-container">
                         <a ng-href="{{'https://www.youtube.com/watch?v=' + video.videoId}}" target="_blank">
@@ -288,7 +303,7 @@
         <div id="quick-filter-title">
             <span class="glyphicon glyphicon-filter"></span>Quick filter
         </div>
-        <input type="text" class="form-control" ng-model="filterText" placeholder="Filter artist and title."/>
+        <input type="text" ng-blur="quickFilter()" class="form-control" ng-model="filterText" placeholder="Filter artist and title."/>
         <div id="negate-filter-wrapper">
             <input id="negateFilter" name="negateFilter" type="checkbox" ng-model="negateFilter" />
             <span id="negate-filter-label">Negate</span>

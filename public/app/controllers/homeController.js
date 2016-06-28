@@ -17,6 +17,48 @@
                 'BIANNUAL' : 0.5
             };
 
+            var resetPagination = function(){
+                $scope.pagination = {
+                    currentPage : 1,
+                    resultsPerPage : 100
+                };
+            };
+
+            $scope.getPages = function(){
+              return new Array(Math.ceil($scope.filteredResults.length / $scope.pagination.resultsPerPage));
+            };
+
+            $scope.paginate = function(){
+                var startIndex = ($scope.pagination.currentPage-1) * $scope.pagination.resultsPerPage;
+                var endIndex = Math.min(startIndex + $scope.pagination.resultsPerPage, $scope.filteredResults.length);
+                $scope.displayList = $scope.filteredResults.filter(function(d,i){
+                   if(i >= startIndex && i < endIndex){
+                       return d;
+                   }
+                });
+            };
+
+            $scope.gotoPage = function(page){
+                if(page * $scope.pagination.resultsPerPage > $scope.filteredResults){
+                  $scope.pagination.currentPage = Math.ceil($scope.filteredResults / resultsPerPage);
+                }
+                else if(page < 1){
+                    page = 1;
+                }
+                else{
+                    $scope.pagination.currentPage = page;
+                }
+                $scope.paginate();
+            };
+
+            $scope.nextPage = function(){
+                $scope.gotoPage($scope.pagination.currentPage++)
+            };
+
+            $scope.previousPage = function(){
+                $scope.gotoPage($scope.pagination.currentPage--);
+            };
+
             /**
              * set playlistService scope variable so the view can access service methods directly instead of creating redundant
              * intermediary methods
@@ -106,6 +148,8 @@
              * setup view
              */
             var init = function(){
+                resetPagination();
+
                 $scope.selectedIntervalType = $scope.dateIntervalTypes.BIENNIAL;
                 $scope.intervalSearch = false;
                 $scope.extendedSearch = false;
@@ -153,6 +197,11 @@
                 $scope.filteredResults = [];
                 $scope.hashedResults = {};
                 $scope.channelFilter = [];
+                $scope.pagination = {
+                    currentPage : 1,
+                    resultsPerPage : 50,
+                    totalPages : 0
+                };
             };
 
             $scope.setPlaying = function(video, val){
@@ -217,6 +266,8 @@
                 //if a search term exists
                 $scope.searchParam = $scope.searchParam.trim();
                 if($scope.searchParam){
+
+                    resetPagination();
 
                     iteration = 0;
                     $scope.related = undefined;
@@ -806,6 +857,29 @@
                 });
             };
 
+            $scope.quickFilter = function(){
+                $scope.filteredResults = $scope.filteredResults.filter(function(d){
+                    if(!$scope.filterText || $scope.filterText.trim().length === 0){
+                        return d;
+                    }
+                    else{
+                        $scope.filterText = $scope.filterText.toLowerCase().trim();
+                        if($scope.negateFilter){
+                            if(!(video.title.toLowerCase().indexOf($scope.filterText) > -1 || video.channelTitle.toLowerCase().indexOf($scope.filterText) > -1)){
+                                return d;
+                            }
+                        }
+                        else{
+                            if(video.title.toLowerCase().indexOf($scope.filterText) > -1 || video.channelTitle.toLowerCase().indexOf($scope.filterText) > -1){
+                                return d;
+                            }
+                        }
+                    }
+                });
+
+                $scope.paginate();
+            };
+
             $scope.filterByChannel = function(){
                 $scope.isChannelFilterEnabled = true;
                 $scope.filteredResults = $scope.searchResults.filter(function(d){
@@ -819,6 +893,7 @@
                       }
                   }
               });
+                $scope.paginate();
             };
 
             $scope.removeChannelFilter = function(idx){
@@ -842,17 +917,19 @@
             $scope.filter = function(){
                 if(!$scope.minViews && (!$scope.minDislikes && $scope.minDislikes !== 0) && !$scope.minDate && !$scope.shorterThanFilter && !$scope.longerThanFilter && !$scope.minRating){
                     $scope.filteredResults = $scope.searchResults;
-                    return;
                 }
-                $scope.filteredResults = $scope.searchResults.filter(function(d){
-                    if(((!$scope.minDislikes && $scope.minDislikes !== 0) || d.dislikes <= $scope.minDislikes) &&
-                        (!$scope.minViews || d.viewCount >= $scope.minViews) &&
-                        (!$scope.minRating || d.pctLikes >= $scope.minRating) &&
-                        (!$scope.maxDate || d.created >= $scope.maxDate) &&
-                        (!$scope.minDate || d.created >= $scope.minDate) && durationFilter(d)){
-                        return d;
-                    }
-                });
+                else{
+                    $scope.filteredResults = $scope.searchResults.filter(function(d){
+                        if(((!$scope.minDislikes && $scope.minDislikes !== 0) || d.dislikes <= $scope.minDislikes) &&
+                            (!$scope.minViews || d.viewCount >= $scope.minViews) &&
+                            (!$scope.minRating || d.pctLikes >= $scope.minRating) &&
+                            (!$scope.maxDate || d.created >= $scope.maxDate) &&
+                            (!$scope.minDate || d.created >= $scope.minDate) && durationFilter(d)){
+                            return d;
+                        }
+                    });
+                }
+                $scope.paginate();
             };
 
             var durationFilter = function(video){
