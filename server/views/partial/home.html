@@ -107,12 +107,16 @@
                             <label class="safe-search-mode-button btn btn-default" ng-model="safeSearch" uib-btn-radio="'strict'">Strict</label>
                         </div>
                     </div>
-                    <div id="extended-search-wrapper">
-                        <div class="alert alert-warning">
+                    <div id="search-optimizer-wrappers">
+                        <div id="extended-search-wrapper">
                             <button type="button" class="btn btn-warning" ng-model="extendedSearch" uib-btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
                                 <span class="glyphicon glyphicon-forward"></span>Extended Search
                             </button>
-                            <div id="extended-search-message" class="text-warning"><span class="glyphicon glyphicon-warning-sign"></span>Performs search on related videos after initial search.  Additional results will not maintain other pre-search filters</div>
+                        </div>
+                        <div id="interval-search-wrapper">
+                            <button type="button" class="btn btn-info" ng-model="intervalSearch" uib-btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
+                                <span class="glyphicon glyphicon-calendar"></span>Interval Search
+                            </button>
                         </div>
                     </div>
                 </form>

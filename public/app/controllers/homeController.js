@@ -11,6 +11,12 @@
             var popularByCountryBase = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&maxResults=50&chart=mostPopular&regionCode=';
             var youtubeVideoCategoriesBase = 'https://www.googleapis.com/youtube/v3/videoCategories?part=snippet&regionCode=';
 
+            $scope.dateIntervalTypes = {
+                'BIENNIAL' : 2,
+                'ANNUAL' : 1,
+                'BIANNUAL' : 0.5
+            };
+
             /**
              * set playlistService scope variable so the view can access service methods directly instead of creating redundant
              * intermediary methods
@@ -100,7 +106,10 @@
              * setup view
              */
             var init = function(){
+                $scope.selectedIntervalType = $scope.dateIntervalTypes.BIENNIAL;
+                $scope.intervalSearch = false;
                 $scope.extendedSearch = false;
+
                 $scope.videoDuration = $scope.videoDurationOptions[0];
                 $scope.safeSearch = $scope.safeSearchOptions[0];
                 $scope.preSearchFiltersVisible = $scope.sortVisible = $scope.filterVisible = true;
@@ -309,13 +318,33 @@
 
                 related = $scope.checkRelated && $scope.related ? '&relatedToVideoId=' + $scope.related : '';
 
-                //for each sort order type, execute the GET request.  doing this so that more results are returned.
-                for (var i = 0; i < sortOrders.length; i++) {
-                    var token = sortOrders[i].token ? '&pageToken=' + sortOrders[i].token : '';
+                //check if date interval searching is turned on
+                if($scope.intervalSearch && !related){
 
-                    promises.push($http.post('api/youtube/get', {'url' : youtubeSearchBase + $scope.searchParam + "&type=video&maxResults=50" +
-                    dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + safeSearch +
-                    "&order=" + sortOrders[i].order + related  + token}));
+                    for(var j = 0; j < 10 / $scope.selectedIntervalType; j++){
+                        var date = new Date();
+                        var large = new Date(date.getFullYear()-j*$scope.selectedIntervalType, date.getMonth(), date.getDate());
+                        var small = new Date(large.getFullYear() - $scope.selectedIntervalType, date.getMonth(), date.getDate());
+                        dateSmall = "&publishedAfter=" + small.toISOString();
+                        dateLarge = "&publishedBefore=" + large.toISOString();
+                        for (var i = 0; i < sortOrders.length; i++) {
+                            var token = sortOrders[i].token ? '&pageToken=' + sortOrders[i].token : '';
+
+                            promises.push($http.post('api/youtube/get', {'url' : youtubeSearchBase + $scope.searchParam + "&type=video&maxResults=50" +
+                            dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + safeSearch +
+                            "&order=" + sortOrders[i].order + related  + token}));
+                        }
+                    }
+                }
+                else{
+                    //for each sort order type, execute the GET request.  doing this so that more results are returned.
+                    for (var i = 0; i < sortOrders.length; i++) {
+                        var token = sortOrders[i].token ? '&pageToken=' + sortOrders[i].token : '';
+
+                        promises.push($http.post('api/youtube/get', {'url' : youtubeSearchBase + $scope.searchParam + "&type=video&maxResults=50" +
+                        dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + safeSearch +
+                        "&order=" + sortOrders[i].order + related  + token}));
+                    }
                 }
 
                 //wait for all requests to complete

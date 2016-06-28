@@ -435,10 +435,6 @@ body{
     display: inline-block;
 }
 
-#extended-search-wrapper .btn{
-    margin-right: 7px;
-}
-
 #category-wrapper-title{
     margin-bottom: -10px;
 }
@@ -665,4 +661,12 @@ div.report-modal .modal-content {
 #summary-area .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus{
     background-color: rgb(1,87,155);
     color: white;
+}
+
+#search-optimizer-wrappers{
+    text-align: center;
+}
+
+#interval-search-wrapper{
+    margin-top: 5px;
 }
