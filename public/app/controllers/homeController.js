@@ -300,6 +300,8 @@
 
             /**
              * fetches the actual results
+             * performs in a recursive manner, until the next page tokens crap out.  at that point, the promise rejects
+             *
              * @param dateSmall (can be an empty string)
              * @param dateLarge (can be an empty string)
              * @param promise (optional)
@@ -323,8 +325,9 @@
 
                     for(var j = 0; j < 10 / $scope.selectedIntervalType; j++){
                         var date = new Date();
-                        var large = new Date(date.getFullYear()-j*$scope.selectedIntervalType, date.getMonth(), date.getDate());
-                        var small = new Date(large.getFullYear() - $scope.selectedIntervalType, date.getMonth(), date.getDate());
+                        var large = new Date(date.getTime()-j*$scope.selectedIntervalType*1000*60*60*24*365);
+                        var small = new Date(large.getTime() - 1000*60*60*24*365*$scope.selectedIntervalType);
+
                         dateSmall = "&publishedAfter=" + small.toISOString();
                         dateLarge = "&publishedBefore=" + large.toISOString();
                         for (var i = 0; i < sortOrders.length; i++) {
@@ -886,6 +889,10 @@
 
             $scope.disableDownload = function(video){
               video.downloadDisabled = true;
+            };
+
+            $scope.setSelectedIntervalType = function(value){
+                $scope.selectedIntervalType = value;
             };
 
             init();

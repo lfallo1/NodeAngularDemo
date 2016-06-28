@@ -670,3 +670,30 @@ div.report-modal .modal-content {
 #interval-search-wrapper{
     margin-top: 5px;
 }
+
+.popover-content{
+    color: black;
+}
+
+#extended-search-wrapper .popover-title{
+    color: #f0ad4e;
+}
+
+.question-mark{
+    color: #FBC02D;
+    font-size: 16px;
+    margin-left: 4px;
+}
+
+#extended-search-wrapper button{
+    margin-left: 24px;
+}
+
+#extended-search-wrapper button {
+    width: 35%;
+}
+
+.question-mark:hover{
+    cursor: pointer;
+    opacity: 0.7;
+}
