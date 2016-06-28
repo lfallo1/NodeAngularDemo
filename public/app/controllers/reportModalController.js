@@ -103,7 +103,7 @@
         };
 
         $scope.inChannelFilter = function(channelTitle){
-            return $scope.channelFilter.indexOf(channelTitle) > -1;
+            return $scope.channelFilter.indexOf(channelTitle.toLowerCase()) > -1;
         }
 
         $scope.addChannelFilter = function(channelTitle){
