@@ -2,9 +2,14 @@
     angular.module('youtubeSearchApp').controller('ReportModalCtrl', ['$scope', '$timeout', '$q', 'content', '$uibModalInstance', function($scope, $timeout, $q, content, $uibModalInstance){
 
         var init = function(){
+            $scope.limit = '';
             $scope.hashedResults = content.hashedResults;
             $scope.channelFilter = content.channelFilter;
-            $scope.prepareTableData();
+            $scope.loadingTable = true;
+            $timeout(function(){
+                $scope.prepareTableData();
+                $scope.loadingTable = false;
+            },0);
             $scope.prepareChart().then(function(){
                 console.log('prepare chart finished');
             });
@@ -44,6 +49,9 @@
             $scope.tableData = $scope.tableData.sort(function(a,b){
                 return a.channelSummary['count'] < b.channelSummary['count'] ? 1 : a.channelSummary['count'] > b.channelSummary['count'] ? -1 : 0;
             });
+
+            $scope.limit = Math.min($scope.tableData.length, 200);
+            $scope.tableData = $scope.tableData.splice(0,$scope.limit);
         };
 
         $scope.sortTable = function(key){

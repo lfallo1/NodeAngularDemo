@@ -17,6 +17,10 @@
             </div>
         </form>
 
+        <div id="progress-bar-container" ng-show="fetching">
+            <uib-progressbar class="progress-striped active" max="100" value="100" type="primary"><i>Fetching results...</i></uib-progressbar>
+        </div>
+
         <div id="results-label-container" class="row" ng-if="searchResults.length > 0">
             <div class="form-group col-md-12 text-center">
                 <div id="search-results-header">
@@ -208,16 +212,16 @@
     <!-- SEARCH RESULTS -->
     <div id="results" class="col-md-7 text-center" ng-if="searchResults.length > 0">
         <ul class="pagination">
-            <li>
-                <a href="" aria-label="Previous" ng-click="previousPage()">
+            <li ng-click="previousPage()">
+                <a href="" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
-            <li ng-class="pagination.currentPage === page ? 'active' : ''" ng-repeat="i in getPages() track by $index">
+            <li ng-class="pagination.currentPage === ($index + 1) ? 'active' : ''" ng-repeat="i in getPages() track by $index">
                 <a href="" ng-click="gotoPage($index+1)">{{$index+1}}</a>
             </li>
-            <li>
-                <a href="" aria-label="Next" ng-click="nextPage()">
+            <li ng-click="nextPage()">
+                <a href="" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>

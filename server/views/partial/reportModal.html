@@ -1,8 +1,11 @@
 <div id="report-modal-head" class="modal-header">
-    <div><span class="glyphicon glyphicon-list-alt"></span> Search Results Summary</div>
+    <div><span class="glyphicon glyphicon-list-alt"></span> Top {{limit}} Channels in Results</div>
 </div>
 <div id="report-modal-body" class="modal-body">
-    <div id="summary-area" class="row">
+    <div ng-show="loadingTable">
+        <div class="alert alert-info text-center"><h3>Loading table, please wait...</h3></div>
+    </div>
+    <div ng-show="!loadingTable" id="summary-area" class="row">
         <div class="col-xs-12">
 
             <table class="table table-responsive table-hover">

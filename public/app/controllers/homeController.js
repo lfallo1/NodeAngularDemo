@@ -39,11 +39,11 @@
             };
 
             $scope.gotoPage = function(page){
-                if(page * $scope.pagination.resultsPerPage > $scope.filteredResults){
-                  $scope.pagination.currentPage = Math.ceil($scope.filteredResults / resultsPerPage);
+                if((page-1) * $scope.pagination.resultsPerPage > $scope.filteredResults.length){
+                  $scope.pagination.currentPage = Math.ceil($scope.filteredResults.length / $scope.pagination.resultsPerPage);
                 }
                 else if(page < 1){
-                    page = 1;
+                    $scope.pagination.currentPage = 1;
                 }
                 else{
                     $scope.pagination.currentPage = page;
@@ -52,11 +52,13 @@
             };
 
             $scope.nextPage = function(){
-                $scope.gotoPage($scope.pagination.currentPage++)
+                $scope.pagination.currentPage += 1;
+                $scope.gotoPage($scope.pagination.currentPage);
             };
 
             $scope.previousPage = function(){
-                $scope.gotoPage($scope.pagination.currentPage--);
+                $scope.pagination.currentPage -= 1;
+                $scope.gotoPage($scope.pagination.currentPage);
             };
 
             /**
