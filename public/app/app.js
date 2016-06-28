@@ -11,7 +11,7 @@ angular.module('youtubeSearchApp', ['ui.router','ngRoute', 'ngAnimate', 'toaster
         ChartJsProvider.setOptions({
             colours: ['#0D47A1', '#00ADF9'],
             text : 'Video Summary',
-            responsive: true
+            responsive: false
         });
 
         $routeProvider.

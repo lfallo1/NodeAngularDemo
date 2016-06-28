@@ -1,0 +1,75 @@
+<div id="report-modal-head" class="modal-header">
+    <div><span class="glyphicon glyphicon-list-alt"></span> Search Results Summary</div>
+</div>
+<div id="report-modal-body" class="modal-body">
+    <div id="summary-area" class="row">
+        <div class="col-xs-12">
+
+            <table class="table table-responsive table-hover">
+                <thead>
+                <tr>
+                    <th>Channel</th>
+                    <th>Videos in Results</th>
+                    <th>Avg Rating</th>
+                    <th>Avg Views Per Video</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="channel in tableData">
+                    <td>{{channel.title}}</td>
+                    <td>{{channel.channelSummary.count | number:0}}</td>
+                    <td>{{channel.channelSummary.averageRating | number:2}}</td>
+                    <td>{{(channel.channelSummary.views / channel.channelSummary.count) | number:0}}</td>
+                    <td>
+                        <button ng-show="!inChannelFilter(channel.title)" class="btn btn-success btn-md" ng-click="addChannelFilter(channel.title)"><span class="glyphicon glyphicon-plus"></span> Channel Filter</button>
+                        <button ng-show="inChannelFilter(channel.title)" class="btn btn-danger btn-md" ng-click="removeChannelFilter(channel.title)"><span class="glyphicon glyphicon-minus"></span> Channel Filter</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+
+            <!--<uib-tabset active="active">-->
+                <!--<uib-tab id="table-channel-data" index="0" heading="Table Summary">-->
+                    <!--<table class="table table-responsive table-hover">-->
+                        <!--<thead>-->
+                        <!--<tr>-->
+                            <!--<th>Channel</th>-->
+                            <!--<th>Videos in Results</th>-->
+                            <!--<th>Avg Rating</th>-->
+                            <!--<th>Avg Views Per Video</th>-->
+                            <!--<th></th>-->
+                        <!--</tr>-->
+                        <!--</thead>-->
+                        <!--<tbody>-->
+                        <!--<tr ng-repeat="channel in tableData">-->
+                            <!--<td>{{channel.title}}</td>-->
+                            <!--<td>{{channel.channelSummary.count | number:0}}</td>-->
+                            <!--<td>{{channel.channelSummary.averageRating | number:2}}</td>-->
+                            <!--<td>{{(channel.channelSummary.views / channel.channelSummary.count) | number:0}}</td>-->
+                            <!--<td>-->
+                                <!--<button ng-show="!inChannelFilter(channel.title)" class="btn btn-success btn-md" ng-click="addChannelFilter(channel.title)"><span class="glyphicon glyphicon-plus"></span> Channel Filter</button>-->
+                                <!--<button ng-show="inChannelFilter(channel.title)" class="btn btn-danger btn-md" ng-click="removeChannelFilter(channel.title)"><span class="glyphicon glyphicon-minus"></span> Channel Filter</button>-->
+                            <!--</td>-->
+                        <!--</tr>-->
+                        <!--</tbody>-->
+                    <!--</table>-->
+                <!--</uib-tab>-->
+                <!--<uib-tab title="Coming Soon" disabled index="1" heading="Chart Summary">-->
+                    <!--&lt;!&ndash;<div id="chart-area" class="row" ng-if="data && data[0] && data[0].length > 0">&ndash;&gt;-->
+                        <!--&lt;!&ndash;<div class="col-md-6 col-md-offset-3 well well-lg">&ndash;&gt;-->
+                            <!--&lt;!&ndash;<div id="chart-heading">Top Channels in Results</div>&ndash;&gt;-->
+                            <!--&lt;!&ndash;<canvas id="line" height="650" width="650" class="chart chart-line"&ndash;&gt;-->
+                                    <!--&lt;!&ndash;chart-data="data" chart-labels="labels" chart-options="chartOptions"&ndash;&gt;-->
+                                    <!--&lt;!&ndash;chart-legend="true" chart-series="series" chart-click="onClick"></canvas>&ndash;&gt;-->
+                        <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                    <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                <!--</uib-tab>-->
+            <!--</uib-tabset>-->
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-danger" ng-click="close()">Close</button>
+</div>
