@@ -329,37 +329,7 @@
                 var dateSmall = $scope.preSearchMinDate ? "&publishedAfter=" + $scope.preSearchMinDate.toISOString() : '';
 
                 //fetch results, passing the date range (the date ranges can be empty)
-                fetchResults(dateSmall, dateLarge).then(function(){
-
-                    //if the related videos is empty, or search related videos is turned off then finish the search
-                    if($scope.nextRelated.length == 0 || !$scope.extendedSearch){
-                        relatedPending = false;
-                        stopSearch('Finished search', 'info');
-                        return;
-                    }
-                    iteration++;
-                    resetSortOrders();
-                    relatedPending = false;
-                    $scope.related = $scope.nextRelated[0];
-                    $scope.nextRelated.splice(0,1);
-                    $scope.checkRelated = true;
-                    fetchResultsWrapper(0,false);
-                }, function(err){
-
-                    //if the related videos is empty, or search related videos is turned off then finish the search
-                    if($scope.nextRelated.length == 0 || !$scope.extendedSearch || $scope.wasInterrupted){
-                        stopSearch('Finished search', 'info');
-                        relatedPending = false;
-                        return;
-                    }
-                    iteration++;
-                    resetSortOrders();
-                    relatedPending = false;
-                    $scope.related = $scope.nextRelated[0];
-                    $scope.nextRelated.splice(0,1);
-                    $scope.checkRelated = true;
-                    fetchResultsWrapper(0,false);
-                });
+                fetchResults(dateSmall, dateLarge).then(handleFetchIterationComplete, handleFetchIterationComplete);
             };
 
             /**
@@ -425,52 +395,10 @@
                     }
 
                     //otherwise there are items
-                    var nonDuplicates = [];
-                    for (var i = 0; i < res.length; i++) {
+                    var nonDuplicates = getNonDuplicates(res);
 
-                        //set next page tokens
-                        for (var j = 0; j < sortOrders.length; j++) {
-                            sortOrders[j].token = res[0].data.nextPageToken;
-                        }
-
-                        //get all items from response
-                        var items = res[i].data.items;
-
-                        //loop through all items in response
-                        for (var j = 0; j < items.length; j++) {
-
-                            //check if already exists in main array or temp nonDuplicates array
-                            if ($scope.searchResults.filter(function (d) {
-                                    if (d.videoId == items[j].id.videoId) {
-                                        return d;
-                                    }
-                                }).length === 0 && nonDuplicates.filter(function (d) {
-                                    if (d.id.videoId === items[j].id.videoId) {
-                                        return d;
-                                    }
-                                }).length === 0) {
-                                nonDuplicates.push(items[j]);
-                            }
-                        }
-                    }
-
-                    //query the statistics for each video
-                    var promises = [];
-                    for (var i = 0; i < nonDuplicates.length; i++) {
-
-                        //create list of video id's (max list size of 50).
-                        var count = 0;
-                        var idList = [];
-                        while (count < 50 && i < nonDuplicates.length) {
-                            idList.push(nonDuplicates[i].id.videoId);
-                            i++;
-                            count++;
-                        }
-
-                        //create a promise with list of video id's for the batch request
-                        var payload = {'url' : youtubeVideoBase + idList.toString()};
-                        promises.push($http.post('api/youtube/get', payload));
-                    }
+                    //send requests / store promises
+                    var promises = createBatchVideoRequest(nonDuplicates);
 
                     if(promises.length === 0){
                         deferred.resolve();
@@ -487,49 +415,7 @@
 
                         //populated related video id's (for now, only populating during first pass)
                         if(relatedPending && $scope.nextRelated.length === 0){
-
-                            //split search term(s) into array
-                            var parts = $scope.searchParam.toLowerCase().split(' ' );
-
-                            //loop over each returned video
-                            for(var count = data.length - 1; count >= 0; count--){
-
-                                //if the video has tags
-                                if(data[count].snippet.tags){
-
-                                    //get the tags
-                                    var terms = data[count].snippet.tags.toString().toLowerCase();
-
-                                    var isRelevant = true;
-
-                                    //check if tags match what we searched for
-                                    for(var i = 0; i < parts.length; i++){
-
-                                        //if for any term in our search, it does NOT exist in the videos's tags, then we consider it not a relevant match
-                                        if(terms.toLowerCase().indexOf(parts[i]) < 0){
-                                            isRelevant = false;
-                                            break;
-                                        }
-                                    }
-
-                                    if(!isRelevant){
-                                        terms = data[count].snippet.title.toString().toLowerCase();
-                                        for(var i = 0; i < parts.length; i++){
-
-                                            //if for any term in our search, it does NOT exist in the videos's tags, then we consider it not a relevant match
-                                            if(terms.toLowerCase().indexOf(parts[i]) < 0){
-                                                isRelevant = false;
-                                                break;
-                                            }
-                                        }
-                                    }
-
-                                    //if relevant (terms are similar), then add to related list
-                                    if(isRelevant){
-                                        $scope.nextRelated.push(data[count].id);
-                                    }
-                                }
-                            }
+                            getRelatedVideos(data);
                         }
 
                         addVideosToList(data);
@@ -550,6 +436,12 @@
                 return deferred.promise;
             };
 
+            /**
+             * upddate categories.
+             * different countries have different categories.  when a new country is selected, this method gets
+             * called to refresh the categories list
+             * @returns {*}
+             */
             $scope.updateCategories = function(){
                 var deferred = $q.defer();
                 var payload = {url : youtubeVideoCategoriesBase + $scope.selectedCountry['alpha-2']};
@@ -566,6 +458,9 @@
                 return deferred.promise;
             };
 
+            /**
+             * Perform search in popular videos mode
+             */
             $scope.searchPopular = function(){
                 $scope.searchResults = [];
                 $scope.wasInterrupted = undefined;
@@ -624,48 +519,10 @@
                     var nextPageToken = res[0].data.nextPageToken;
 
                     //otherwise there are items
-                    var nonDuplicates = [];
-                    for (var i = 0; i < res.length; i++) {
-
-                        //get all items from response
-                        var items = res[i].data.items;
-
-                        //loop through all items in response
-                        for (var j = 0; j < items.length; j++) {
-
-                            //check if already exists in main array or temp nonDuplicates array
-                            if ($scope.searchResults.filter(function (d) {
-                                    if (d.videoId == items[j].id) {
-                                        return d;
-                                    }
-                                }).length === 0 && nonDuplicates.filter(function (d) {
-                                    if (d.id === items[j].id) {
-                                        return d;
-                                    }
-                                }).length === 0) {
-                                nonDuplicates.push(items[j]);
-                            }
-                        }
-                    }
+                    var nonDuplicates = getNonDuplicates(res);
 
                     //query the statistics for each video
-                    var promises = [];
-                    for (var i = 0; i < nonDuplicates.length; i++) {
-
-                        //create list of video id's (max list size of 50).
-                        var count = 0;
-                        var idList = [];
-                        while (count < 50 && i < nonDuplicates.length) {
-                            idList.push(nonDuplicates[i].id);
-                            i++;
-                            count++;
-                        }
-
-                        //create a promise with list of video id's for the batch request
-
-                        var payload = {'url' : youtubeVideoBase + idList.toString()};
-                        promises.push($http.post('api/youtube/get', payload));
-                    }
+                    var promises = createBatchVideoRequest(nonDuplicates);
 
                     if(promises.length === 0){
                         stopSearch('Finished search', 'info');
@@ -712,44 +569,10 @@
 
                     if(res.data.items.length > 0){
 
-                        var nonDuplicates = [];
-                        //get all items from response
-                        var items = res.data.items;
-
-                        //loop through all items in response
-                        for (var j = 0; j < items.length; j++) {
-
-                            //check if already exists in main array or temp nonDuplicates array
-                            if ($scope.searchResults.filter(function (d) {
-                                    if (d.videoId == items[j].id) {
-                                        return d;
-                                    }
-                                }).length === 0 && nonDuplicates.filter(function (d) {
-                                    if (d.id === items[j].id) {
-                                        return d;
-                                    }
-                                }).length === 0) {
-                                nonDuplicates.push(items[j]);
-                            }
-                        }
+                        var nonDuplicates = getNonDuplicates(res);
 
                         //query the statistics for each video
-                        var promises = [];
-                        for (var i = 0; i < nonDuplicates.length; i++) {
-
-                            //create list of video id's (max list size of 50).
-                            var count = 0;
-                            var idList = [];
-                            while (count < 50 && i < nonDuplicates.length) {
-                                idList.push(nonDuplicates[i].id);
-                                i++;
-                                count++;
-                            }
-
-                            //create a promise with list of video id's for the batch request
-                            var payload = {'url' : youtubeVideoBase + idList.toString()};
-                            promises.push($http.post('api/youtube/get', payload));
-                        }
+                        var promises = createBatchVideoRequest(nonDuplicates);
 
                         if(promises.length === 0){
                             stopSearch('Finished search', 'info');
@@ -779,6 +602,10 @@
                 });
             };
 
+            /**
+             * given data object in form of youtube api response, add videos to list
+             * @param data
+             */
             var addVideosToList = function(data){
                 //for each video, add to the list
                 for (var i = 0; i < data.length; i++) {
@@ -840,6 +667,133 @@
                 }
             };
 
+            /**
+             * Given a youtube api data response, check each video to see if it is related to the original search
+             * @param data
+             */
+            var getRelatedVideos = function(data){
+                //split search term(s) into array
+                var parts = $scope.searchParam.toLowerCase().split(' ' );
+
+                //loop over each returned video
+                for(var count = data.length - 1; count >= 0; count--){
+
+                    //if the video has tags
+                    if(data[count].snippet.tags){
+
+                        //get the tags
+                        var terms = data[count].snippet.tags.toString().toLowerCase();
+
+                        var isRelevant = true;
+
+                        //check if tags match what we searched for
+                        for(var i = 0; i < parts.length; i++){
+
+                            //if for any term in our search, it does NOT exist in the videos's tags, then we consider it not a relevant match
+                            if(terms.toLowerCase().indexOf(parts[i]) < 0){
+                                isRelevant = false;
+                                break;
+                            }
+                        }
+
+                        if(!isRelevant){
+                            terms = data[count].snippet.title.toString().toLowerCase();
+                            for(var i = 0; i < parts.length; i++){
+
+                                //if for any term in our search, it does NOT exist in the videos's tags, then we consider it not a relevant match
+                                if(terms.toLowerCase().indexOf(parts[i]) < 0){
+                                    isRelevant = false;
+                                    break;
+                                }
+                            }
+                        }
+
+                        //if relevant (terms are similar), then add to related list
+                        if(isRelevant){
+                            $scope.nextRelated.push(data[count].id);
+                        }
+                    }
+                }
+            };
+
+            /**
+             * return list of videos that do not already exist in searchResult array
+             * @param res
+             * @returns {Array}
+             */
+            var getNonDuplicates = function(res){
+                var nonDuplicates = [];
+                for (var i = 0; i < res.length; i++) {
+
+                    //set next page tokens
+                    for (var j = 0; j < sortOrders.length; j++) {
+                        sortOrders[j].token = res[0].data.nextPageToken;
+                    }
+
+                    //get all items from response
+                    var items = res[i].data.items;
+
+                    //loop through all items in response
+                    for (var j = 0; j < items.length; j++) {
+
+                        //check if already exists in main array or temp nonDuplicates array
+                        if ($scope.searchResults.filter(function (d) {
+                                if (d.videoId == items[j].id.videoId) {
+                                    return d;
+                                }
+                            }).length === 0 && nonDuplicates.filter(function (d) {
+                                if (d.id.videoId === items[j].id.videoId) {
+                                    return d;
+                                }
+                            }).length === 0) {
+                            nonDuplicates.push(items[j]);
+                        }
+                    }
+                }
+                return nonDuplicates;
+            };
+
+            /**
+             * send batch requests (50 per)
+             * @param nonDuplicates
+             * @returns {Array} of promises
+             */
+            var createBatchVideoRequest = function(nonDuplicates){
+                var promises = [];
+                for (var i = 0; i < nonDuplicates.length; i++) {
+
+                    //create list of video id's (max list size of 50).
+                    var count = 0;
+                    var idList = [];
+                    while (count < 50 && i < nonDuplicates.length) {
+                        idList.push(nonDuplicates[i].id.videoId);
+                        i++;
+                        count++;
+                    }
+
+                    //create a promise with list of video id's for the batch request
+                    var payload = {'url' : youtubeVideoBase + idList.toString()};
+                    promises.push($http.post('api/youtube/get', payload));
+                }
+                return promises;
+            };
+
+            var handleFetchIterationComplete = function(){
+
+                //if the related videos is empty, or search related videos is turned off then finish the search
+                if($scope.nextRelated.length == 0 || !$scope.extendedSearch || $scope.wasInterrupted){
+                    relatedPending = false;
+                    stopSearch('Finished search', 'info');
+                    return;
+                }
+                iteration++;
+                resetSortOrders();
+                relatedPending = false;
+                $scope.related = $scope.nextRelated[0];
+                $scope.nextRelated.splice(0,1);
+                $scope.checkRelated = true;
+                fetchResultsWrapper(0,false);
+            };
 
             /**
              * ---------------------------------------------------
@@ -847,6 +801,9 @@
              * ---------------------------------------------------
              */
 
+            /**
+             * opens the, well... report modal
+             */
             $scope.openReportModal = function(){
                 var modalInstance = $uibModal.open({
                     templateUrl: 'partials/reportModal.html',
@@ -863,6 +820,7 @@
                     }
                 });
 
+                //on resolution or dismiss call filterByChannel
                 modalInstance.result.then(function () {
                     $scope.filterByChannel();
                 }, function () {
@@ -870,6 +828,11 @@
                 });
             };
 
+            /**
+             * filter by text in quick filter text box
+             * @param video
+             * @returns {boolean}
+             */
             var quickFilter = function(video){
                 if(!$scope.filterText || $scope.filterText.trim().length === 0){
                     return true;
@@ -889,6 +852,13 @@
                 }
             };
 
+            /**
+             * Filter by the selected channel(s).
+             * When this method is called, it ignores the other filters.
+             * If, however, the channelList array is empty, then standard filter is called.  This is because the user
+             * can clear out all channel filters in the channel filter / summary modal.  When they resolve the modal, this
+             * method is invoked regardless.  So if they clear out all channel filter entries, then normal filter is called.
+             */
             $scope.filterByChannel = function(){
                 if($scope.channelFilter.length === 0 || !$scope.enableChannelFilter){
                     $scope.filter();
