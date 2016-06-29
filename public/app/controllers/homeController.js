@@ -868,32 +868,33 @@
                 });
             };
 
-            $scope.quickFilter = function(){
-                $scope.filteredResults = $scope.filteredResults.filter(function(d){
-                    if(!$scope.filterText || $scope.filterText.trim().length === 0){
-                        return d;
+            var quickFilter = function(video){
+                if(!$scope.filterText || $scope.filterText.trim().length === 0){
+                    return true;
+                }
+                else{
+                    $scope.filterText = $scope.filterText.toLowerCase().trim();
+                    if($scope.negateFilter){
+                        if(!(video.title.toLowerCase().indexOf($scope.filterText) > -1 || video.channelTitle.toLowerCase().indexOf($scope.filterText) > -1)){
+                            return true;
+                        }
                     }
                     else{
-                        $scope.filterText = $scope.filterText.toLowerCase().trim();
-                        if($scope.negateFilter){
-                            if(!(video.title.toLowerCase().indexOf($scope.filterText) > -1 || video.channelTitle.toLowerCase().indexOf($scope.filterText) > -1)){
-                                return d;
-                            }
-                        }
-                        else{
-                            if(video.title.toLowerCase().indexOf($scope.filterText) > -1 || video.channelTitle.toLowerCase().indexOf($scope.filterText) > -1){
-                                return d;
-                            }
+                        if(video.title.toLowerCase().indexOf($scope.filterText) > -1 || video.channelTitle.toLowerCase().indexOf($scope.filterText) > -1){
+                            return true;
                         }
                     }
-                });
-
-                $scope.paginate();
+                }
             };
 
             $scope.filterByChannel = function(){
+                if($scope.channelFilter.length === 0){
+                    $scope.filter();
+                    return;
+                }
+
                 $scope.isChannelFilterEnabled = true;
-                $scope.filteredResults = $scope.filteredResults.filter(function(d){
+                $scope.filteredResults = $scope.searchResults.filter(function(d){
                  if(!$scope.channelFilter || $scope.channelFilter.length === 0){
                      $scope.isChannelFilterEnabled = false;
                      return d;
@@ -903,13 +904,14 @@
                           return d;
                       }
                   }
-              });
+                 });
                 $scope.paginate();
             };
 
-            $scope.removeChannelFilter = function(idx){
+            $scope.removeChannelFilter = function(channelTitle){
+                var idx = $scope.channelFilter.indexOf(channelTitle);
                 $scope.channelFilter.splice(idx, 1);
-                $scope.filterByChannel();
+                $scope.channelFilter.length > 0 ? $scope.filterByChannel() : $scope.filter();
             };
 
             $scope.sort = function(){
@@ -926,7 +928,7 @@
             };
 
             $scope.filter = function(){
-                if(!$scope.minViews && (!$scope.minDislikes && $scope.minDislikes !== 0) && !$scope.minDate && !$scope.shorterThanFilter && !$scope.longerThanFilter && !$scope.minRating){
+                if((!$scope.filterText || $scope.filterText.trim().length === 0) && !$scope.minViews && (!$scope.minDislikes && $scope.minDislikes !== 0) && !$scope.minDate && !$scope.shorterThanFilter && !$scope.longerThanFilter && !$scope.minRating){
                     $scope.filteredResults = $scope.searchResults;
                 }
                 else{
@@ -935,7 +937,7 @@
                             (!$scope.minViews || d.viewCount >= $scope.minViews) &&
                             (!$scope.minRating || d.pctLikes >= $scope.minRating) &&
                             (!$scope.maxDate || d.created >= $scope.maxDate) &&
-                            (!$scope.minDate || d.created >= $scope.minDate) && durationFilter(d)){
+                            (!$scope.minDate || d.created >= $scope.minDate) && durationFilter(d) && quickFilter(d)){
                             return d;
                         }
                     });
