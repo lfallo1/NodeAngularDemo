@@ -192,6 +192,8 @@
                     new SortOption('pctLikes', -1, 'star', 'Rating')
                 ];
                 $scope.sortField.value = $scope.sortOptions[0].value;
+
+                $scope.enableChannelFilter = true;
             };
 
             $scope.reset = function(){
@@ -888,7 +890,7 @@
             };
 
             $scope.filterByChannel = function(){
-                if($scope.channelFilter.length === 0){
+                if($scope.channelFilter.length === 0 || !$scope.enableChannelFilter){
                     $scope.filter();
                     return;
                 }
