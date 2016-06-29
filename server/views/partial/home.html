@@ -17,8 +17,9 @@
             </div>
         </form>
 
-        <div id="progress-bar-container" ng-show="fetching">
+        <div id="progress-bar-container" ng-if="fetching">
             <uib-progressbar class="progress-striped active" max="100" value="100" type="primary"><i>Fetching results...</i></uib-progressbar>
+            <uib-alert class="longer-search-warning" ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</uib-alert>
         </div>
 
         <div id="results-label-container" class="row" ng-if="searchResults.length > 0">
@@ -116,7 +117,7 @@
                             <button type="button" class="btn btn-warning" ng-model="extendedSearch" uib-btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
                                 <span class="glyphicon glyphicon-forward"></span>Extended Search
                             </button>
-                            <span class="question-mark" uib-popover="Extended search automatically saves a list of highly matching videos during initial search and then performs additional searches using the compiled list. Interval search performs each query in time intervals. Options are annual (12 month intervals), biannual (6 month intervals), and biennial (24 month intervals)." popover-title="Search Mode Definitions" type="button"><span class="glyphicon glyphicon-question-sign" ng-click=""></span></span>
+                            <span class="question-mark" popover-placement="top-right" uib-popover="Extended search automatically saves a list of highly matching videos during initial search and then performs additional searches using the compiled list. Interval search performs each query in time intervals. Options are annual (12 month intervals), biannual (6 month intervals), and biennial (24 month intervals)." popover-title="Search Mode Definitions" type="button"><span class="glyphicon glyphicon-question-sign" ng-click=""></span></span>
                         </div>
                         <div id="interval-search-wrapper">
 

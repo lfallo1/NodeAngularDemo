@@ -223,6 +223,7 @@
              * Interrupt a search
              */
             $scope.interrupt = function(){
+                $scope.alerts = [];
                 relatedPending = false;
                 $scope.related = undefined;
                 $scope.checkRelated = false;
@@ -238,6 +239,7 @@
              * @param toasterType
              */
             var stopSearch = function(msg, toasterType){
+                $scope.alerts = [];
                 $scope.fetching = false;
                 toaster.pop(toasterType, '', msg);
             };
@@ -269,6 +271,8 @@
                 $scope.searchParam = $scope.searchParam.trim();
                 if($scope.searchParam){
 
+                    $scope.alerts = [];
+
                     resetPagination();
 
                     iteration = 0;
@@ -293,6 +297,11 @@
                     videoCategoryId = ($scope.selectedCategory && $scope.selectedCategory.id && $scope.selectedCategory.id > 0) ? '&videoCategoryId=' + $scope.selectedCategory.id : '';
                     if(!regionCode || !videoCategoryId){
                         regionCode = videoCategoryId = '';
+                    }
+
+                    //setup warning
+                    if($scope.intervalSearch){
+                        $scope.alerts = [{type:'danger', msg:'Warning!  With the Interval option selected, results take considerably longer to retrieve.  Please click STOP and uncheck the option if you wish to perform a faster search.'}];
                     }
 
                     //call the wrapper
@@ -884,7 +893,7 @@
 
             $scope.filterByChannel = function(){
                 $scope.isChannelFilterEnabled = true;
-                $scope.filteredResults = $scope.searchResults.filter(function(d){
+                $scope.filteredResults = $scope.filteredResults.filter(function(d){
                  if(!$scope.channelFilter || $scope.channelFilter.length === 0){
                      $scope.isChannelFilterEnabled = false;
                      return d;
@@ -972,6 +981,10 @@
 
             $scope.setSelectedIntervalType = function(value){
                 $scope.selectedIntervalType = value;
+            };
+
+            $scope.closeAlert = function(idx){
+                $scope.alerts.splice(idx,1);
             };
 
             init();
