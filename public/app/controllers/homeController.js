@@ -355,25 +355,25 @@
                 related = $scope.checkRelated && $scope.related ? '&relatedToVideoId=' + $scope.related : '';
 
                 //check if date interval searching is turned on
-                if($scope.intervalSearch && !related){
-
-                    for(var j = 0; j < 10 / $scope.selectedIntervalType; j++){
-                        var date = new Date();
-                        var large = new Date(date.getTime()-j*$scope.selectedIntervalType*1000*60*60*24*365);
-                        var small = new Date(large.getTime() - 1000*60*60*24*365*$scope.selectedIntervalType);
-
-                        dateSmall = "&publishedAfter=" + small.toISOString();
-                        dateLarge = "&publishedBefore=" + large.toISOString();
-                        for (var i = 0; i < sortOrders.length; i++) {
-                            var token = sortOrders[i].token ? '&pageToken=' + sortOrders[i].token : '';
-
-                            promises.push($http.post('api/youtube/get', {'url' : youtubeSearchBase + $scope.searchParam + "&type=video&maxResults=50" +
-                            dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + safeSearch +
-                            "&order=" + sortOrders[i].order + related  + token}));
-                        }
-                    }
-                }
-                else{
+                //if($scope.intervalSearch && !related){
+                //
+                //    for(var j = 0; j < 10 / $scope.selectedIntervalType; j++){
+                //        var date = new Date();
+                //        var large = new Date(date.getTime()-j*$scope.selectedIntervalType*1000*60*60*24*365);
+                //        var small = new Date(large.getTime() - 1000*60*60*24*365*$scope.selectedIntervalType);
+                //
+                //        dateSmall = "&publishedAfter=" + small.toISOString();
+                //        dateLarge = "&publishedBefore=" + large.toISOString();
+                //        for (var i = 0; i < sortOrders.length; i++) {
+                //            var token = sortOrders[i].token ? '&pageToken=' + sortOrders[i].token : '';
+                //
+                //            promises.push($http.post('api/youtube/get', {'url' : youtubeSearchBase + $scope.searchParam + "&type=video&maxResults=50" +
+                //            dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + safeSearch +
+                //            "&order=" + sortOrders[i].order + related  + token}));
+                //        }
+                //    }
+                //}
+                //else{
                     //for each sort order type, execute the GET request.  doing this so that more results are returned.
                     for (var i = 0; i < sortOrders.length; i++) {
                         var token = sortOrders[i].token ? '&pageToken=' + sortOrders[i].token : '';
@@ -382,7 +382,7 @@
                         dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + safeSearch +
                         "&order=" + sortOrders[i].order + related  + token}));
                     }
-                }
+                //}
 
                 //wait for all requests to complete
                 $q.all(promises).then(function (res) {
