@@ -33,6 +33,11 @@ app.get('/partials/:name', function(req, res){
     res.render('partial/' + name);
 });
 
+app.get('/partials/directives/:name', function(req, res){
+    var name = req.params.name;
+    res.render('partial/directives/' + name);
+});
+
 //Endpoints
 app.use('/api/countries', countriesAPI.getAll);
 app.use('/api/youtube/get', youtubeAPI.get);

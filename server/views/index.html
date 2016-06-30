@@ -25,10 +25,6 @@
     <script type="text/javascript" src="bower/Chart.js/Chart.js"></script>
     <script type="text/javascript" src="bower/angular-chart.js/dist/angular-chart.js"></script>
 
-    <link href="bower/angular-chart.js/dist/angular-chart.css" rel="stylesheet" />
-    <link href="bower/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
-    <link href="bower/AngularJS-Toaster/toaster.css" rel="stylesheet" />
-
     <!--app -->
     <script type="text/javascript" src='static/app/app.js'></script>
 
@@ -40,11 +36,11 @@
     <script type="text/javascript" src='static/app/controllers/managePlaylistModalController.js'></script>
     <script type="text/javascript" src='static/app/controllers/reportModalController.js'></script>
 
-    <!-- filters -->
-    <script type="text/javascript" src='static/app/filters/quickFilter.js'></script>
-
     <!-- directives -->
-    <script type="text/javascript" src='static/app/directives/scroll.js'></script>
+    <script type="text/javascript" src='static/app/directives/quickFilter.js'></script>
+    <script type="text/javascript" src='static/app/directives/searchResults.js'></script>
+    <script type="text/javascript" src='static/app/directives/sortFilter.js'></script>
+    <script type="text/javascript" src='static/app/directives/searchBox.js'></script>
 
     <!-- services -->
     <script type="text/javascript" src='static/app/services/timeService.js'></script>
@@ -52,14 +48,17 @@
     <script type="text/javascript" src='static/app/services/playlistService.js'></script>
     <script type="text/javascript" src='static/app/services/countriesService.js'></script>
 
+    <link href="bower/angular-chart.js/dist/angular-chart.css" rel="stylesheet" />
+    <link href="bower/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+    <link href="bower/AngularJS-Toaster/toaster.css" rel="stylesheet" />
+
     <!-- css -->
     <link href="css/style.css" rel="stylesheet" />
 
-
     <base href="/" />
 
+    <!-- Youtube API setup -->
     <script src="https://apis.google.com/js/platform.js" async defer></script>
-
     <script>
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
                     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -73,18 +72,19 @@
 
 </head>
 <body>
-<div id="page-header" class="row text-center">
-    <div id="title-text"><span id="you">You</span><span id="tube">Tube</span><span id="search"> Agent</span></div>
-    <div class="text-center"><small>YouTube Sorting and Filtering - Easy to Use and Advanced Search Engine to Optimize YouTube Results</small></div>
-    <div id="contact-info" class="text-right col-md-12">Contact | <a href="mailto:fallon.lance@gmail.com">Lance Fallon <span class="glyphicon glyphicon-envelope"></span></a></div>
-    <br />
-    <div class="google-button">
-        <div class="g-signin2" data-onsuccess="onSignIn"></div>
-    </div>
+    <div id="page-header" class="row text-center">
+        <div id="title-text"><span id="you">You</span><span id="tube">Tube</span><span id="search"> Agent</span></div>
+        <div class="text-center"><small>YouTube Sorting and Filtering - Easy to Use and Advanced Search Engine to Optimize YouTube Results</small></div>
+        <div id="contact-info" class="text-right col-md-12">Contact | <a href="mailto:fallon.lance@gmail.com">Lance Fallon <span class="glyphicon glyphicon-envelope"></span></a></div>
+        <br />
+        <div class="google-button">
+            <div class="g-signin2" data-onsuccess="onSignIn"></div>
+        </div>
 
-</div>
-<div ng-view></div>
+    </div>
+    <div ng-view></div>
     <toaster-container></toaster-container>
+
 </body>
 </html>
 

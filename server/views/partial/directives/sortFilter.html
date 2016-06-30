@@ -1,0 +1,155 @@
+<div id="sort-filter-column" class="col-md-3">
+    <!-- PRE-SEARCH FILTERS -->
+    <div id="pre-search-wrapper" class="row">
+        <div ng-show="searchMode === TEXT_SEARCH" id="date-range-input-group-wrapper" class="col-md-12">
+            <div id="date-range-header">Pre-Search Filters (Optional)
+                <span ng-show="preSearchFiltersVisible" class="toggle-button glyphicon glyphicon-minus" ng-click="setPreSearchFiltersVisible(false)"></span>
+                <span ng-show="!preSearchFiltersVisible" class="toggle-button glyphicon glyphicon-plus" ng-click="setPreSearchFiltersVisible(true)"></span>
+            </div>
+            <form ng-show="preSearchFiltersVisible" id="date-range-input-form" class="form-inline">
+                <div id="date-filter-wrapper">
+                    <div class="form-group">
+                        <label for="pre-search-min-date">Min Date</label>
+                        <input type="date" class="form-control" id="pre-search-min-date" ng-model="preSearchMinDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="pre-search-max-date">Max Date</label>
+                        <input type="date" class="form-control" id="pre-search-max-date" ng-model="preSearchMaxDate">
+                    </div>
+                </div>
+                <div id="category-wrapper">
+                    <div id="category-wrapper-title">Category</div>
+                    <div id="category-select-options-wrapper">
+                        <div id="countries-dropdown-textmode-wrapper" class="form-group">
+                            <select id="countries-list-textmode" name="countries" class="form-control"
+                                    ng-model="selectedCountry"
+                                    ng-options="country.name for country in countries"
+                                    ng-change="updateCategories()"
+                                    placeholder="Select a country">
+                                <option value="">{{searchMode === TEXT_SEARCH ? 'Any country' : 'Select a country'}}</option>
+                            </select>
+                        </div>
+                        <div id="categories-dropdown-wrapper-text-search">
+                            <select id="categories-list-text-search" name="categories" class="form-control"
+                                    ng-model="selectedCategory"
+                                    ng-options="category as category.snippet.title for category in videoCategories">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div id="duration-wrapper" class="btn-group col-md-12">
+                    <div id="duration-header">Duration</div>
+                    <div id="duration-label-wrapper">
+                        <label id="duration-any" class="duration-button btn btn-default" ng-model="videoDuration" uib-btn-radio="'any'">Any</label>
+                        <label id="duration-short" class="duration-button btn btn-default" ng-model="videoDuration" uib-btn-radio="'short'">Short</label>
+                        <label id="duration-medium" class="duration-button btn btn-default" ng-model="videoDuration" uib-btn-radio="'medium'">Medium</label>
+                        <label id="duration-long" class="duration-button btn btn-default" ng-model="videoDuration" uib-btn-radio="'long'">Long</label>
+                    </div>
+                </div>
+                <div id="safe-search-wrapper" class="btn-group col-md-12">
+                    <div id="safe-search-header">Safe Search</div>
+                    <div id="safe-search-mode-label-wrapper">
+                        <label class="safe-search-mode-button btn btn-default" ng-model="safeSearch" uib-btn-radio="'moderate'">Moderate</label>
+                        <label class="safe-search-mode-button btn btn-default" ng-model="safeSearch" uib-btn-radio="'none'">None</label>
+                        <label class="safe-search-mode-button btn btn-default" ng-model="safeSearch" uib-btn-radio="'strict'">Strict</label>
+                    </div>
+                </div>
+                <div id="search-optimizer-wrappers">
+                    <div id="extended-search-wrapper">
+                        <button type="button" class="btn btn-warning" ng-model="extendedSearch" uib-btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
+                            <span class="glyphicon glyphicon-forward"></span>Extended Search
+                        </button>
+                        <span class="question-mark" popover-placement="top-right" uib-popover="Extended search automatically saves a list of highly matching videos during initial search and then performs additional searches using the compiled list." popover-title="Search Mode Definitions" type="button"><span class="glyphicon glyphicon-question-sign" ng-click=""></span></span>
+                    </div>
+                    <!--<div id="interval-search-wrapper">-->
+
+                    <!--Interval search performs each query in time intervals. Options are annual (12 month intervals), biannual (6 month intervals), and biennial (24 month intervals).-->
+
+                    <!--&lt;!&ndash; Split button &ndash;&gt;-->
+                    <!--<div class="btn-group" uib-dropdown>-->
+                    <!--<button type="button" class="btn btn-info" ng-model="intervalSearch" uib-btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">-->
+                    <!--<span class="glyphicon glyphicon-calendar"></span>Interval Search-->
+                    <!--</button>-->
+                    <!--<button type="button" class="btn btn-info" uib-dropdown-toggle>-->
+                    <!--<span class="caret"></span>-->
+                    <!--<span class="sr-only">Split button!</span>-->
+                    <!--</button>-->
+                    <!--<ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">-->
+                    <!--<li ng-click="setSelectedIntervalType(dateIntervalTypes.ANNUAL)"  role="menuitem"><a href=""><span ng-click="setSelectedIntervalType(dateIntervalTypes.ANNUAL)" ng-show="selectedIntervalType === dateIntervalTypes.ANNUAL" class="glyphicon glyphicon-ok"></span>Yearly</a></li>-->
+                    <!--<li ng-click="setSelectedIntervalType(dateIntervalTypes.BIENNIAL)"  role="menuitem"><a href=""><span ng-show="selectedIntervalType === dateIntervalTypes.BIENNIAL" class="glyphicon glyphicon-ok"></span>Biennial</a></li>-->
+                    <!--<li ng-click="setSelectedIntervalType(dateIntervalTypes.BIANNUAL)" role="menuitem"><a href=""><span ng-show="selectedIntervalType === dateIntervalTypes.BIANNUAL" class="glyphicon glyphicon-ok"></span>Biannual</a></li>-->
+                    <!--</ul>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- (END) PRE-SEARCH FILTERS -->
+
+    <!--SORT / POST-FILTERS -->
+    <div class="row">
+        <div id="sort-and-filter" class="col-md-12">
+            <div id="sort-options-container" class="row">
+                <div class="col-md-12 sort-filter-header">
+                    <div class="sort-filter-header-content"><span class="glyphicon glyphicon-sort"></span>Sort</div>
+                    <span ng-show="sortVisible" class="toggle-button glyphicon glyphicon-minus" ng-click="setSortVisible(false)"></span>
+                    <span ng-show="!sortVisible" class="toggle-button glyphicon glyphicon-plus" ng-click="setSortVisible(true)"></span>
+                </div>
+
+                <div id="sort-content" class="btn-group col-md-12" ng-show="sortVisible">
+                    <div id="sort-content-wrapper">
+                        <button ng-repeat="option in sortOptions"
+                                class="sort-button btn btn-default" type="button" ng-model="sortField.value"
+                                uib-btn-radio="option.value" ng-click="sortOptionChanged(option)">
+                            <span class="glyphicon glyphicon-{{option.glyph}}"></span>{{option.displayName}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="filter-options-container" class="row">
+                <div class="col-md-12 sort-filter-header">
+                    <div class="sort-filter-header-content"><span class="glyphicon glyphicon-filter"></span>Post-Search Filters</div>
+                    <span ng-show="filterVisible" class="toggle-button glyphicon glyphicon-minus" ng-click="setFilterVisible(false)"></span>
+                    <span ng-show="!filterVisible" class="toggle-button glyphicon glyphicon-plus" ng-click="setFilterVisible(true)"></span>
+                </div>
+                <div class="col-md-12 filter-content-table" ng-show="filterVisible">
+                    <table>
+                        <tbody>
+                        <tr class="row-padding">
+                            <td class="filter-label"><span class="glyphicon glyphicon-thumbs-down"></span>Dislikes</td>
+                            <td class="filter-input"><input ng-model="minDislikes" type="number" class="form-control" ng-blur="filter()" placeholder="Maximum dislikes" /></td>
+                        </tr>
+                        <tr class="row-padding">
+                            <td class="filter-label"><span class="glyphicon glyphicon-user"></span>Min Views</td>
+                            <td class="filter-input"><input ng-model="minViews" type="number" class="form-control" ng-blur="filter()" placeholder="Minimum views" /></td>
+                        </tr>
+                        <tr class="row-padding">
+                            <td class="filter-label"><span class="glyphicon glyphicon-star"></span>Min Rating</td>
+                            <td class="filter-input"><input ng-model="minRating" type="number" class="form-control" ng-blur="filter()" placeholder="Minimum rating (0 to 100)" /></td>
+                        </tr>
+                        <tr class="row-padding">
+                            <td class="filter-label"><span class="glyphicon glyphicon-calendar"></span>Min Date</td>
+                            <td class="filter-input"><input type="date" ng-blur="filter()" class="form-control" ng-model="minDate" placeholder="earliest date" /></td>
+                        </tr>
+                        <tr class="row-padding">
+                            <td class="filter-label"><span class="glyphicon glyphicon-calendar"></span>Max Date</td>
+                            <td class="filter-input"><input type="date" ng-blur="filter()" class="form-control" ng-model="maxDate" placeholder="latest date" /></td>
+                        </tr>
+                        <tr class="row-padding">
+                            <td class="filter-label"><span class="glyphicon glyphicon-time"></span>Duration</td>
+                            <td class="filter-input">
+                                <div id="duration-range-wrapper">
+                                    <input ng-model="longerThanFilter" ng-blur="filter()" type="number" class="form-control" placeholder="> (mins)" ng-blur="filter()"/>
+                                    <input ng-model="shorterThanFilter" ng-blur="filter()" type="number" class="form-control" placeholder="< (mins)" ng-blur="filter()" />
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- (end) SORT / POST-FILTERS  -->
+</div>

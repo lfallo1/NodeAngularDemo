@@ -1,0 +1,70 @@
+<!-- SEARCH RESULTS -->
+<div id="results" class="col-md-7 text-center" ng-if="searchResults.length > 0">
+    <ul class="pagination">
+        <li ng-click="previousPage()">
+            <a href="" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <li ng-class="pagination.currentPage === ($index + 1) ? 'active' : ''" ng-repeat="i in getPages() track by $index">
+            <a href="" ng-click="gotoPage($index+1)">{{$index+1}}</a>
+        </li>
+        <li ng-click="nextPage()">
+            <a href="" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+    <table class="table">
+        <tbody>
+        <tr ng-repeat="video in displayList">
+            <td>
+                <div ng-if="!video.playing" class="video-image-container">
+                    <a ng-href="{{'https://www.youtube.com/watch?v=' + video.videoId}}" target="_blank">
+                        <img src="{{video.thumbnail.url}}" width="250px" class="thumbnail" />
+                    </a>
+                </div>
+                <div ng-if="video.playing" class="player">
+                    <iframe width="560" height="315" src="{{getIFrameSrc(video.videoId)}}" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <div ng-if="!video.playing" class="play-video-button btn btn-default" ng-click="setPlaying(video, true)"><span class="glyphicon glyphicon-play"></span></div>
+                <div ng-if="video.playing" class="hide-video-button btn btn-default" ng-click="setPlaying(video, false)"><span class="glyphicon glyphicon-stop"></span></div>
+                <div ng-if="!isVideoInList(video, watchlist)" class="add-to-watchlist text-info" ng-click="toggleVideoInList(video, watchlist)"><span class="glyphicon glyphicon-plus"></span>Add to watchlist</div>
+                <div ng-if="isVideoInList(video, watchlist)" class="add-to-watchlist text-danger" ng-click="toggleVideoInList(video, watchlist)"><span class="glyphicon glyphicon-remove"></span>Remove from watchlist</div>
+                <div ng-if="!isVideoInList(video, selectedVideos) && AuthService.isLoggedIn()" class="add-to-multivid-playlist text-success" ng-click="toggleVideoInList(video, selectedVideos)"><span class="glyphicon glyphicon-plus"></span>Add to playlist queue</div>
+                <div ng-if="isVideoInList(video, selectedVideos) && AuthService.isLoggedIn()" class="add-to-multivid-playlist text-danger" ng-click="toggleVideoInList(video, selectedVideos)"><span class="glyphicon glyphicon-remove"></span>Remove from queue</div>
+            </td>
+            <td>
+                <div class="video-details-container">
+                    <a ng-href="{{'https://www.youtube.com/watch?v=' + video.videoId}}" target="_blank">
+                        <div class="videoTitle">
+                            {{video.title}}
+                        </div>
+                    </a>
+                    <div class="created"><a href="https://www.youtube.com/channel/{{video.channelId}}" target="_blank">{{video.channelTitle}}</a> - {{video.created | date:'MM-dd-yyyy'}}</div>
+                    <div class="duration">{{video.duration}}</div>
+                    <div class="rating"><small>Rating</small> {{video.pctLikes | number:2}}</div>
+                    <div class="view-count"><small>Views</small> {{video.viewCount}}</div>
+                    <div class="likes"><small>Likes</small> {{video.likes}}</div>
+                    <div class="dislikes"><small>Dislikes</small> {{video.dislikes}}</div>
+                    <div class="video-buttons row">
+                        <div class="col-md-12">
+                            <div class="download-mp3"><a class="btn btn-success" ng-show="!video.downloadDisabled" target="_self" href="api/youtube/mp3/{{video.videoId}}" download="{{video.videoId + '.mp3'}}" ng-click="disableDownload(video)"><span class="glyphicon glyphicon-headphones"></span>Download mp3</a></div>
+                            <div class="download-mp3"><a class="btn btn-success" ng-show="video.downloadDisabled" disabled><span class="glyphicon glyphicon-headphones"></span>Download mp3</a></div>
+                        </div>
+                        <div class="col-md-12">
+                            <div ng-if="AuthService.isLoggedIn()" class="add-playlist-button btn btn-success" ng-click="playlistService.addToPlaylist(video)"><span class="glyphicon glyphicon-plus"></span> Youtube playlist</div>
+                        </div>
+                    </div>
+
+                    <!--<div id="youtube-members-only" ng-if="AuthService.isLoggedIn()">-->
+                    <!--<hr />-->
+                    <!--<button type="button" ng-click="addToPlaylist(video)">+ Add to playlist</button>-->
+                    <!--</div>-->
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<!-- (END) SEARCH RESULTS -->

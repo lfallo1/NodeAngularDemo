@@ -1,0 +1,37 @@
+<!-- QUICK FILTERS / WATCH LIST / BULK PLAYLIST -->
+<div id="quick-filter" class="row">
+
+    <div id="selectedChannelsWrapper" ng-show="channelFilter.length > 0" class="col-md-12 well well-sm">
+        <div id="selected-channels-enable-button">
+            <input type="checkbox" name="enableChannelFilter" ng-model="enableChannelFilter" ng-change="filterByChannel()"/>
+            <span id="enable-channel-filter-checkbox">Enable Channel Filter</span>
+        </div>
+        <div class="button-list-item" ng-repeat="channel in channelFilter" ng-click="removeChannelFilter(idx)">
+            {{channel}}<span class="glyphicon glyphicon-remove"></span>
+        </div>
+    </div>
+
+    <!-- WATCH LIST -->
+    <div id="watchlist" ng-show="watchlist.length > 0" class="col-md-12">
+        <button id="watchlist-header" class="btn btn-default" ng-click="openListManagerModal(watchlist, WATCHLIST_MODAL_CTRL, 'watchlistModal.html')">
+            <span class="glyphicon glyphicon-eye-open"></span>
+            Watchlist ({{watchlist.length}} items)
+        </button>
+    </div>
+
+    <!-- SELECTED VIDEOS LIST -->
+    <div id="save-selected-items" ng-show="selectedVideos.length > 0 && AuthService.isLoggedIn()" class="col-md-12">
+        <button ng-disabled="savingToPlaylist" class="btn btn-success" ng-click="openListManagerModal(selectedVideos, BULK_PLAYLIST_MODAL_CTRL, 'bulkPlaylistModal.html')"><span class="glyphicon glyphicon-floppy-disk"></span>Selected videos ({{selectedVideos.length}} videos)</button>
+    </div>
+    <div class="col-md-12" ng-show="searchResults.length > 0">
+        <div id="quick-filter-title">
+            <span class="glyphicon glyphicon-filter"></span>Quick filter
+        </div>
+        <input type="text" ng-blur="filter()" class="form-control" ng-model="filterText" placeholder="Filter artist and title."/>
+        <div id="negate-filter-wrapper">
+            <input id="negateFilter" name="negateFilter" type="checkbox" ng-model="negateFilter" />
+            <span id="negate-filter-label">Negate</span>
+        </div>
+    </div>
+</div>
+<!-- (END) QUICK FILTERS -->
