@@ -731,6 +731,7 @@ div.report-modal .modal-content {
 
 .readonly-quickfilter{
     padding: 16px;
+    background-color: #eee;
 }
 
 .readonly-quickfilter:hover{
