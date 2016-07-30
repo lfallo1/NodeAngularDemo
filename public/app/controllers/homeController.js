@@ -859,6 +859,17 @@
                 });
             };
 
+            var addQuickFilterTerm = function(term){
+              if(!term || !term.trim()){
+                return;
+              }
+
+              $scope.quickFilterTerms.push({
+                'value' : term.trim().replace("!",""),
+                'negate': term.startsWith('!')
+              });
+            }
+
             $scope.updateQuickFilter = function(){
 
               if(!$scope.filterText || $scope.filterText.trim().length === 0){
@@ -873,15 +884,15 @@
               for(var i = 0; i < searchText.length; i++){
                  if(searchText.charAt(i) === ' ' || i === (searchText.length - 1)){
                    if(temp.length > 0){
-                     temp += searchText.charAt(i);
-                     terms.push(temp);
+                     temp += searchText.charAt(i) === '"' ? '' : searchText.charAt(i);
+                     addQuickFilterTerm(temp);
                      temp = '';
                    }
                  }
                  else if(searchText.charAt(i) === '"'){
                    //if temp is not empty, then the quote occurred after a non-space, so add current temp string to term list
                    if(temp.length > 0){
-                     terms.push(temp);
+                     addQuickFilterTerm(temp);
                      temp = '';
                    }
 
@@ -891,18 +902,21 @@
                    }
 
                   //find the closing quote
-                   var closeQuoteIndex = i + searchText.substring(i+1).indexOf('"') + 1;
+                   var closeQuoteIndex = searchText.substring(i+1).indexOf('"');
 
                    //if no closing quote, then split on spaces and bail
                    if(closeQuoteIndex < 0){
-                     searchText.substring(i).split(" ").forEach(function(str){
-                       terms.push(str);
+                     searchText.substring(i+1).replace('"','').split(" ").forEach(function(str){
+                       addQuickFilterTerm(str);
                      });
                      break;
                    } else{
                      closeQuoteIndex = i + searchText.substring(i+1).indexOf('"') + 1;
                      //otherwise push the quote wrapped string to end of array
-                     terms.push(searchText.substring(i+1, closeQuoteIndex).trim());
+                     var newTerm = searchText.substring(i+1, closeQuoteIndex).trim();
+                     if(newTerm){
+                        addQuickFilterTerm(newTerm);
+                     }
 
                      //place iterator after closing quote
                      i = closeQuoteIndex;
@@ -913,8 +927,6 @@
                      temp += searchText.charAt(i);
                  }
               }
-
-              $scope.quickFilterTerms = terms;
 
             };
 
@@ -954,10 +966,10 @@
             };
 
             var isTextInVideo = function(videoTitle, videoChannelTitle, searchText){
-              if($scope.negateFilter){
-                  return !(videoTitle.indexOf(searchText) > -1) || (videoChannelTitle.indexOf(searchText) > -1);
+              if(searchText.negate){
+                  return !(videoTitle.indexOf(searchText.value) > -1) || (videoChannelTitle.indexOf(searchText.value) > -1);
               }
-              return (videoTitle.indexOf(searchText) > -1) || (videoChannelTitle.indexOf(searchText) > -1);
+              return (videoTitle.indexOf(searchText.value) > -1) || (videoChannelTitle.indexOf(searchText.value) > -1);
             };
 
             $scope.removeQuickFilterTerm = function(term){
