@@ -17,6 +17,11 @@
                 'BIANNUAL' : 0.5
             };
 
+            $scope.quickFilterModes = {
+              'ALL' : 0,
+              'ANY' : 1
+            };
+
             var resetPagination = function(){
                 $scope.pagination = {
                     currentPage : 1,
@@ -74,6 +79,8 @@
             $scope.POPULAR_SEARCH = 2;
             $scope.WATCHLIST_MODAL_CTRL = 'WatchlistModalCtrl';
             $scope.BULK_PLAYLIST_MODAL_CTRL = 'BulkPlaylistModalCtrl';
+            $scope.quickFilterType = "0";
+            $scope.quickFilterTerms = [];
             var ALL_CATEGORIES = {'id' : '-1', 'snippet' : {'title' : 'Search All Categories'}};
             var relatedPending = false;
             var iteration = 0;
@@ -86,6 +93,12 @@
 
             $scope.videoDurationOptions = ['any','long','medium','short'];
             $scope.safeSearchOptions = ['moderate', 'none', 'strict'];
+
+            $scope.quickFilterVisible = true;
+
+            $scope.toggleQuickFilter = function(){
+              $scope.quickFilterVisible = !$scope.quickFilterVisible;
+            };
 
             $scope.isVideoInList = function(video, list){
                 return list.filter(function(d){
@@ -151,6 +164,10 @@
              */
             var init = function(){
                 resetPagination();
+
+                //reset quick filter
+                $scope.quickFilterType = "0";
+                $scope.quickFilterTerms = [];
 
                 $scope.selectedIntervalType = $scope.dateIntervalTypes.BIENNIAL;
                 $scope.intervalSearch = false;
@@ -355,25 +372,25 @@
                 related = $scope.checkRelated && $scope.related ? '&relatedToVideoId=' + $scope.related : '';
 
                 //check if date interval searching is turned on
-                //if($scope.intervalSearch && !related){
-                //
-                //    for(var j = 0; j < 10 / $scope.selectedIntervalType; j++){
-                //        var date = new Date();
-                //        var large = new Date(date.getTime()-j*$scope.selectedIntervalType*1000*60*60*24*365);
-                //        var small = new Date(large.getTime() - 1000*60*60*24*365*$scope.selectedIntervalType);
-                //
-                //        dateSmall = "&publishedAfter=" + small.toISOString();
-                //        dateLarge = "&publishedBefore=" + large.toISOString();
-                //        for (var i = 0; i < sortOrders.length; i++) {
-                //            var token = sortOrders[i].token ? '&pageToken=' + sortOrders[i].token : '';
-                //
-                //            promises.push($http.post('api/youtube/get', {'url' : youtubeSearchBase + $scope.searchParam + "&type=video&maxResults=50" +
-                //            dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + safeSearch +
-                //            "&order=" + sortOrders[i].order + related  + token}));
-                //        }
-                //    }
-                //}
-                //else{
+                if($scope.intervalSearch && !related){
+
+                   for(var j = 0; j < 10 / $scope.selectedIntervalType; j++){
+                       var date = new Date();
+                       var large = new Date(date.getTime()-j*$scope.selectedIntervalType*1000*60*60*24*365);
+                       var small = new Date(large.getTime() - 1000*60*60*24*365*$scope.selectedIntervalType);
+
+                       dateSmall = "&publishedAfter=" + small.toISOString();
+                       dateLarge = "&publishedBefore=" + large.toISOString();
+                       for (var i = 0; i < sortOrders.length; i++) {
+                           var token = sortOrders[i].token ? '&pageToken=' + sortOrders[i].token : '';
+
+                           promises.push($http.post('api/youtube/get', {'url' : youtubeSearchBase + $scope.searchParam + "&type=video&maxResults=50" +
+                           dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + safeSearch +
+                           "&order=" + sortOrders[i].order + related  + token}));
+                       }
+                   }
+                }
+                else{
                     //for each sort order type, execute the GET request.  doing this so that more results are returned.
                     for (var i = 0; i < sortOrders.length; i++) {
                         var token = sortOrders[i].token ? '&pageToken=' + sortOrders[i].token : '';
@@ -382,7 +399,7 @@
                         dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + safeSearch +
                         "&order=" + sortOrders[i].order + related  + token}));
                     }
-                //}
+                }
 
                 //wait for all requests to complete
                 $q.all(promises).then(function (res) {
@@ -569,7 +586,7 @@
 
                     if(res.data.items.length > 0){
 
-                        var nonDuplicates = getNonDuplicates(res);
+                        var nonDuplicates = getUniqueItemsFromResponse(res.data.items);
 
                         //query the statistics for each video
                         var promises = createBatchVideoRequest(nonDuplicates);
@@ -731,27 +748,40 @@
                     }
 
                     //get all items from response
-                    var items = res[i].data.items;
-
-                    //loop through all items in response
-                    for (var j = 0; j < items.length; j++) {
-
-                        //check if already exists in main array or temp nonDuplicates array
-                        if ($scope.searchResults.filter(function (d) {
-                                if (d.videoId == items[j].id.videoId) {
-                                    return d;
-                                }
-                            }).length === 0 && nonDuplicates.filter(function (d) {
-                                if (d.id.videoId === items[j].id.videoId) {
-                                    return d;
-                                }
-                            }).length === 0) {
-                            nonDuplicates.push(items[j]);
-                        }
-                    }
+                    var currentNonDuplicates = nonDuplicates.slice(0);
+                    nonDuplicates = nonDuplicates.concat(getUniqueItemsFromResponse(res[i].data.items, currentNonDuplicates));
                 }
                 return nonDuplicates;
             };
+
+            var getUniqueItemsFromResponse = function(items, currentNonDuplicates){
+
+              var nonDuplicates = currentNonDuplicates || [];
+              var newVideos = [];
+
+              //loop through all items in response
+              for (var j = 0; j < items.length; j++) {
+
+                  var itemVideoId = items[j].id.videoId || items[j].id;
+
+                  //check if already exists in main array or temp nonDuplicates array
+                  if ($scope.searchResults.filter(function (d) {
+                          if (d.videoId == itemVideoId) {
+                              return d;
+                          }
+                      }).length === 0 && nonDuplicates.filter(function (d) {
+
+                          if (d.id.videoId === itemVideoId) {
+                              return d;
+                          }
+                      }).length === 0) {
+                      newVideos.push(items[j]);
+                      nonDuplicates.push(items[j]);
+                  }
+              }
+
+              return newVideos;
+            }
 
             /**
              * send batch requests (50 per)
@@ -766,7 +796,8 @@
                     var count = 0;
                     var idList = [];
                     while (count < 50 && i < nonDuplicates.length) {
-                        idList.push(nonDuplicates[i].id.videoId);
+                        var videoId = nonDuplicates[i].id.videoId || nonDuplicates[i].id;
+                        idList.push(videoId);
                         i++;
                         count++;
                     }
@@ -828,29 +859,115 @@
                 });
             };
 
+            $scope.updateQuickFilter = function(){
+
+              if(!$scope.filterText || $scope.filterText.trim().length === 0){
+                  return;
+              }
+
+              var searchText = $scope.filterText.toLowerCase().trim();
+              $scope.quickFilterTerms = [];
+
+              var terms = [];
+              var temp = '';
+              for(var i = 0; i < searchText.length; i++){
+                 if(searchText.charAt(i) === ' ' || i === (searchText.length - 1)){
+                   if(temp.length > 0){
+                     temp += searchText.charAt(i);
+                     terms.push(temp);
+                     temp = '';
+                   }
+                 }
+                 else if(searchText.charAt(i) === '"'){
+                   //if temp is not empty, then the quote occurred after a non-space, so add current temp string to term list
+                   if(temp.length > 0){
+                     terms.push(temp);
+                     temp = '';
+                   }
+
+                  //if quote occurs as last character and is not a closing quote, then break
+                   if(i === (searchText.length - 1)){
+                     break;
+                   }
+
+                  //find the closing quote
+                   var closeQuoteIndex = i + searchText.substring(i+1).indexOf('"') + 1;
+
+                   //if no closing quote, then split on spaces and bail
+                   if(closeQuoteIndex < 0){
+                     searchText.substring(i).split(" ").forEach(function(str){
+                       terms.push(str);
+                     });
+                     break;
+                   } else{
+                     closeQuoteIndex = i + searchText.substring(i+1).indexOf('"') + 1;
+                     //otherwise push the quote wrapped string to end of array
+                     terms.push(searchText.substring(i+1, closeQuoteIndex).trim());
+
+                     //place iterator after closing quote
+                     i = closeQuoteIndex;
+                   }
+                 }
+                 else{
+                    //not a space or quote,then add character to temp string
+                     temp += searchText.charAt(i);
+                 }
+              }
+
+              $scope.quickFilterTerms = terms;
+
+            };
+
             /**
              * filter by text in quick filter text box
              * @param video
              * @returns {boolean}
              */
             var quickFilter = function(video){
-                if(!$scope.filterText || $scope.filterText.trim().length === 0){
+                if($scope.quickFilterTerms.length === 0){
                     return true;
                 }
                 else{
-                    $scope.filterText = $scope.filterText.toLowerCase().trim();
-                    if($scope.negateFilter){
-                        if(!(video.title.toLowerCase().indexOf($scope.filterText) > -1 || video.channelTitle.toLowerCase().indexOf($scope.filterText) > -1)){
-                            return true;
-                        }
+
+                  //get video & channel title
+                  var videoTitle = video.title.toLowerCase();
+                  var channelTitle = video.channelTitle.toLowerCase();
+
+                  //exact mode
+                  if($scope.quickFilterType == 0){
+                    for(var i = 0; i < $scope.quickFilterTerms.length; i++){
+                      if(!isTextInVideo(videoTitle, channelTitle, $scope.quickFilterTerms[i])){
+                        return false;
+                      }
                     }
-                    else{
-                        if(video.title.toLowerCase().indexOf($scope.filterText) > -1 || video.channelTitle.toLowerCase().indexOf($scope.filterText) > -1){
-                            return true;
-                        }
+                    return true;
+                  }
+                  else {
+                    for(var i = 0; i < $scope.quickFilterTerms.length; i++){
+                      if(isTextInVideo(videoTitle, channelTitle, $scope.quickFilterTerms[i])){
+                        return true;
+                      }
                     }
+                    return false
+                  }
                 }
             };
+
+            var isTextInVideo = function(videoTitle, videoChannelTitle, searchText){
+              if($scope.negateFilter){
+                  return !(videoTitle.indexOf(searchText) > -1) || (videoChannelTitle.indexOf(searchText) > -1);
+              }
+              return (videoTitle.indexOf(searchText) > -1) || (videoChannelTitle.indexOf(searchText) > -1);
+            };
+
+            $scope.removeQuickFilterTerm = function(term){
+              for(var i = $scope.quickFilterTerms.length -1; i >= 0; i--){
+                if($scope.quickFilterTerms[i] === term){
+                  $scope.quickFilterTerms.splice(i,1);
+                }
+              }
+              $scope.filter();
+            }
 
             /**
              * Filter by the selected channel(s).

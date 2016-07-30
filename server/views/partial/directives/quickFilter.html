@@ -24,14 +24,34 @@
         <button ng-disabled="savingToPlaylist" class="btn btn-success" ng-click="openListManagerModal(selectedVideos, BULK_PLAYLIST_MODAL_CTRL, 'bulkPlaylistModal.html')"><span class="glyphicon glyphicon-floppy-disk"></span>Selected videos ({{selectedVideos.length}} videos)</button>
     </div>
     <div class="col-md-12" ng-show="searchResults.length > 0">
-        <div id="quick-filter-title">
+        <div id="quick-filter-terms-list" ng-if="quickFilterTerms.length > 0">
+          <ul class="list-group">
+            <li class="list-group-item" ng-repeat="term in quickFilterTerms" ng-click="removeQuickFilterTerm(term)">
+              {{term}}
+              <span class="glyphicon glyphicon-remove"></span>
+            </li>
+          <ul>
+        </div>
+        <div id="quick-filter-title" ng-click="toggleQuickFilter()">
             <span class="glyphicon glyphicon-filter"></span>Quick filter
+            <span ng-if="quickFilterVisible" class="glyphicon glyphicon-minus"></span>
+            <span ng-if="!quickFilterVisible" class="glyphicon glyphicon-plus"></span>
         </div>
-        <input type="text" ng-blur="filter()" class="form-control" ng-model="filterText" placeholder="Filter artist and title."/>
-        <div id="negate-filter-wrapper">
-            <input id="negateFilter" name="negateFilter" type="checkbox" ng-model="negateFilter" />
-            <span id="negate-filter-label">Negate</span>
+        <div ng-show="quickFilterVisible">
+          <input type="text" ng-blur="updateQuickFilter(); filter();" class="form-control" ng-model="filterText" placeholder="Filter artist and title."/>
+          <div id="negate-filter-wrapper">
+              <input id="negateFilter" name="negateFilter" type="checkbox" ng-model="negateFilter" ng-change="filter()" />
+              <span id="negate-filter-label">Negate</span>
+          </div>
+
+          <div id="filter-type-wrapper" class="btn-group">
+              <div id="filter-type-label-wrapper">
+                  <label id="quick-filter-all-terms-label" class="filter-type-button btn btn-warning" ng-model="quickFilterType" uib-btn-radio="'0'" ng-click="filter()">All terms</label>
+                  <label id="quick-filter-any-term-label" class="filter-type-button btn btn-warning" ng-model="quickFilterType" uib-btn-radio="'1'" ng-click="filter()">Any term</label>
+              </div>
+          </div>
         </div>
+
     </div>
 </div>
 <!-- (END) QUICK FILTERS -->
