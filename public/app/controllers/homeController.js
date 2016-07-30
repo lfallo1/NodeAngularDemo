@@ -873,6 +873,7 @@
             $scope.updateQuickFilter = function(){
 
               if(!$scope.filterText || $scope.filterText.trim().length === 0){
+                  $scope.quickFilterTerms = [];
                   return;
               }
 
