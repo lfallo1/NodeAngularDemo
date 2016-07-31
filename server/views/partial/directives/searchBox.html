@@ -6,6 +6,7 @@
 </div>
 
 <div id="textbox-container" class="form-group col-md-6 col-md-offset-3">
+
     <form ng-show="searchMode === TEXT_SEARCH" ng-submit="doSearch()">
         <div class="input-group">
             <input class="form-control" type="text" ng-model="searchParam" placeholder="search term here..." autofocus />
@@ -18,7 +19,6 @@
         <uib-progressbar class="progress-striped active" max="100" value="100" type="primary"><i>Fetching results...</i></uib-progressbar>
         <uib-alert class="longer-search-warning" ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</uib-alert>
     </div>
-
     <div id="results-label-container" class="row" ng-if="searchResults.length > 0">
         <div class="form-group col-md-12 text-center">
             <div id="search-results-header">
@@ -27,6 +27,7 @@
             </div>
             <div id="reset-results" class="btn btn-danger" ng-click="reset()"><span class="glyphicon glyphicon-retweet"></span> Reset results</div>
             <div ng-show="!fetching" id="open-report-button" class="btn btn-primary" ng-click="openReportModal()"><span class="glyphicon glyphicon-list-alt"></span> Search Results Summary</div>
+            <div id="download-json-results" ng-show="searchResults.length > 0 && saveUrl"><a ng-href="{{saveUrl}}" download="{{saveName}}"><span class="glyphicon glyphicon-download"></span> Download results as json</a></div>
         </div>
     </div>
     <div ng-show="searchMode === POPULAR_SEARCH" id="search-popular-wrapper" class="row">

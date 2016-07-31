@@ -1,7 +1,9 @@
 'use strict';
 
 angular.module('youtubeSearchApp', ['ui.router','ngRoute', 'ngAnimate', 'toaster', 'ui.bootstrap', 'chart.js']).
-    config(['$stateProvider', '$locationProvider', '$urlRouterProvider', '$routeProvider', '$httpProvider', 'ChartJsProvider', function($stateProvider, $locationProvider, $urlRouterProvider, $routeProvider, $httpProvider, ChartJsProvider) {
+    config(['$stateProvider', '$locationProvider', '$urlRouterProvider', '$routeProvider', '$httpProvider', 'ChartJsProvider', '$compileProvider', function($stateProvider, $locationProvider, $urlRouterProvider, $routeProvider, $httpProvider, ChartJsProvider, $compileProvider) {
+
+        $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|file|blob|mailto|chrome-extension):/);
 
         //$httpProvider.interceptors.push('httpRequestInterceptor');
         $httpProvider.defaults.useXDomain = true;

@@ -194,6 +194,7 @@ body{
 #sort-options-container, #filter-options-container{
     margin-left: 5px;
     margin-right: 5px;
+    margin-bottom: 10px;
 }
 
 .filter-content{
@@ -594,6 +595,7 @@ body{
     width: 35%;
     margin: 0px auto;
     margin-top: 4px;
+    margin-bottom: 4px;
     font-size: 16px;
 }
 
@@ -692,7 +694,7 @@ div.report-modal .modal-content {
 }
 
 #extended-search-wrapper button {
-    width: 45%;
+    width: 55%;
 }
 
 .question-mark:hover{
@@ -756,4 +758,32 @@ div.report-modal .modal-content {
     border-radius: 6px;
     color: white;
     font-size: 20px;
+}
+
+.fileUpload {
+	position: relative;
+	overflow: hidden;
+	margin: 20px;
+	width: 90%;
+}
+.fileUpload input.upload {
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin: 0;
+	padding: 0;
+	font-size: 20px;
+	cursor: pointer;
+	opacity: 0;
+	filter: alpha(opacity=0);
+}
+
+#download-json-results a{
+    color: #ec971f;
+    font-size: 18px;
+
+}
+
+#sort-options-container #category-wrapper, #sort-options-container #duration-wrapper, #sort-options-container #safe-search-wrapper{
+    text-align: center;
 }

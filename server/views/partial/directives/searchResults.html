@@ -17,7 +17,7 @@
     </ul>
     <table class="table">
         <tbody>
-        <tr ng-repeat="video in displayList">
+        <tr ng-repeat="video in displayList track by $index">
             <td>
                 <div ng-if="!video.playing" class="video-image-container">
                     <a ng-href="{{'https://www.youtube.com/watch?v=' + video.videoId}}" target="_blank">

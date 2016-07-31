@@ -40,7 +40,10 @@
         <div ng-show="quickFilterVisible">
           <input ng-show="!quickFilterReadonly" type="text" ng-blur="updateQuickFilter(); filter(); quickFilterReadonly = true" class="form-control" ng-model="filterText" placeholder="Filter artist and title."/>
           <div ng-show="quickFilterReadonly" class="readonly-quickfilter" ng-click="quickFilterReadonly = false">
-            <span ng-repeat="term in quickFilterTerms" ng-class="term.negate ? 'quickfilter-negate-term' : 'quickfilter-include-term'">{{term.value}}</span>
+            <span ng-show="quickFilterTerms.length > 0" ng-repeat="term in quickFilterTerms" ng-class="term.negate ? 'quickfilter-negate-term' : 'quickfilter-include-term'">{{term.value}}</span>
+            <div id="quick-filter-no-terms-specified" ng-show="quickFilterTerms.length === 0" class="text-center text-danger">
+              Click to add additional text filters
+            </div>
           </div>
           <div id="filter-type-wrapper" class="btn-group">
               <div id="filter-type-label-wrapper">

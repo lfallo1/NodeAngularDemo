@@ -1,10 +1,19 @@
 <div id="sort-filter-column" class="col-md-3">
+  <!-- upload json file -->
+  <div id="choose-json-file" class="row">
+    <div class="fileUpload btn btn-warning">
+        <span><span class="glyphicon glyphicon-upload"></span> Upload previously saved JSON file</span>
+        <input class="upload" type="file" name="file" onchange="angular.element(this).scope().uploadFile(this.files)"/>
+    </div>
+  </div>
+
     <!-- PRE-SEARCH FILTERS -->
-    <div id="pre-search-wrapper" class="row">
-        <div ng-show="searchMode === TEXT_SEARCH" id="date-range-input-group-wrapper" class="col-md-12">
-            <div id="date-range-header">Pre-Search Filters (Optional)
-                <span ng-show="preSearchFiltersVisible" class="toggle-button glyphicon glyphicon-minus" ng-click="setPreSearchFiltersVisible(false)"></span>
-                <span ng-show="!preSearchFiltersVisible" class="toggle-button glyphicon glyphicon-plus" ng-click="setPreSearchFiltersVisible(true)"></span>
+    <div ng-show="searchMode === TEXT_SEARCH" id="sort-and-filter" class="col-md-12">
+        <div id="sort-options-container" class="row">
+            <div class="row">
+              <div class="clickable col-md-12 sort-filter-header" ng-click="setPreSearchFiltersVisible(!preSearchFiltersVisible)">
+                  <div><span class="glyphicon glyphicon-sort"></span>Pre-Search Filters (Optional)</div>
+              </div>
             </div>
             <form ng-show="preSearchFiltersVisible" id="date-range-input-form" class="form-inline">
                 <div id="date-filter-wrapper">
@@ -91,10 +100,8 @@
     <div class="row">
         <div id="sort-and-filter" class="col-md-12">
             <div id="sort-options-container" class="row">
-                <div class="col-md-12 sort-filter-header">
+                <div class="clickable col-md-12 sort-filter-header" ng-click="setSortVisible(!sortVisible)">
                     <div class="sort-filter-header-content"><span class="glyphicon glyphicon-sort"></span>Sort</div>
-                    <span ng-show="sortVisible" class="toggle-button glyphicon glyphicon-minus" ng-click="setSortVisible(false)"></span>
-                    <span ng-show="!sortVisible" class="toggle-button glyphicon glyphicon-plus" ng-click="setSortVisible(true)"></span>
                 </div>
 
                 <div id="sort-content" class="btn-group col-md-12" ng-show="sortVisible">
@@ -108,10 +115,8 @@
                 </div>
             </div>
             <div id="filter-options-container" class="row">
-                <div class="col-md-12 sort-filter-header">
+                <div class="clickable col-md-12 sort-filter-header" ng-click="setFilterVisible(!filterVisible)">
                     <div class="sort-filter-header-content"><span class="glyphicon glyphicon-filter"></span>Post-Search Filters</div>
-                    <span ng-show="filterVisible" class="toggle-button glyphicon glyphicon-minus" ng-click="setFilterVisible(false)"></span>
-                    <span ng-show="!filterVisible" class="toggle-button glyphicon glyphicon-plus" ng-click="setFilterVisible(true)"></span>
                 </div>
                 <div class="col-md-12 filter-content-table" ng-show="filterVisible">
                     <table>

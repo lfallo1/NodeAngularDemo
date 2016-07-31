@@ -250,6 +250,7 @@
                 $scope.wasInterrupted = true;
                 $scope.fetching = false;
                 toaster.pop('info', '', 'Search stopped');
+                $scope.setSaveUrl();
             };
 
             /**
@@ -261,6 +262,7 @@
                 $scope.alerts = [];
                 $scope.fetching = false;
                 toaster.pop(toasterType, '', msg);
+                $scope.setSaveUrl();
             };
 
             /**
@@ -274,6 +276,29 @@
                     {order : 'viewCount', token : ''},
                     {order : 'title', token : ''}
                 ];
+            };
+
+            var resetAll = function(){
+              $scope.saveUrl = undefined;
+
+              $scope.alerts = [];
+
+              resetPagination();
+
+              iteration = 0;
+              $scope.related = undefined;
+              $scope.nextRelated = [];
+              $scope.checkRelated = false;
+              relatedPending = true;
+
+              resetSortOrders();
+              $scope.searchResults = [];
+              $scope.hashedResults = {};
+              $scope.displayList = [];
+              $scope.channelFilter = [];
+              $scope.tableData = [];
+
+              $scope.wasInterrupted = undefined;
             };
 
             /**
@@ -290,23 +315,7 @@
                 $scope.searchParam = $scope.searchParam.trim();
                 if($scope.searchParam){
 
-                    $scope.alerts = [];
-
-                    resetPagination();
-
-                    iteration = 0;
-                    $scope.related = undefined;
-                    $scope.nextRelated = [];
-                    $scope.checkRelated = false;
-                    relatedPending = true;
-
-                    resetSortOrders();
-                    $scope.searchResults = [];
-                    $scope.hashedResults = {};
-                    $scope.channelFilter = [];
-                    $scope.tableData = [];
-
-                    $scope.wasInterrupted = undefined;
+                    resetAll();
                     $scope.fetching = true;
 
                     videoDuration = $scope.videoDuration ? '&videoDuration=' + $scope.videoDuration : '';
@@ -481,6 +490,7 @@
             $scope.searchPopular = function(){
                 $scope.searchResults = [];
                 $scope.wasInterrupted = undefined;
+                $scope.saveUrl = undefined;
                 $scope.fetching = true;
                 if($scope.selectedCategory && $scope.selectedCategory.id && $scope.selectedCategory.id > 0){
                     $scope.fetchPopularByCountryAndCategory($scope.selectedCountry['alpha-2'], $scope.selectedCategory.id);
@@ -1029,6 +1039,54 @@
                 $scope.filter();
             };
 
+            var createJsonObjectForFile = function(){
+              return {
+                'searchResults':$scope.searchResults,
+                'sortField': $scope.sortField.value,
+                'filterText': $scope.filterText,
+                'minViews': $scope.minViews,
+                'minDislikes': $scope.minDislikes,
+                'minDate': $scope.minDate,
+                'maxData': $scope.maxDate,
+                'minRating': $scope.minRating,
+                'shorterThanFilter': $scope.shorterThanFilter,
+                'longerThanFilter': $scope.longerThanFilter,
+                'quickFilterTerms': $scope.quickFilterTerms,
+                'searchParam': $scope.searchParam,
+                'quickFilterType': $scope.quickFilterType
+              }
+            };
+
+            var setupJsonObjectsFromFile = function(json){
+
+              if(!json.searchResults){
+                toaster.pop('error', '', 'Unable to read file');
+                return;
+              }
+
+              $scope.searchResults = json.searchResults;
+              $scope.sortField.value = json.sortField;
+              $scope.filterText = json.filterText;
+              $scope.minViews = json.minViews;
+              $scope.minDislikes = json.minDislikes;
+              $scope.minDate = json.minDate ? new Date(json.minDate) : null;
+              $scope.maxDate = json.maxDate ? new Date(json.maxDate) : null;
+              $scope.minRating = json.minRating;
+              $scope.shorterThanFilter = json.shorterThanFilter;
+              $scope.longerThanFilter = json.longerThanFilter;
+              $scope.quickFilterTerms = json.quickFilterTerms;
+              $scope.quickFilterType = json.quickFilterType;
+              $scope.searchParam = json.searchParam;
+
+              //convert date properties (they come back as strings) on search results back to date objects
+              $scope.searchResults.forEach(function(video){
+                video.created = new Date(video.created);
+              });
+
+              $scope.quickFilterReadonly = true;
+              $scope.updateQuickFilter();
+            }
+
             $scope.filter = function(){
                 if((!$scope.filterText || $scope.filterText.trim().length === 0) && !$scope.minViews && (!$scope.minDislikes && $scope.minDislikes !== 0) && !$scope.minDate && !$scope.shorterThanFilter && !$scope.longerThanFilter && !$scope.minRating){
                     $scope.filteredResults = $scope.searchResults;
@@ -1038,12 +1096,13 @@
                         if(((!$scope.minDislikes && $scope.minDislikes !== 0) || d.dislikes <= $scope.minDislikes) &&
                             (!$scope.minViews || d.viewCount >= $scope.minViews) &&
                             (!$scope.minRating || d.pctLikes >= $scope.minRating) &&
-                            (!$scope.maxDate || d.created >= $scope.maxDate) &&
+                            (!$scope.maxDate || d.created <= $scope.maxDate) &&
                             (!$scope.minDate || d.created >= $scope.minDate) && durationFilter(d) && quickFilter(d)){
                             return d;
                         }
                     });
                 }
+                $scope.setSaveUrl();
                 $scope.paginate();
             };
 
@@ -1089,6 +1148,88 @@
 
             $scope.closeAlert = function(idx){
                 $scope.alerts.splice(idx,1);
+            };
+
+            $scope.setSaveUrl = function(){
+              var data = createJsonObjectForFile();
+              var json = JSON.stringify(data);
+              var blob = new Blob([json], {type: "application/json"});
+              $scope.saveUrl  = URL.createObjectURL(blob);
+              $scope.saveName = $scope.searchParam.replace(" ","_") + new Date().getTime().toString() + ".json";
+            };
+
+            $scope.uploadFile = function(files) {
+
+              if(files.length > 1){
+
+                //must select only one file
+                toaster.pop('error','','Please select only one file');
+                return;
+              } else {
+
+                //get the file, and validate
+                var file = files[0];
+
+                if(file.size > 15728640 || file.type !== 'application/json'){
+                  //max file size 15mb and must be json
+                  toaster.pop('error','','Please upload a json file less than 15mb')
+                  return;
+                }
+
+                //upload the file
+                readAsDataURL(files[0], $scope).then(function(res){
+                  $http.get(res).then(function(json){
+                    setupJsonObjectsFromFile(json.data);
+                    $scope.sort();
+                  }, function(err){
+                    toaster.pop('error', '', 'Unable to read file');
+                    console.log(err);
+                  })
+                });
+              }
+            };
+
+            var onLoad = function(reader, deferred, scope) {
+                return function () {
+                    scope.$apply(function () {
+                        deferred.resolve(reader.result);
+                    });
+                };
+            };
+
+            var onError = function (reader, deferred, scope) {
+                return function () {
+                    scope.$apply(function () {
+                        deferred.reject(reader.result);
+                    });
+                };
+            };
+
+            var onProgress = function(reader, scope) {
+                return function (event) {
+                    scope.$broadcast("fileProgress",
+                        {
+                            total: event.total,
+                            loaded: event.loaded
+                        });
+                };
+            };
+
+            var getReader = function(deferred, scope) {
+                var reader = new FileReader();
+                reader.onload = onLoad(reader, deferred, scope);
+                reader.onerror = onError(reader, deferred, scope);
+                reader.onprogress = onProgress(reader, scope);
+                return reader;
+            };
+
+            var readAsDataURL = function (file, scope) {
+                var deferred = $q.defer();
+
+                var reader = getReader(deferred, scope);
+                reader.readAsDataURL(file);
+
+                return deferred.promise;
             };
 
             init();
