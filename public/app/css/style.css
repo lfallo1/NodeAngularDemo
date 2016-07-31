@@ -595,7 +595,7 @@ body{
     width: 35%;
     margin: 0px auto;
     margin-top: 4px;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
     font-size: 16px;
 }
 
@@ -781,7 +781,7 @@ div.report-modal .modal-content {
 #download-json-results a{
     color: #ec971f;
     font-size: 18px;
-
+    font-weight: bold;
 }
 
 #sort-options-container #category-wrapper, #sort-options-container #duration-wrapper, #sort-options-container #safe-search-wrapper{

@@ -27,7 +27,7 @@
             </div>
             <div id="reset-results" class="btn btn-danger" ng-click="reset()"><span class="glyphicon glyphicon-retweet"></span> Reset results</div>
             <div ng-show="!fetching" id="open-report-button" class="btn btn-primary" ng-click="openReportModal()"><span class="glyphicon glyphicon-list-alt"></span> Search Results Summary</div>
-            <div id="download-json-results" ng-show="searchResults.length > 0 && saveUrl"><a ng-href="{{saveUrl}}" download="{{saveName}}"><span class="glyphicon glyphicon-download"></span> Download results as json</a></div>
+            <div id="download-json-results" ng-show="searchResults.length > 0 && saveUrl && !fetching"><a ng-href="{{saveUrl}}" download="{{saveName}}"><span class="glyphicon glyphicon-download"></span> Download results as json</a></div>
         </div>
     </div>
     <div ng-show="searchMode === POPULAR_SEARCH" id="search-popular-wrapper" class="row">
