@@ -70,25 +70,29 @@
                         </button>
                         <span class="question-mark" popover-placement="top-right" uib-popover="Extended search automatically saves a list of highly matching videos during initial search and then performs additional searches using the compiled list." popover-title="Search Mode Definitions" type="button"><span class="glyphicon glyphicon-question-sign" ng-click=""></span></span>
                     </div>
+
                     <div id="interval-search-wrapper">
 
-                    <!--Interval search performs each query in time intervals. Options are annual (12 month intervals), biannual (6 month intervals), and biennial (24 month intervals).-->
+                      <!--Interval search performs each query in time intervals. Options are annual (12 month intervals), biannual (6 month intervals), and biennial (24 month intervals).-->
 
-                    <!--&lt;!&ndash; Split button &ndash;&gt;-->
-                    <div class="btn-group" uib-dropdown>
-                    <button type="button" class="btn btn-info" ng-model="intervalSearch" uib-btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
-                    <span class="glyphicon glyphicon-calendar"></span>Interval Search
-                    </button>
-                    <button type="button" class="btn btn-info" uib-dropdown-toggle>
-                    <span class="caret"></span>
-                    <span class="sr-only">Split button!</span>
-                    </button>
-                    <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
-                    <li ng-click="setSelectedIntervalType(dateIntervalTypes.ANNUAL)"  role="menuitem"><a href=""><span ng-click="setSelectedIntervalType(dateIntervalTypes.ANNUAL)" ng-show="selectedIntervalType === dateIntervalTypes.ANNUAL" class="glyphicon glyphicon-ok"></span>Yearly</a></li>
-                    <li ng-click="setSelectedIntervalType(dateIntervalTypes.BIENNIAL)"  role="menuitem"><a href=""><span ng-show="selectedIntervalType === dateIntervalTypes.BIENNIAL" class="glyphicon glyphicon-ok"></span>Biennial</a></li>
-                    <li ng-click="setSelectedIntervalType(dateIntervalTypes.BIANNUAL)" role="menuitem"><a href=""><span ng-show="selectedIntervalType === dateIntervalTypes.BIANNUAL" class="glyphicon glyphicon-ok"></span>Biannual</a></li>
-                    </ul>
-                    </div>
+                      <!--&lt;!&ndash; Split button &ndash;&gt;-->
+
+                      <!--
+                      <div class="btn-group" uib-dropdown>
+                      <button type="button" class="btn btn-info" ng-model="intervalSearch" uib-btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
+                      <span class="glyphicon glyphicon-calendar"></span>Interval Search
+                      </button>
+                      <button type="button" class="btn btn-info" uib-dropdown-toggle>
+                      <span class="caret"></span>
+                      <span class="sr-only">Split button!</span>
+                      </button>
+                      <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
+                      <li ng-click="setSelectedIntervalType(dateIntervalTypes.ANNUAL)"  role="menuitem"><a href=""><span ng-click="setSelectedIntervalType(dateIntervalTypes.ANNUAL)" ng-show="selectedIntervalType === dateIntervalTypes.ANNUAL" class="glyphicon glyphicon-ok"></span>Yearly</a></li>
+                      <li ng-click="setSelectedIntervalType(dateIntervalTypes.BIENNIAL)"  role="menuitem"><a href=""><span ng-show="selectedIntervalType === dateIntervalTypes.BIENNIAL" class="glyphicon glyphicon-ok"></span>Biennial</a></li>
+                      <li ng-click="setSelectedIntervalType(dateIntervalTypes.BIANNUAL)" role="menuitem"><a href=""><span ng-show="selectedIntervalType === dateIntervalTypes.BIANNUAL" class="glyphicon glyphicon-ok"></span>Biannual</a></li>
+                      </ul>
+                      </div>
+                      -->
                     </div>
                 </div>
             </form>
