@@ -4,20 +4,23 @@ body{
 }
 
 #sort-filter-column{
-    background: rgba(0,0,0,0.04);
-    border: 1px solid rgba(0,0,0,.1);
-    border-radius: 8px;
+    border-right: 2px solid rgba(160,160,160,0.5);
+    background: rgba(160,160,160,0.08);
 }
 
 #page-header{
     margin-left: 30px;
 }
 
-#page-header #you, #page-header #tube{
-    font-size: 42px;
+#title-text{
+    color: white;
 }
 
-#page-header #tube{
+#you{
+    margin-right: 2px;
+}
+
+#tube{
     color: white;
     background: rgba(231, 5, 23, 1);
     padding: 4px;
@@ -255,7 +258,7 @@ body{
 
 .google-button {
     position: absolute;
-    top: 15px;
+    top: 6px;
     right: 50px;
 }
 
@@ -319,10 +322,15 @@ body{
 }
 
 #search-mode-btn-wrapper .btn{
-    padding: 10px 25px;
-    font-size: 24px;
+    padding: 4px 20px;
+    font-size: 20px;
     margin-right: -4px;
-    color: #01579B !important;
+    border-radius: 0
+}
+
+.btn-default:hover, .btn-default:active, .btn-default.active, .open > .dropdown-toggle.btn-default{
+    background: rgb(1,87,155) !important;
+    color: white;
 }
 
 #search-popular-wrapper select{
@@ -375,7 +383,6 @@ body{
 }
 
 #sort-content-wrapper .btn.active{
-    color:rgb(1,87,155);
     font-weight: bold;
 }
 
@@ -641,10 +648,6 @@ div.report-modal .modal-content {
     font-size: 14px;
 }
 
-#results-and-filters{
-    margin-top: -25px;
-}
-
 #chart-area .well{
     margin: 0px auto;
     width: 750px;
@@ -786,4 +789,16 @@ div.report-modal .modal-content {
 
 #sort-options-container #category-wrapper, #sort-options-container #duration-wrapper, #sort-options-container #safe-search-wrapper{
     text-align: center;
+}
+
+#input-container{
+    background: linear-gradient(rgb(70,70,70),rgb(50,50,50), rgb(70,70,70));
+    margin: 0 auto;
+    width: 100%;
+    margin-top: -20px;
+    padding: 20px;
+}
+
+.navbar{
+    border-radius: 0px;
 }
