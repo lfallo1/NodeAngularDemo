@@ -978,7 +978,7 @@
 
             var isTextInVideo = function(videoTitle, videoChannelTitle, searchText){
               if(searchText.negate){
-                  return !(videoTitle.indexOf(searchText.value) > -1) || (videoChannelTitle.indexOf(searchText.value) > -1);
+                  return !((videoTitle.indexOf(searchText.value) > -1) || (videoChannelTitle.indexOf(searchText.value) > -1));
               }
               return (videoTitle.indexOf(searchText.value) > -1) || (videoChannelTitle.indexOf(searchText.value) > -1);
             };
