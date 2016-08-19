@@ -7,7 +7,7 @@ var ffmpeg = require('fluent-ffmpeg');
 //var apiKey = process.env.YOUTUBE_API_KEY || 'AIzaSyB3v4vF0MIHB00iTr4lAxW2ONwZNmTR0HM';
 var apiKey = process.env.YOUTUBE_API_KEY || 'AIzaSyC5yjrJfXxhqyjOGC52qlGqXa-fodne9JM';
 
-var ffmpegLocation = process.env.FFMPEG || '/Users/lancefallon/Documents/angularProjects/NodeAngularDemo/server/ffmpeg/mac/ffmpeg_10.6+/ffmpeg';
+var ffmpegLocation = process.env.FFMPEG || '/Users/lfallon/youtubeAgent/NodeAngularDemo/server/ffmpeg/mac/ffmpeg_10.6+/ffmpeg';
 
 //var apiKey = 'AIzaSyAY8aVa_oVZya_-a53oyFikvs-RwJfNDuk';
 
@@ -49,8 +49,7 @@ module.exports.toMp3 = function(req, res, next){
         res.setHeader('Content-type', 'audio/mpeg');
         res.write(file);
         res.end('', function(){
-            fs.unlinkSync(__dirname + '/' + id + timestamp + '.mp3');
+            // fs.unlinkSync(__dirname + '/' + id + timestamp + '.mp3');
         });
     });
 };
-
