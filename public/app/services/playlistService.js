@@ -129,6 +129,30 @@
             return deferred.promise;
         };
 
+        service.savePlaylistAsMp3 = function(){
+
+          choosePlaylist().then(function (selectedPlaylist) {
+            var playlistId = '&playlistId=' + selectedPlaylist.id;
+            var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50' + playlistId;
+            $http.post('api/youtube/get', {'url' : url}).then(function(res){
+              var videos = res.data.items;
+              var promises = [];
+              for(var i = 0; i < videos.length; i++){
+                promises.push($http.get('api/youtube/mp3/' + videos[i].contentDetails.videoId));
+              }
+              $q.all(promises).then(function(res){
+                console.log(res);
+              }, function(err){
+                console.log(err);
+              });
+            }, function(err){
+              toaster.pop('error', '', 'Unable to download playlist at this time');
+            });
+          }, function(err){
+
+          });
+        };
+
         var addMultipleToPlaylistWrapper = function(videos, playlist, deferred){
             var deferred = deferred || $q.defer();
 
@@ -188,7 +212,7 @@
             });
 
             return deferred.promise;
-        }
+        };
 
         var saveVideoToPlaylist = function(video, playlist){
             var deferred = $q.defer();

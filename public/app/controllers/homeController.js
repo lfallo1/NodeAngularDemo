@@ -1142,6 +1142,8 @@
               video.downloadDisabled = true;
             };
 
+            $scope.downloadPlaylist = PlaylistService.savePlaylistAsMp3;
+
             $scope.setSelectedIntervalType = function(value){
                 $scope.selectedIntervalType = value;
             };
