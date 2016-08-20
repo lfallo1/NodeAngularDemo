@@ -7,7 +7,7 @@ var ffmpeg = require('fluent-ffmpeg');
 //var apiKey = process.env.YOUTUBE_API_KEY || 'AIzaSyB3v4vF0MIHB00iTr4lAxW2ONwZNmTR0HM';
 var apiKey = process.env.YOUTUBE_API_KEY || 'AIzaSyC5yjrJfXxhqyjOGC52qlGqXa-fodne9JM';
 
-var ffmpegLocation = process.env.FFMPEG || '/Users/lfallon/youtubeAgent/NodeAngularDemo/server/ffmpeg/mac/ffmpeg_10.6+/ffmpeg';
+var ffmpegLocation = process.env.FFMPEG || '/Users/lancefallon/Documents/angularProjects/NodeAngularDemo/server/ffmpeg/mac/ffmpeg_10.6+/ffmpeg';
 
 //var apiKey = 'AIzaSyAY8aVa_oVZya_-a53oyFikvs-RwJfNDuk';
 
@@ -41,6 +41,32 @@ module.exports.toMp3 = function(req, res, next){
     youtubedl(url, { filter: 'audioonly' })
       .pipe(res);
 };
+
+// module.exports.toMp3 = function(req, res, next){
+//     var id = req.params.id;
+//     var title = req.params.title;
+//     var ytUrl = 'https://www.youtube.com/watch?v=' + id;
+//     var stream = youtubedl(ytUrl);
+//     var timestamp = '_' + new Date().getTime();
+//     console.log(timestamp);
+//
+//     var proc = new ffmpeg({source: stream});
+//     proc.setFfmpegPath(ffmpegLocation);
+//     proc.withAudioCodec('libmp3lame')
+//         .toFormat('mp3')
+//         .output(__dirname + '/' + id + timestamp + '.mp3')
+//         .run();
+//     proc.on('end', function() {
+//         var file = fs.readFileSync(__dirname + '/' + id + timestamp + '.mp3');
+//         res.setHeader('Content-Length', file.length);
+//         res.setHeader('Content-disposition', 'attachment; filename=' + title + '.mp3');
+//         res.setHeader('Content-type', 'audio/mpeg');
+//         res.write(file);
+//         res.end('', function(){
+//             fs.unlinkSync(__dirname + '/' + id + timestamp + '.mp3');
+//         });
+//     });
+// };
 
 module.exports.toMp4 = function(req, res, next){
   var title = req.params.title;
