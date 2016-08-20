@@ -49,7 +49,7 @@ module.exports.toMp4 = function(req, res, next){
 
   res.type('video/mp4');
 
-  var video = youtubedl(url);
+  var video = youtubedl(url, '', ['--max-quality=18']);
   video.on('info', function (info) {
       res.set({
           'Content-Disposition': 'attachment; filename="' + title + '.mp4'
