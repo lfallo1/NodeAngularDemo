@@ -809,3 +809,14 @@ div.report-modal .modal-content {
 .navbar{
     border-radius: 0px;
 }
+
+#scrollToTopButton{
+    text-align: center;
+}
+
+#scrollToTopButton button{
+    width: 50%;
+    margin-bottom: 5px;
+    font-size: 20px;
+    font-weight: bolder;
+}

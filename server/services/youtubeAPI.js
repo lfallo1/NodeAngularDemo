@@ -30,26 +30,35 @@ _options = options;
 };
 
 module.exports.toMp3 = function(req, res, next){
+    var title = req.params.title;
     var id = req.params.id;
-    var ytUrl = 'https://www.youtube.com/watch?v=' + id;
-    var stream = youtubedl(ytUrl);
-    var timestamp = '_' + new Date().getTime();
-    console.log(timestamp);
-
-    var proc = new ffmpeg({source: stream});
-    proc.setFfmpegPath(ffmpegLocation);
-    proc.withAudioCodec('libmp3lame')
-        .toFormat('mp3')
-        .output(__dirname + '/' + id + timestamp + '.mp3')
-        .run();
-    proc.on('end', function() {
-        var file = fs.readFileSync(__dirname + '/' + id + timestamp + '.mp3');
-        res.setHeader('Content-Length', file.length);
-        res.setHeader('Content-disposition', 'attachment; filename=' + id + '.mp3');
-        res.setHeader('Content-type', 'audio/mpeg');
-        res.write(file);
-        res.end('', function(){
-            // fs.unlinkSync(__dirname + '/' + id + timestamp + '.mp3');
-        });
+    var url = 'https://www.youtube.com/watch?v=' + id;
+    res.type('audio/mpeg');
+    res.set({
+        'Content-Disposition': 'attachment; filename="' + title + '.m4v'
     });
+
+    youtubedl(url, { filter: 'audioonly' })
+      .pipe(res);
+};
+
+module.exports.toMp4 = function(req, res, next){
+  var title = req.params.title;
+  var id = req.params.id;
+  var url = 'https://www.youtube.com/watch?v=' + id;
+
+  res.type('video/mp4');
+
+  var video = youtubedl(url);
+  video.on('info', function (info) {
+      res.set({
+          'Content-Disposition': 'attachment; filename="' + title + '.mp4'
+      })
+  });
+  video.on('data', function (data) {
+      res.write(data);
+  });
+  video.on('end', function () {
+      res.end()
+  });
 };

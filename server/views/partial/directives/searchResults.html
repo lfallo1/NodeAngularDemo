@@ -18,7 +18,7 @@
     <table class="table">
         <tbody>
         <tr ng-repeat="video in displayList track by $index">
-            <td>
+            <td id="{{video.videoId}}">
                 <div ng-if="!video.playing" class="video-image-container">
                     <a ng-href="{{'https://www.youtube.com/watch?v=' + video.videoId}}" target="_blank">
                         <img src="{{video.thumbnail.url}}" width="250px" class="thumbnail" />
@@ -49,8 +49,12 @@
                     <div class="dislikes"><small>Dislikes</small> {{video.dislikes}}</div>
                     <div class="video-buttons row">
                         <div class="col-md-12">
-                            <div class="download-mp3"><a class="btn btn-success" ng-show="!video.downloadDisabled" target="_self" href="api/youtube/mp3/{{video.videoId}}" download="{{video.videoId + '.mp3'}}" ng-click="disableDownload(video)"><span class="glyphicon glyphicon-headphones"></span>Download mp3</a></div>
-                            <div class="download-mp3"><a class="btn btn-success" ng-show="video.downloadDisabled" disabled><span class="glyphicon glyphicon-headphones"></span>Download mp3</a></div>
+                            <div class="download-mp3"><a class="btn btn-success" ng-show="!video.downloadAudioDisabled" target="_self" href="api/youtube/mp3/{{video.videoId}}/{{video.safeTitle}}" download="{{video.safeTitle + '.mp3'}}" ng-click="disableAudioDownload(video)"><span class="glyphicon glyphicon-headphones"></span>Download mp3</a></div>
+                            <div class="download-mp3"><a class="btn btn-success" ng-show="video.downloadAudioDisabled" disabled><span class="glyphicon glyphicon-headphones"></span>Download mp3</a></div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="download-mp3"><a class="btn btn-success" ng-show="!video.downloadVideoDisabled" target="_self" href="api/youtube/mp4/{{video.videoId}}/{{video.safeTitle}}" download="{{video.safeTitle + '.mp4'}}" ng-click="disableVideoDownload(video)"><span class="glyphicon glyphicon-download"></span>Download video</a></div>
+                            <div class="download-mp3"><a class="btn btn-success" ng-show="video.downloadVideoDisabled" disabled><span class="glyphicon glyphicon-download"></span>Download video</a></div>
                         </div>
                         <div class="col-md-12">
                             <div ng-if="AuthService.isLoggedIn()" class="add-playlist-button btn btn-success" ng-click="playlistService.addToPlaylist(video)"><span class="glyphicon glyphicon-plus"></span> Youtube playlist</div>

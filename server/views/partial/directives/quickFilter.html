@@ -11,6 +11,11 @@
         </div>
     </div>
 
+    <!-- Scroll button -->
+    <div id="scrollToTopButton" ng-show="searchResults.length > 0">
+      <button class="btn btn-default" ng-click="scrollToElement('results')"><span class="glyphicon glyphicon-arrow-up"></span>Scroll top</button>
+    </div>
+
     <!-- WATCH LIST -->
     <div id="watchlist" ng-show="watchlist.length > 0" class="col-md-12">
         <button id="watchlist-header" class="btn btn-default" ng-click="openListManagerModal(watchlist, WATCHLIST_MODAL_CTRL, 'watchlistModal.html')">
@@ -23,6 +28,7 @@
     <div id="save-selected-items" ng-show="selectedVideos.length > 0 && AuthService.isLoggedIn()" class="col-md-12">
         <button ng-disabled="savingToPlaylist" class="btn btn-success" ng-click="openListManagerModal(selectedVideos, BULK_PLAYLIST_MODAL_CTRL, 'bulkPlaylistModal.html')"><span class="glyphicon glyphicon-floppy-disk"></span>Selected videos ({{selectedVideos.length}} videos)</button>
     </div>
+
     <div class="col-md-12" ng-show="searchResults.length > 0">
         <!-- <div id="quick-filter-terms-list" ng-if="quickFilterTerms.length > 0">
           <ul class="list-group">
@@ -38,7 +44,7 @@
             <span ng-if="!quickFilterVisible" class="glyphicon glyphicon-plus"></span>
         </div>
         <div ng-show="quickFilterVisible">
-          <input ng-show="!quickFilterReadonly" type="text" ng-blur="updateQuickFilter(); filter(); quickFilterReadonly = true" class="form-control" ng-model="filterText" placeholder="Filter artist and title."/>
+          <input ng-show="!quickFilterReadonly" type="text" ng-blur="updateQuickFilter(); filter(); quickFilterReadonly = true; scrollToElement('results', true);" class="form-control" ng-model="filterText" placeholder="Filter artist and title."/>
           <div ng-show="quickFilterReadonly" class="readonly-quickfilter" ng-click="quickFilterReadonly = false">
             <span ng-show="quickFilterTerms.length > 0" ng-repeat="term in quickFilterTerms" ng-class="term.negate ? 'quickfilter-negate-term' : 'quickfilter-include-term'">{{term.value}}</span>
             <div id="quick-filter-no-terms-specified" ng-show="quickFilterTerms.length === 0" class="text-center text-danger">

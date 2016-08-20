@@ -129,28 +129,24 @@
             return deferred.promise;
         };
 
-        service.savePlaylistAsMp3 = function(){
-
-          choosePlaylist().then(function (selectedPlaylist) {
-            var playlistId = '&playlistId=' + selectedPlaylist.id;
-            var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50' + playlistId;
-            $http.post('api/youtube/get', {'url' : url}).then(function(res){
-              var videos = res.data.items;
-              var promises = [];
-              for(var i = 0; i < videos.length; i++){
-                promises.push($http.get('api/youtube/mp3/' + videos[i].contentDetails.videoId));
-              }
-              $q.all(promises).then(function(res){
-                console.log(res);
-              }, function(err){
-                console.log(err);
-              });
-            }, function(err){
-              toaster.pop('error', '', 'Unable to download playlist at this time');
-            });
+        service.getVideosInPlaylist = function(id, videos, pageToken, deferred){
+          var accessToken = AuthService.isLoggedIn() ? '&access_token=' + gapi.auth2.getAuthInstance().currentUser.get().hg.access_token : '';
+          var pageToken = pageToken ? '&pageToken=' + pageToken : '';
+          var deferred = deferred || $q.defer();
+          var videos = videos || [];
+          var playlistId = '&playlistId=' + id;
+          var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50' + playlistId + pageToken + accessToken;
+          $http.get(url).then(function(res){
+            videos.push(res);
+            if(res.data.nextPageToken){
+              service.getVideosInPlaylist(id, videos, res.data.nextPageToken, deferred);
+              return;
+            }
+            deferred.resolve(videos);
           }, function(err){
-
+            deferred.reject(err);
           });
+          return deferred.promise;
         };
 
         var addMultipleToPlaylistWrapper = function(videos, playlist, deferred){
@@ -182,8 +178,6 @@
 
             // load all playlists then open a modal, passing the list of playlists as content
             service.loadPlaylists().then(function(playlists){
-
-
 
                 var modalInstance = $uibModal.open({
                     templateUrl: 'partials/playlistModal.html',

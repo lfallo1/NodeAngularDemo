@@ -3,8 +3,8 @@
  */
 (function(){
     angular.module('youtubeSearchApp').controller('HomeCtrl', [
-        '$rootScope', '$scope', '$http', '$q', '$log', '$timeout', '$location', 'TimeService', 'toaster', '$window', '$uibModal', 'AuthService', 'PlaylistService', '$sce', 'CountriesService',
-        function($rootScope, $scope, $http, $q, $log, $timeout, $location, TimeService, toaster, $window, $uibModal, AuthService, PlaylistService, $sce, CountriesService){
+        '$rootScope', '$scope', '$http', '$q', '$log', '$timeout', '$location', 'TimeService', 'toaster', '$window', '$uibModal', 'AuthService', 'PlaylistService', '$sce', 'CountriesService', '$anchorScroll',
+        function($rootScope, $scope, $http, $q, $log, $timeout, $location, TimeService, toaster, $window, $uibModal, AuthService, PlaylistService, $sce, CountriesService, $anchorScroll){
 
             var youtubeSearchBase = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=';
             var youtubeVideoBase = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=';
@@ -77,6 +77,7 @@
             var sortOrders = [];
             $scope.TEXT_SEARCH = 1;
             $scope.POPULAR_SEARCH = 2;
+            $scope.PLAYLIST_SEARCH = 3;
             $scope.WATCHLIST_MODAL_CTRL = 'WatchlistModalCtrl';
             $scope.BULK_PLAYLIST_MODAL_CTRL = 'BulkPlaylistModalCtrl';
             $scope.quickFilterType = "0";
@@ -227,6 +228,12 @@
 
             $scope.setPlaying = function(video, val){
                 video.playing = val;
+
+                //when video player expands, it can cause page to scroll away from desired / expanded video.
+                //this adds the scroll to method to end of digest loop, so that once video loads / expands, the page will correctly set its posision
+                $timeout(function(){
+                    $scope.scrollToElement(video.videoId);
+                },0);
             };
 
             $scope.getIFrameSrc = function (videoId) {
@@ -307,14 +314,12 @@
             $scope.doSearch = function(){
 
                 //if already searching, just return immediately
-                if($scope.fetching){
+                $scope.searchParam = $scope.searchParam.trim();
+                if($scope.fetching || !$scope.searchParam){
                     return;
                 }
 
-                //if a search term exists
-                $scope.searchParam = $scope.searchParam.trim();
-                if($scope.searchParam){
-
+                if($scope.searchMode === $scope.TEXT_SEARCH){
                     resetAll();
                     $scope.fetching = true;
 
@@ -334,6 +339,9 @@
 
                     //call the wrapper
                     fetchResultsWrapper(0);
+                }
+                else if($scope.searchMode === $scope.PLAYLIST_SEARCH){
+                  getVideosInPlaylist();
                 }
             };
 
@@ -668,6 +676,7 @@
 
                         var videoObject = {
                             "title": title,
+                            "safeTitle": title.substring(0,30).trim().replace(/\W+/g, "_"),
                             "channelTitle": channelTitle,
                             "channelId": channelId,
                             "created": created,
@@ -806,7 +815,12 @@
                     var count = 0;
                     var idList = [];
                     while (count < 50 && i < nonDuplicates.length) {
-                        var videoId = nonDuplicates[i].id.videoId || nonDuplicates[i].id;
+                        var videoId = null;
+                        if(nonDuplicates[i].contentDetails){
+                            videoId = nonDuplicates[i].contentDetails.videoId;
+                        } else{
+                            videoId = nonDuplicates[i].id.videoId || nonDuplicates[i].id;
+                        }
                         idList.push(videoId);
                         i++;
                         count++;
@@ -1053,7 +1067,8 @@
                 'longerThanFilter': $scope.longerThanFilter,
                 'quickFilterTerms': $scope.quickFilterTerms,
                 'searchParam': $scope.searchParam,
-                'quickFilterType': $scope.quickFilterType
+                'quickFilterType': $scope.quickFilterType,
+                'searchMode' : $scope.searchMode
               }
             };
 
@@ -1077,6 +1092,7 @@
               $scope.quickFilterTerms = json.quickFilterTerms;
               $scope.quickFilterType = json.quickFilterType;
               $scope.searchParam = json.searchParam;
+              $scope.searchMode = json.searchMode || $scope.TEXT_SEARCH;
 
               //convert date properties (they come back as strings) on search results back to date objects
               $scope.searchResults.forEach(function(video){
@@ -1138,11 +1154,38 @@
                 $scope.sortVisible = val;
             };
 
-            $scope.disableDownload = function(video){
-              video.downloadDisabled = true;
+            $scope.disableAudioDownload = function(video){
+              video.downloadAudioDisabled = true;
             };
 
-            $scope.downloadPlaylist = PlaylistService.savePlaylistAsMp3;
+            $scope.disableVideoDownload = function(video){
+              video.downloadVideoDisabled = true;
+            };
+
+            var getVideosInPlaylist = function(){
+              $scope.fetching = true;
+              PlaylistService.getVideosInPlaylist($scope.searchParam).then(function(videos){
+                var nonDups = getNonDuplicates(videos);
+
+                var promises = createBatchVideoRequest(nonDups);
+
+                $q.all(promises).then(function (res) {
+                    var data = [];
+                    for (var i = 0; i < res.length; i++) {
+                        data = data.concat(res[i].data.items);
+                    }
+
+                    addVideosToList(data);
+                    $scope.sort();
+
+                    $scope.fetching = false;
+                }, function (err) {
+                    stopSearch('Service unavailable', 'error');
+                })
+              }, function(err){
+                stopSearch('Playlist not available or access denied', 'Unable to fetch playlist at this time');
+              });
+            }
 
             $scope.setSelectedIntervalType = function(value){
                 $scope.selectedIntervalType = value;
@@ -1232,6 +1275,18 @@
                 reader.readAsDataURL(file);
 
                 return deferred.promise;
+            };
+
+            $scope.scrollToElement = function(elementId, endOfDigest){
+              if(endOfDigest){
+                  $timeout(function(){
+                    var id = elementId || '';
+                    $anchorScroll(id);
+                  },0);
+              } else{
+                var id = elementId || '';
+                $anchorScroll(id);
+              }
             };
 
             init();

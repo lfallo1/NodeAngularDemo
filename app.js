@@ -41,7 +41,8 @@ app.get('/partials/directives/:name', function(req, res){
 //Endpoints
 app.use('/api/countries', countriesAPI.getAll);
 app.use('/api/youtube/get', youtubeAPI.get);
-app.use('/api/youtube/mp3/:id', youtubeAPI.toMp3);
+app.use('/api/youtube/mp3/:id/:title', youtubeAPI.toMp3);
+app.use('/api/youtube/mp4/:id/:title', youtubeAPI.toMp4);
 app.use('/api/config', function(req,res,next){
     res.json({'clientId' : clientId, 'authCallbackUrl' : authCallbackUrl});
 })
