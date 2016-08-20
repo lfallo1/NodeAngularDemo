@@ -820,3 +820,7 @@ div.report-modal .modal-content {
     font-size: 20px;
     font-weight: bolder;
 }
+
+#playlist-search-mode-button .glyphicon{
+    margin-right: 3px;
+}
