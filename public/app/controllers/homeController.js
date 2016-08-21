@@ -319,8 +319,9 @@
                     return;
                 }
 
+                resetAll();
+
                 if($scope.searchMode === $scope.TEXT_SEARCH){
-                    resetAll();
                     $scope.fetching = true;
 
                     videoDuration = $scope.videoDuration ? '&videoDuration=' + $scope.videoDuration : '';
