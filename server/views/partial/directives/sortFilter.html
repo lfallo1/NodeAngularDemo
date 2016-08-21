@@ -20,11 +20,11 @@
                   <div id="date-filter-wrapper">
                       <div class="form-group">
                           <label for="pre-search-min-date">Min Date</label>
-                          <input type="date" class="form-control" id="pre-search-min-date" ng-model="preSearchMinDate">
+                          <input type="date" class="form-control" id="pre-search-min-date" ng-model="preSearchMinDate" ng-change="checkDisablePostFilter()">
                       </div>
                       <div class="form-group">
                           <label for="pre-search-max-date">Max Date</label>
-                          <input type="date" class="form-control" id="pre-search-max-date" ng-model="preSearchMaxDate">
+                          <input type="date" class="form-control" id="pre-search-max-date" ng-model="preSearchMaxDate" ng-change="checkDisablePostFilter()">
                       </div>
                   </div>
                   <div id="category-wrapper">
@@ -140,11 +140,11 @@
                           </tr>
                           <tr class="row-padding">
                               <td class="filter-label"><span class="glyphicon glyphicon-calendar"></span>Min Date</td>
-                              <td class="filter-input"><input type="date" ng-blur="filter()" class="form-control" ng-model="minDate" placeholder="earliest date" /></td>
+                              <td class="filter-input"><input type="date" ng-blur="filter()" class="form-control" ng-disabled="disablePostDateFilters" ng-model="minDate" placeholder="earliest date" /></td>
                           </tr>
                           <tr class="row-padding">
                               <td class="filter-label"><span class="glyphicon glyphicon-calendar"></span>Max Date</td>
-                              <td class="filter-input"><input type="date" ng-blur="filter()" class="form-control" ng-model="maxDate" placeholder="latest date" /></td>
+                              <td class="filter-input"><input type="date" ng-blur="filter()" class="form-control" ng-disabled="disablePostDateFilters" ng-model="maxDate" placeholder="latest date" /></td>
                           </tr>
                           <tr class="row-padding">
                               <td class="filter-label"><span class="glyphicon glyphicon-time"></span>Duration</td>

@@ -1290,6 +1290,16 @@
               }
             };
 
+            $scope.checkDisablePostFilter = function(){
+              if($scope.preSearchMinDate || $scope.preSearchMaxDate){
+                $scope.disablePostDateFilters = true;
+                $scope.maxDate = $scope.preSearchMaxDate;
+                $scope.minDate = $scope.preSearchMinDate;
+              } else{
+                $scope.disablePostDateFilters = false;
+              }
+            };
+
             init();
 
         }]);

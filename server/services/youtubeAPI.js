@@ -29,17 +29,39 @@ _options = options;
     });
 };
 
-module.exports.toMp3 = function(req, res, next){
-    var title = req.params.title;
-    var id = req.params.id;
-    var url = 'https://www.youtube.com/watch?v=' + id;
-    res.type('audio/mpeg');
-    res.set({
-        'Content-Disposition': 'attachment; filename="' + title + '.m4v'
-    });
+// module.exports.toMp3 = function(req, res, next){
+//     var title = req.params.title;
+//     var id = req.params.id;
+//     var url = 'https://www.youtube.com/watch?v=' + id;
+//     res.type('audio/mpeg');
+//     res.set({
+//         'Content-Disposition': 'attachment; filename="' + title + '.m4v'
+//     });
+//
+//     youtubedl(url, { filter: 'audioonly' })
+//       .pipe(res);
+// };
 
-    youtubedl(url, { filter: 'audioonly' })
-      .pipe(res);
+module.exports.toMp3 = function(req, res, next){
+    var id = req.params.id;
+    var title = req.params.title;
+    var ytUrl = 'https://www.youtube.com/watch?v=' + id;
+    var stream = youtubedl(ytUrl);
+    // var timestamp = '_' + new Date().getTime();
+    // console.log(timestamp);
+
+    res.setHeader('Content-disposition', 'attachment; filename=' + title + '.mp3');
+    res.setHeader('Content-type', 'audio/mpeg');
+
+    var proc = new ffmpeg({source: stream});
+    proc.setFfmpegPath(ffmpegLocation);
+    proc.withAudioCodec('libmp3lame')
+        .toFormat('mp3')
+        .output(res)
+        .run();
+    proc.on('end', function() {
+        console.log('finished');
+    });
 };
 
 // module.exports.toMp3 = function(req, res, next){
