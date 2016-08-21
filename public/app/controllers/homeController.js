@@ -817,7 +817,7 @@
                     var idList = [];
                     while (count < 50 && i < nonDuplicates.length) {
                         var videoId = null;
-                        if(nonDuplicates[i].contentDetails){
+                        if(nonDuplicates[i].contentDetails && nonDuplicates[i].contentDetails.videoId){
                             videoId = nonDuplicates[i].contentDetails.videoId;
                         } else{
                             videoId = nonDuplicates[i].id.videoId || nonDuplicates[i].id;
