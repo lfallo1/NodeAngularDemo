@@ -140,11 +140,11 @@
                           </tr>
                           <tr class="row-padding">
                               <td class="filter-label"><span class="glyphicon glyphicon-calendar"></span>Min Date</td>
-                              <td class="filter-input"><input type="date" ng-blur="filter()" class="form-control" ng-disabled="disablePostDateFilters" ng-model="minDate" placeholder="earliest date" /></td>
+                              <td class="filter-input"><input type="date" ng-blur="filter()" class="form-control" ng-disabled="disablePostDateFilters && (searchMode === TEXT_SEARCH)" ng-model="minDate" placeholder="earliest date" /></td>
                           </tr>
                           <tr class="row-padding">
                               <td class="filter-label"><span class="glyphicon glyphicon-calendar"></span>Max Date</td>
-                              <td class="filter-input"><input type="date" ng-blur="filter()" class="form-control" ng-disabled="disablePostDateFilters" ng-model="maxDate" placeholder="latest date" /></td>
+                              <td class="filter-input"><input type="date" ng-blur="filter()" class="form-control" ng-disabled="disablePostDateFilters && (searchMode === TEXT_SEARCH)" ng-model="maxDate" placeholder="latest date" /></td>
                           </tr>
                           <tr class="row-padding">
                               <td class="filter-label"><span class="glyphicon glyphicon-time"></span>Duration</td>

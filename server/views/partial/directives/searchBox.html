@@ -1,7 +1,7 @@
 <div class="row">
   <div id="search-mode-btn-wrapper" class="btn-group col-md-12">
       <div id="search-mode-labels-wrapper">
-          <label id="search-mode-button" class="btn btn-default" ng-model="searchMode" uib-btn-radio="TEXT_SEARCH" uncheckable>Search by Text</label>
+          <label id="search-mode-button" class="btn btn-default" ng-model="searchMode" uib-btn-radio="TEXT_SEARCH" uncheckable ng-click="checkDisablePostFilter()">Search by Text</label>
           <label id="popular-search-mode-button" class="btn btn-default" ng-model="searchMode" uib-btn-radio="POPULAR_SEARCH" uncheckable><span class="glyphicon glyphicon-star"></span>Search Popular</label>
           <label id="playlist-search-mode-button" class="btn btn-default" ng-model="searchMode" uib-btn-radio="PLAYLIST_SEARCH" uncheckable><span class="glyphicon glyphicon-list"></span>Enter Playlist Id</label>
       </div>
