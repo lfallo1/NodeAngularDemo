@@ -677,7 +677,7 @@
 
                         var videoObject = {
                             "title": title,
-                            "safeTitle": title.substring(0,30).trim().replace(/\W+/g, "_"),
+                            "safeTitle": title.substring(0,60).trim().replace(/\W+/g, "_"),
                             "channelTitle": channelTitle,
                             "channelId": channelId,
                             "created": created,
