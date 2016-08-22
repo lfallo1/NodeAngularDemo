@@ -9,6 +9,8 @@ var apiKey = process.env.YOUTUBE_API_KEY || 'AIzaSyC5yjrJfXxhqyjOGC52qlGqXa-fodn
 
 var ffmpegLocation = process.env.FFMPEG || '/Users/lancefallon/Documents/angularProjects/NodeAngularDemo/server/ffmpeg/mac/ffmpeg_10.6+/ffmpeg';
 
+var YOUTUBE_BASE = 'https://www.youtube.com/watch?v=';
+
 //var apiKey = 'AIzaSyAY8aVa_oVZya_-a53oyFikvs-RwJfNDuk';
 
 var _options = {};
@@ -24,7 +26,7 @@ _options = options;
         res.json(data)
     })
     .catch(function (err) {
-            err.xtra = _options;
+        err.xtra = _options;
         res.status('500').send(err);
     });
 };
@@ -32,7 +34,7 @@ _options = options;
 module.exports.toMp3 = function(req, res, next){
     var id = req.params.id;
     var title = req.params.title;
-    var ytUrl = 'https://www.youtube.com/watch?v=' + id;
+    var ytUrl = YOUTUBE_BASE + id;
     var stream = youtubedl(ytUrl);
     // var timestamp = '_' + new Date().getTime();
     // console.log(timestamp);
@@ -47,14 +49,22 @@ module.exports.toMp3 = function(req, res, next){
         .output(res)
         .run();
     proc.on('end', function() {
-        console.log('finished');
+        console.log('finished downloading ' + ytUrl);
+    });
+    proc.on('error', function(err){
+      console.log(err);
+      res.end();
+    });
+    stream.on('error', function(err){
+      console.log(err);
+      res.end();
     });
 };
 
 module.exports.toMp4 = function(req, res, next){
   var title = req.params.title;
   var id = req.params.id;
-  var url = 'https://www.youtube.com/watch?v=' + id;
+  var url = YOUTUBE_BASE + id;
 
   res.type('video/mp4');
 
@@ -68,6 +78,11 @@ module.exports.toMp4 = function(req, res, next){
       res.write(data);
   });
   video.on('end', function () {
+      console.log('finished downloading ' + url);
       res.end()
   });
+  video.on('error', function(err){
+    console.log(err);
+    res.end();
+  })
 };
