@@ -824,3 +824,14 @@ div.report-modal .modal-content {
 #playlist-search-mode-button .glyphicon{
     margin-right: 3px;
 }
+
+.site-snippet{
+    font-size: 13px;
+    margin-left: 10px;
+    font-weight: lighter;
+    color: #f0ad4e;
+}
+
+.popover-title{
+    color: black;
+}
