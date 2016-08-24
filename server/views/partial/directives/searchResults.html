@@ -15,6 +15,9 @@
             </a>
         </li>
     </ul>
+
+    <div class="btn btn-lg btn-default" ng-click="toggleAutoplay()">Turn autoplay {{autoplay ? 'OFF' : 'ON'}}</div>
+
     <table class="table">
         <tbody>
         <tr ng-repeat="video in displayList track by $index">
@@ -25,10 +28,11 @@
                     </a>
                 </div>
                 <div ng-if="video.playing" class="player">
-                    <iframe width="560" height="315" src="{{getIFrameSrc(video.videoId)}}" frameborder="0" allowfullscreen></iframe>
+                    <youtube-video video-url="getIFrameSrc(video.videoId)" player-vars="youtubePlayerOptions"></youtube-video>
+                    <!-- <iframe width="560" onStateChange="{{alert('state change')}}" height="315" src="{{getIFrameSrc(video.videoId)}}" frameborder="0" allowfullscreen></iframe> -->
                 </div>
-                <div ng-if="!video.playing" class="play-video-button btn btn-default" ng-click="setPlaying(video, true)"><span class="glyphicon glyphicon-play"></span></div>
-                <div ng-if="video.playing" class="hide-video-button btn btn-default" ng-click="setPlaying(video, false)"><span class="glyphicon glyphicon-stop"></span></div>
+                <div ng-if="!video.playing" class="play-video-button btn btn-default" ng-click="setPlaying(video, true, $index)"><span class="glyphicon glyphicon-play"></span></div>
+                <div ng-if="video.playing" class="hide-video-button btn btn-default" ng-click="setPlaying(video, false, $index)"><span class="glyphicon glyphicon-stop"></span></div>
                 <div ng-if="!isVideoInList(video, watchlist)" class="add-to-watchlist text-info" ng-click="toggleVideoInList(video, watchlist)"><span class="glyphicon glyphicon-plus"></span>Add to watchlist</div>
                 <div ng-if="isVideoInList(video, watchlist)" class="add-to-watchlist text-danger" ng-click="toggleVideoInList(video, watchlist)"><span class="glyphicon glyphicon-remove"></span>Remove from watchlist</div>
                 <div ng-if="!isVideoInList(video, selectedVideos) && AuthService.isLoggedIn()" class="add-to-multivid-playlist text-success" ng-click="toggleVideoInList(video, selectedVideos)"><span class="glyphicon glyphicon-plus"></span>Add to playlist queue</div>

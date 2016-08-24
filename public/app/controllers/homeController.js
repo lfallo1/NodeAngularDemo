@@ -165,6 +165,8 @@
              */
             var init = function(){
 
+                $scope.autoplay = true;
+
                 resetPagination();
 
                 //reset quick filter
@@ -229,8 +231,33 @@
                 };
             };
 
-            $scope.setPlaying = function(video, val){
+            $scope.$on('youtube.player.ended', handleYoutubeEnd);
+            $scope.$on('youtube.player.error', handleYoutubeEnd);
+
+            function handleYoutubeEnd($event, player) {
+               if($scope.nextVideo && $scope.autoplay){
+                 $scope.currentVideo.playing = false;
+                  $scope.setPlaying($scope.filteredResults[$scope.nextVideo], true, $scope.nextVideo);
+               }
+            };
+
+            $scope.toggleAutoplay = function(){
+              $scope.autoplay = !$scope.autoplay;
+            };
+
+            $scope.youtubePlayerOptions = {
+              autoplay : 1
+            };
+
+            $scope.setPlaying = function(video, val, index){
                 video.playing = val;
+                if(video.playing){
+                  $scope.currentVideo = video;
+                  $scope.nextVideo = index < ($scope.filteredResults.length - 1) ? (index+1) : undefined;
+                } else{
+                  $scope.currentVideo = undefined;
+                  $scope.nextVideo = undefined;
+                }
 
                 //when video player expands, it can cause page to scroll away from desired / expanded video.
                 //this adds the scroll to method to end of digest loop, so that once video loads / expands, the page will correctly set its posision
@@ -240,7 +267,7 @@
             };
 
             $scope.getIFrameSrc = function (videoId) {
-                return $sce.trustAsResourceUrl('https://www.youtube.com/embed/' + videoId);
+                return 'https://www.youtube.com/embed/' + videoId;
             };
 
             $scope.sortOptionChanged = function(option){
@@ -1377,6 +1404,8 @@
                 return 'Enter a youtube playlist id or video id';
               }
             };
+
+
 
             init();
 
