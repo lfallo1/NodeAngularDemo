@@ -835,3 +835,8 @@ div.report-modal .modal-content {
 .popover-title{
     color: black;
 }
+
+.popover{
+    max-width: 500px !important;
+    width: auto;
+}

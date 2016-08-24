@@ -3,7 +3,7 @@
       <div id="search-mode-labels-wrapper">
           <label id="search-mode-button" class="btn btn-default" ng-model="searchMode" uib-btn-radio="TEXT_SEARCH" uncheckable ng-click="checkDisablePostFilter()">Search by Text</label>
           <label id="popular-search-mode-button" class="btn btn-default" ng-model="searchMode" uib-btn-radio="POPULAR_SEARCH" uncheckable><span class="glyphicon glyphicon-star"></span>Search Popular</label>
-          <label id="playlist-search-mode-button" class="btn btn-default" ng-model="searchMode" uib-btn-radio="PLAYLIST_SEARCH" uncheckable><span class="glyphicon glyphicon-list"></span>Enter Playlist Id</label>
+          <label id="playlist-search-mode-button" class="btn btn-default" ng-model="searchMode" uib-btn-radio="PLAYLIST_SEARCH" uncheckable><span class="glyphicon glyphicon-list"></span>Playlist or Video Id</label>
       </div>
   </div>
 
@@ -11,7 +11,7 @@
 
       <form ng-show="searchMode === TEXT_SEARCH || searchMode === PLAYLIST_SEARCH" ng-submit="doSearch()">
           <div class="input-group">
-              <input class="form-control" type="text" ng-model="searchParam" placeholder="search term here..." autofocus />
+              <input class="form-control" type="text" ng-model="searchParam" ng-attr-placeholder="{{getSearchBoxPlaceholder()}}" autofocus />
               <div id="searchButton" ng-if="!fetching" class="notta-button input-group-addon" ng-click="doSearch()"><span class="glyphicon glyphicon-search"></span>Search</div>
               <div id="stopButton" ng-if="fetching" class="notta-button input-group-addon" ng-click="interrupt()"><span class="glyphicon glyphicon-stop"></span>Stop</div>
           </div>

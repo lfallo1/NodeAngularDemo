@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('youtubeSearchApp', ['ui.router','ngRoute', 'ngAnimate', 'toaster', 'ui.bootstrap', 'chart.js']).
+angular.module('youtubeSearchApp', ['ui.router', 'ngCookies', 'ngRoute', 'ngAnimate', 'toaster', 'ui.bootstrap', 'chart.js']).
     config(['$stateProvider', '$locationProvider', '$urlRouterProvider', '$routeProvider', '$httpProvider', 'ChartJsProvider', '$compileProvider', function($stateProvider, $locationProvider, $urlRouterProvider, $routeProvider, $httpProvider, ChartJsProvider, $compileProvider) {
 
         $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|file|blob|mailto|chrome-extension):/);
@@ -39,11 +39,12 @@ angular.module('youtubeSearchApp', ['ui.router','ngRoute', 'ngAnimate', 'toaster
         }, function(err){
             $log.error(err);
         });
-
-
-
         //set AuthService on rootScope for convenience (still placing AuthService in its service for modularity)
         $rootScope.AuthService = AuthService;
+
+        $rootScope.aboutYoutubeAgent = {
+          templateUrl : 'partials/aboutYoutubeAgent'
+        };
 
         //set the onSignIn event on the window object
         window.onSignIn = AuthService.onSignIn;

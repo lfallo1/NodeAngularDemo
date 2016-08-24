@@ -3,8 +3,8 @@
  */
 (function(){
     angular.module('youtubeSearchApp').controller('HomeCtrl', [
-        '$rootScope', '$scope', '$http', '$q', '$log', '$timeout', '$location', 'TimeService', 'toaster', '$window', '$uibModal', 'AuthService', 'PlaylistService', '$sce', 'CountriesService', '$anchorScroll',
-        function($rootScope, $scope, $http, $q, $log, $timeout, $location, TimeService, toaster, $window, $uibModal, AuthService, PlaylistService, $sce, CountriesService, $anchorScroll){
+        '$rootScope', '$scope', '$http', '$q', '$log', '$timeout', '$location', 'TimeService', 'toaster', '$window', '$uibModal', 'AuthService', 'PlaylistService', '$sce', 'CountriesService', '$anchorScroll', '$cookies',
+        function($rootScope, $scope, $http, $q, $log, $timeout, $location, TimeService, toaster, $window, $uibModal, AuthService, PlaylistService, $sce, CountriesService, $anchorScroll, $cookies){
 
             var youtubeSearchBase = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=';
             var youtubeVideoBase = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=';
@@ -164,6 +164,7 @@
              * setup view
              */
             var init = function(){
+
                 resetPagination();
 
                 //reset quick filter
@@ -212,6 +213,8 @@
                 $scope.sortField.value = $scope.sortOptions[0].value;
 
                 $scope.enableChannelFilter = true;
+
+                checkCookies();
             };
 
             $scope.reset = function(){
@@ -322,6 +325,9 @@
                 resetAll();
 
                 if($scope.searchMode === $scope.TEXT_SEARCH){
+
+                    setSortOptionCookies();
+
                     $scope.fetching = true;
 
                     videoDuration = $scope.videoDuration ? '&videoDuration=' + $scope.videoDuration : '';
@@ -342,7 +348,12 @@
                     fetchResultsWrapper(0);
                 }
                 else if($scope.searchMode === $scope.PLAYLIST_SEARCH){
-                  getVideosInPlaylist();
+                  getVideosInPlaylist().then(function(res){
+                    console.log('playlist retrieved');
+                  }, function(){
+                    console.log('playlist not found, trying video id search');
+                    getVideoById();
+                  })
                 }
             };
 
@@ -1054,6 +1065,45 @@
                 $scope.filter();
             };
 
+            var checkDate = function(date){
+              var timestamp=Date.parse(date)
+              return(isNaN(timestamp)==false);
+            }
+
+            var checkCookies = function(){
+              if($cookies.get("youtubeagent_hasCookies") == 'true'){
+                $scope.sortField.value = $cookies.get('youtubeagent_sortField');
+                $scope.minViews = $cookies.get('youtubeagent_minViews') ? Number($cookies.get('youtubeagent_minViews')) : null;
+                $scope.minDislikes = $cookies.get('youtubeagent_minDislikes') ? Number($cookies.get('youtubeagent_minDislikes')) : null;
+                $scope.minDate = checkDate($cookies.get('youtubeagent_minDate')) ? new Date($cookies.get('youtubeagent_minDate')) : null;
+                $scope.maxDate = checkDate($cookies.get('youtubeagent_maxDate')) ? new Date($cookies.get('youtubeagent_maxDate')) : null;
+                $scope.minRating = $cookies.get('youtubeagent_minRating') ? Number($cookies.get('youtubeagent_minRating')) : null;
+                $scope.shorterThanFilter = $cookies.get('youtubeagent_shorterThanFilter') ? Number($cookies.get('youtubeagent_shorterThanFilter')) : null;
+                $scope.longerThanFilter = $cookies.get('youtubeagent_longerThanFilter') ? Number($cookies.get('youtubeagent_longerThanFilter')) : null;
+                $scope.preSearchMaxDate = checkDate($cookies.get('youtubeagent_preSearchMaxDate')) ? new Date($cookies.get('youtubeagent_preSearchMaxDate')) : null;
+                $scope.preSearchMinDate = checkDate($cookies.get('youtubeagent_preSearchMinDate')) ? new Date($cookies.get('youtubeagent_preSearchMinDate')) : null;
+                $scope.safeSearch = $cookies.get('youtubeagent_safeSearch');
+                $scope.extendedSearch = !!$cookies.get('youtubeagent_extendedSearch');
+              }
+            };
+
+            var setSortOptionCookies = function(){
+                $cookies.put('youtubeagent_hasCookies',true);
+                $cookies.put('youtubeagent_searchResults',$scope.searchResults);
+                $cookies.put('youtubeagent_sortField',$scope.sortField.value);
+                $cookies.put('youtubeagent_minViews',$scope.minViews);
+                $cookies.put('youtubeagent_minDislikes',$scope.minDislikes);
+                $cookies.put('youtubeagent_minDate',$scope.minDate || null);
+                $cookies.put('youtubeagent_maxDate',$scope.maxDate || null);
+                $cookies.put('youtubeagent_minRating',$scope.minRating);
+                $cookies.put('youtubeagent_shorterThanFilter',$scope.shorterThanFilter);
+                $cookies.put('youtubeagent_longerThanFilter',$scope.longerThanFilter);
+                $cookies.put('youtubeagent_preSearchMaxDate',$scope.preSearchMaxDate || null);
+                $cookies.put('youtubeagent_preSearchMinDate',$scope.preSearchMinDate || null);
+                $cookies.put('youtubeagent_safeSearch',$scope.safeSearch);
+                $cookies.put('youtubeagent_extendedSearch',$scope.extendedSearch);
+            };
+
             var createJsonObjectForFile = function(){
               return {
                 'searchResults':$scope.searchResults,
@@ -1062,7 +1112,7 @@
                 'minViews': $scope.minViews,
                 'minDislikes': $scope.minDislikes,
                 'minDate': $scope.minDate,
-                'maxData': $scope.maxDate,
+                'maxDate': $scope.maxDate,
                 'minRating': $scope.minRating,
                 'shorterThanFilter': $scope.shorterThanFilter,
                 'longerThanFilter': $scope.longerThanFilter,
@@ -1163,7 +1213,22 @@
               video.downloadVideoDisabled = true;
             };
 
+            var getVideoById = function(){
+              $http.post('api/youtube/get', {url : youtubeVideoBase + $scope.searchParam}).then(function(res){
+                if(res.data.items.length > 0){
+                    addVideosToList(res.data.items);
+                    $scope.sort();
+                    $scope.fetching = false;
+                    return;
+                }
+                stopSearch('Could not find playlist or video', 'warning');
+              }, function(err){
+                stopSearch('Could not find playlist or video', 'warning');
+              });
+            };
+
             var getVideosInPlaylist = function(){
+              var deferred = $q.defer();
               $scope.fetching = true;
               PlaylistService.getVideosInPlaylist($scope.searchParam).then(function(videos){
                 var nonDups = getNonDuplicates(videos);
@@ -1180,12 +1245,17 @@
                     $scope.sort();
 
                     $scope.fetching = false;
+
+                    deferred.resolve();
                 }, function (err) {
+                    deferred.resolve();
                     stopSearch('Service unavailable', 'error');
                 })
               }, function(err){
-                stopSearch('Playlist not available or access denied', 'Unable to fetch playlist at this time');
+                deferred.reject();
               });
+
+              return deferred.promise;
             }
 
             $scope.setSelectedIntervalType = function(value){
@@ -1297,6 +1367,14 @@
                 $scope.minDate = $scope.preSearchMinDate;
               } else{
                 $scope.disablePostDateFilters = false;
+              }
+            };
+
+            $scope.getSearchBoxPlaceholder = function(){
+              if($scope.searchMode === $scope.TEXT_SEARCH){
+                return 'Enter search terms';
+              } else if($scope.searchMode === $scope.PLAYLIST_SEARCH){
+                return 'Enter a youtube playlist id or video id';
               }
             };
 
