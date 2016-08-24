@@ -84,7 +84,6 @@
             $scope.quickFilterTerms = [];
             var ALL_CATEGORIES = {'id' : '-1', 'snippet' : {'title' : 'Search All Categories'}};
             var relatedPending = false;
-            var iteration = 0;
 
             var regionCode = '';
             var related= '';
@@ -334,7 +333,6 @@
 
               resetPagination();
 
-              iteration = 0;
               $scope.related = undefined;
               $scope.nextRelated = [];
               $scope.checkRelated = false;
@@ -384,7 +382,7 @@
                     }
 
                     //call the wrapper
-                    fetchResultsWrapper(0);
+                    fetchResultsWrapper();
                 }
                 else if($scope.searchMode === $scope.PLAYLIST_SEARCH){
                   getVideosInPlaylist().then(function(res){
@@ -397,13 +395,11 @@
             };
 
             /**
-             * method that accepts an iteration number, and whether or not to cancel the search.
+             * method that accepts whether or not to cancel the search.
              * The method calls fetch results, then waits for all requests to finish.
-             * If the yearlySearch is on, it will perform 5 additional searches between date spans to help improve results
-             * @param iteration
              * @param cancel
              */
-            var fetchResultsWrapper = function(iteration, cancel){
+            var fetchResultsWrapper = function(cancel){
 
                 //if cancel passed in (used if errors occur, and we want to the search to end
                 if(cancel){
@@ -801,6 +797,11 @@
                         }
                     }
                 }
+
+                //nextRelated gets spliced and does not retain its initial size.
+                //in order to easily track progress of the extended search progress, I am saving the
+                //total number of related videos in a variable that will not be altered
+                $scope.nextRelatedInitialLength = $scope.nextRelated.length;
             };
 
             /**
@@ -892,13 +893,12 @@
                     stopSearch('Finished search', 'info');
                     return;
                 }
-                iteration++;
                 resetSortOrders();
                 relatedPending = false;
                 $scope.related = $scope.nextRelated[0];
                 $scope.nextRelated.splice(0,1);
                 $scope.checkRelated = true;
-                fetchResultsWrapper(0,false);
+                fetchResultsWrapper(false);
             };
 
             /**

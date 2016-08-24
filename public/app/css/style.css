@@ -863,3 +863,15 @@ div.report-modal .modal-content {
     font-weight: bold;
     color: #666;
 }
+
+#extended-search-progress-bar-container i{
+    color: white;
+    font-weight: bold;
+}
+
+#extended-search-progress-label{
+    font-size: 18px;
+    color: #5cb85c;
+    margin-top: -20px;
+    text-align: center;
+}
