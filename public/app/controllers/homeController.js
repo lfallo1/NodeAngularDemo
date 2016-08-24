@@ -1083,7 +1083,7 @@
                 $scope.preSearchMaxDate = checkDate($cookies.get('youtubeagent_preSearchMaxDate')) ? new Date($cookies.get('youtubeagent_preSearchMaxDate')) : null;
                 $scope.preSearchMinDate = checkDate($cookies.get('youtubeagent_preSearchMinDate')) ? new Date($cookies.get('youtubeagent_preSearchMinDate')) : null;
                 $scope.safeSearch = $cookies.get('youtubeagent_safeSearch');
-                $scope.extendedSearch = !!$cookies.get('youtubeagent_extendedSearch');
+                $scope.extendedSearch = $cookies.get('youtubeagent_extendedSearch') === 'true';
               }
             };
 
