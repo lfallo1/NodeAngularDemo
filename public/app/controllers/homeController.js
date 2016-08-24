@@ -1438,9 +1438,7 @@
                 return 'Enter a youtube playlist id or video id';
               }
             };
-
-
-
+            
             init();
 
         }]);
