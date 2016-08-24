@@ -789,9 +789,23 @@ div.report-modal .modal-content {
 }
 
 #download-json-results a{
-    color: #ec971f;
+    color: white;
     font-size: 18px;
     font-weight: bold;
+}
+
+#download-json-results a:hover{
+    cursor: pointer;
+    text-decoration: none;
+}
+
+#regenerate-json{
+    color: white;
+}
+
+#regenerate-json:hover{
+    cursor: pointer;
+    text-decoration: underline;
 }
 
 #sort-options-container #category-wrapper, #sort-options-container #duration-wrapper, #sort-options-container #safe-search-wrapper{
