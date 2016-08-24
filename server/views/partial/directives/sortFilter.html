@@ -9,8 +9,8 @@
     </div>
 
       <!-- PRE-SEARCH FILTERS -->
-      <div ng-show="searchMode === TEXT_SEARCH" id="sort-and-filter" class="col-md-12">
-          <div id="sort-options-container" class="row">
+      <div id="sort-and-filter" class="col-md-12">
+          <div ng-show="searchMode === TEXT_SEARCH || searchMode === MOST_VIEWED_SEARCH" id="sort-options-container" class="row">
               <div class="row">
                 <div class="clickable col-md-12 sort-filter-header" ng-click="setPreSearchFiltersVisible(!preSearchFiltersVisible)">
                     <div><span class="glyphicon glyphicon-sort"></span>Pre-Search Filters (Optional)</div>
@@ -66,7 +66,7 @@
                   </div>
                   <div id="search-optimizer-wrappers">
                       <div id="extended-search-wrapper">
-                          <button type="button" class="btn btn-success" ng-model="extendedSearch" uib-btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
+                          <button ng-disabled="searchMode !== TEXT_SEARCH" type="button" class="btn btn-success" ng-model="extendedSearch" uib-btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
                               <span class="glyphicon glyphicon-forward"></span>Extended Search
                           </button>
                           <!-- <span class="question-mark" popover-placement="right" uib-popover="Extended search automatically saves a list of highly matching videos during initial search and then performs additional searches using the compiled list." popover-title="Search Mode Definitions" type="button"><span class="glyphicon glyphicon-question-sign" ng-click=""></span></span> -->

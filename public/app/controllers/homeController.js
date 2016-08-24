@@ -10,6 +10,7 @@
             var youtubeVideoBase = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=';
             var popularByCountryBase = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&maxResults=50&chart=mostPopular&regionCode=';
             var youtubeVideoCategoriesBase = 'https://www.googleapis.com/youtube/v3/videoCategories?part=snippet&regionCode=';
+            var generalSearch = "site:youtube.com";
 
             $scope.dateIntervalTypes = {
                 'BIENNIAL' : 2,
@@ -20,6 +21,67 @@
             $scope.quickFilterModes = {
               'ALL' : 0,
               'ANY' : 1
+            };
+
+            var millisConstants = {
+              YEAR : 1000*60*60*24*365,
+              WEEK : 1000*60*60*24*7,
+              DAY :  1000*60*60*24,
+              HOUR : 1000*60*60
+            };
+
+            $scope.autosetMinDate = function(){
+              var date = new Date(new Date().getTime() - millisConstants.DAY*30)
+              $scope.preSearchMinDate = date;
+              $scope.preSearchMaxDate = new Date();
+            };
+
+            //define search interval for most viewed youtube video searches
+            var defineInterval = function(){
+
+                //check situation where no date is supplied
+                if(!checkDate($scope.preSearchMaxDate) && !checkDate($scope.preSearchMinDate) ){
+                  return {
+                    maxDate : new Date(),
+                    minDate : new Date('04-01-2005'),
+                    intervalSize : (new Date().getTime() - new Date('04-01-2005').getTime())/15,
+                    intervalFrequency : 20
+                  }
+                }
+
+                var maxDate = checkDate($scope.preSearchMaxDate) ? new Date($scope.preSearchMaxDate).getTime() : new Date().getTime();
+                var minDate = checkDate($scope.preSearchMinDate) ? new Date($scope.preSearchMinDate).getTime() : new Date('04-01-2005').getTime();
+
+                var time = maxDate - minDate;
+                var mostViewedSearchInterval = -1;
+                //check > 30 days... yes same result as above, but if included in condition above, then would still need to check date validity in subsequent calls. so just splitting it up for clarity
+                if(time > 2 * millisConstants.YEAR){
+                  mostViewedSearchInterval = 20;
+                }
+                else if(time > 180*millisConstants.DAY){
+                  //15x time hard coded for ranges > than 180 days
+                  mostViewedSearchInterval = 15;
+                }
+                else if(time > 30*millisConstants.DAY){
+                  //10x time hard coded for ranges > than 30 days and < 180 days
+                  mostViewedSearchInterval = 10;
+                } else if(time > millisConstants.WEEK){
+                  //1x per day
+                  mostViewedSearchInterval = time / millisConstants.DAY;
+                } else if(time > millisConstants.DAY){
+                  //2x per day
+                  mostViewedSearchInterval = time / (millisConstants.DAY / 2);
+                } else{
+                  //4x per day
+                  mostViewedSearchInterval = 4;
+                }
+
+                return {
+                  minDate : minDate,
+                  maxDate : maxDate,
+                  intervalSize : time / mostViewedSearchInterval,
+                  intervalFrequency : mostViewedSearchInterval
+                }
             };
 
             var resetPagination = function(){
@@ -34,7 +96,12 @@
             };
 
             $scope.paginate = function(){
-                var startIndex = ($scope.pagination.currentPage-1) * $scope.pagination.resultsPerPage;
+                var currIndex = ($scope.pagination.currentPage-1) * $scope.pagination.resultsPerPage;
+                if(currIndex > $scope.filteredResults.length){
+                  currIndex = 0;
+                  $scope.pagination.currentPage = 1;
+                }
+                var startIndex =  currIndex;
                 var endIndex = Math.min(startIndex + $scope.pagination.resultsPerPage, $scope.filteredResults.length);
                 $scope.displayList = $scope.filteredResults.filter(function(d,i){
                    if(i >= startIndex && i < endIndex){
@@ -78,6 +145,7 @@
             $scope.TEXT_SEARCH = 1;
             $scope.POPULAR_SEARCH = 2;
             $scope.PLAYLIST_SEARCH = 3;
+            $scope.MOST_VIEWED_SEARCH = 4;
             $scope.WATCHLIST_MODAL_CTRL = 'WatchlistModalCtrl';
             $scope.BULK_PLAYLIST_MODAL_CTRL = 'BulkPlaylistModalCtrl';
             $scope.quickFilterType = "0";
@@ -242,7 +310,7 @@
                     if(($scope.nextVideo % $scope.pagination.resultsPerPage) === 0){
                       $scope.gotoPage($scope.pagination.currentPage+1);
                     }
-                    $scope.setPlaying($scope.filteredResults[$scope.nextVideo], true, $scope.nextVideo);
+                    $scope.setPlaying($scope.filteredResults[$scope.nextVideo], true, $scope.nextVideo, true);
                   }
                 },0);
               }
@@ -252,7 +320,7 @@
               autoplay : 1
             };
 
-            $scope.setPlaying = function(video, val, index){
+            $scope.setPlaying = function(video, val, index, isTotalIndex){
                 video.playing = val;
                 if(video.playing){
 
@@ -265,7 +333,7 @@
                   $scope.currentVideo = video;
 
                   //set the next video to be played, if autoplay is on
-                  var totalIndex = index + ($scope.pagination.currentPage-1)*$scope.pagination.resultsPerPage;
+                  var totalIndex = isTotalIndex ? index : index + ($scope.pagination.currentPage-1)*$scope.pagination.resultsPerPage;
                   $scope.nextVideo = $scope.autoplay && (totalIndex < ($scope.filteredResults.length - 1)) ? (totalIndex+1) : undefined;
                 } else{
 
@@ -321,7 +389,8 @@
              * reset sort order objects (main purpose of this is to reset the tokens)
              */
             var resetSortOrders = function(){
-                sortOrders = [
+              sortOrders = $scope.searchMode === $scope.MOST_VIEWED_SEARCH ? [{order : 'viewCount', token : ''}] :
+                [
                     {order : 'relevance', token : ''},
                     {order : 'rating', token : ''},
                     {order : 'date', token : ''},
@@ -331,6 +400,8 @@
             };
 
             var resetAll = function(){
+
+              mostViewedSearchInterval = 0;
               $scope.saveUrl = undefined;
 
               $scope.alerts = [];
@@ -358,14 +429,14 @@
             $scope.doSearch = function(){
 
                 //if already searching, just return immediately
-                $scope.searchParam = $scope.searchParam.trim();
+                $scope.searchParam = $scope.searchMode === $scope.MOST_VIEWED_SEARCH ? generalSearch : $scope.searchParam.trim();
                 if($scope.fetching || !$scope.searchParam){
                     return;
                 }
 
                 resetAll();
 
-                if($scope.searchMode === $scope.TEXT_SEARCH){
+                if($scope.searchMode === $scope.TEXT_SEARCH || $scope.searchMode === $scope.MOST_VIEWED_SEARCH){
 
                     setSortOptionCookies();
 
@@ -458,6 +529,27 @@
                        }
                    }
                 }
+                else if($scope.searchMode === $scope.MOST_VIEWED_SEARCH){
+                  var intervalObj = defineInterval();
+                  for(var j = 0; j < intervalObj.intervalFrequency; j++){
+
+                    var date = new Date(intervalObj.maxDate);
+                    var large = new Date(date.getTime()-j*intervalObj.intervalSize);
+                    var small = new Date(large.getTime() - intervalObj.intervalSize);
+
+                    dateSmall = "&publishedAfter=" + small.toISOString();
+                    dateLarge = "&publishedBefore=" + large.toISOString();
+
+                    //for each sort order type, execute the GET request.  doing this so that more results are returned.
+                    for (var i = 0; i < sortOrders.length; i++) {
+                        var token = sortOrders[i].token ? '&pageToken=' + sortOrders[i].token : '';
+
+                        promises.push($http.post('api/youtube/get', {'url' : youtubeSearchBase + $scope.searchParam + "&type=video&maxResults=50" +
+                        dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + safeSearch +
+                        "&order=" + sortOrders[i].order + related  + token}));
+                    }
+                  }
+                }
                 else{
                     //for each sort order type, execute the GET request.  doing this so that more results are returned.
                     for (var i = 0; i < sortOrders.length; i++) {
@@ -547,6 +639,7 @@
              * Perform search in popular videos mode
              */
             $scope.searchPopular = function(){
+                resetSortOrders();
                 $scope.searchResults = [];
                 $scope.wasInterrupted = undefined;
                 $scope.saveUrl = undefined;
@@ -1436,9 +1529,11 @@
                 return 'Enter search terms';
               } else if($scope.searchMode === $scope.PLAYLIST_SEARCH){
                 return 'Enter a youtube playlist id or video id';
+              } else if($scope.searchMode === $scope.MOST_VIEWED_SEARCH){
+                return 'Perform a general search by view count.';
               }
             };
-            
+
             init();
 
         }]);
