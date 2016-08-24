@@ -442,12 +442,8 @@ body{
     margin-top: 10px !important;
 }
 
-#extended-search-wrapper{
-    margin-top: 25px;
-}
-
-#extended-search-wrapper > div{
-    display: inline-block;
+.extended-search-wrapper{
+    margin-top: 5px;
 }
 
 #category-wrapper-title{
