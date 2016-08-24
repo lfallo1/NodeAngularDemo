@@ -30,10 +30,11 @@
               HOUR : 1000*60*60
             };
 
-            $scope.autosetMinDate = function(){
+            $scope.mostViewedSearchClick = function(){
               var date = new Date(new Date().getTime() - millisConstants.DAY*30)
               $scope.preSearchMinDate = date;
               $scope.preSearchMaxDate = new Date();
+              $scope.searchParam = '';
             };
 
             //define search interval for most viewed youtube video searches
@@ -1512,7 +1513,7 @@
               } else if($scope.searchMode === $scope.PLAYLIST_SEARCH){
                 return 'Enter a youtube playlist id or video id';
               } else if($scope.searchMode === $scope.MOST_VIEWED_SEARCH){
-                return 'Perform a general search by view count.';
+                return 'Search most viewed videos on Youtube';
               }
             };
 

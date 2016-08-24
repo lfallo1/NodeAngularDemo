@@ -3,7 +3,7 @@
       <div id="search-mode-labels-wrapper">
           <label id="search-mode-button" class="btn btn-default" ng-model="searchMode" uib-btn-radio="TEXT_SEARCH" uncheckable ng-click="checkDisablePostFilter()"><span class="glyphicon glyphicon-search"></span>Search by Text</label>
           <label id="popular-search-mode-button" class="btn btn-default" ng-model="searchMode" uib-btn-radio="POPULAR_SEARCH" uncheckable><span class="glyphicon glyphicon-thumbs-up"></span>Popular by Country</label>
-          <label id="most-viewed-search-button" class="btn btn-default" ng-model="searchMode" uib-btn-radio="MOST_VIEWED_SEARCH" uncheckable ng-click="autosetMinDate()"><span class="glyphicon glyphicon-star-empty"></span>Most Viewed</label>
+          <label id="most-viewed-search-button" class="btn btn-default" ng-model="searchMode" uib-btn-radio="MOST_VIEWED_SEARCH" uncheckable ng-click="mostViewedSearchClick()"><span class="glyphicon glyphicon-star-empty"></span>Most Viewed</label>
           <label id="playlist-search-mode-button" class="btn btn-default" ng-model="searchMode" uib-btn-radio="PLAYLIST_SEARCH" uncheckable><span class="glyphicon glyphicon-list"></span>Playlist or Video Id</label>
       </div>
   </div>
@@ -23,12 +23,10 @@
           <uib-alert class="longer-search-warning" ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</uib-alert>
       </div>
 
-      <div id="extended-search-progress-bar-container" ng-if="fetching && related && checkRelated">
+      <!-- <div id="extended-search-progress-bar-container" ng-if="fetching && related && checkRelated">
           <uib-progressbar class="progress-striped active" type="success" animate="true" max="1" value="(nextRelatedInitialLength - nextRelated.length) / nextRelatedInitialLength"><i>{{(100*((nextRelatedInitialLength - nextRelated.length) / nextRelatedInitialLength)).toFixed(0) + '%'}}</i></uib-progressbar>
           <div id="extended-search-progress-label">Extended search started</div>
-      </div>
-
-nextRelatedLength
+      </div> -->
 
       <div id="results-label-container" class="row" ng-if="searchResults.length > 0">
           <div class="form-group col-md-12 text-center">
