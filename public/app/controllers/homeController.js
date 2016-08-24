@@ -25,7 +25,7 @@
             var resetPagination = function(){
                 $scope.pagination = {
                     currentPage : 1,
-                    resultsPerPage : 100
+                    resultsPerPage : 50
                 };
             };
 
@@ -239,7 +239,10 @@
                 $timeout(function(){
                   if($scope.nextVideo){
                     $scope.currentVideo.playing = false;
-                     $scope.setPlaying($scope.filteredResults[$scope.nextVideo], true, $scope.nextVideo);
+                    if(($scope.nextVideo % $scope.pagination.resultsPerPage) === 0){
+                      $scope.gotoPage($scope.pagination.currentPage+1);
+                    }
+                    $scope.setPlaying($scope.filteredResults[$scope.nextVideo], true, $scope.nextVideo);
                   }
                 },0);
               }
@@ -262,7 +265,8 @@
                   $scope.currentVideo = video;
 
                   //set the next video to be played, if autoplay is on
-                  $scope.nextVideo = $scope.autoplay && (index < ($scope.filteredResults.length - 1)) ? (index+1) : undefined;
+                  var totalIndex = index + ($scope.pagination.currentPage-1)*$scope.pagination.resultsPerPage;
+                  $scope.nextVideo = $scope.autoplay && (totalIndex < ($scope.filteredResults.length - 1)) ? (totalIndex+1) : undefined;
                 } else{
 
                   //if closing a video, just set the current video and next video to undefined
