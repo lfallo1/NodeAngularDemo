@@ -1,5 +1,5 @@
 <!-- SEARCH RESULTS -->
-<div id="results" class="col-md-7 text-center" ng-if="searchResults.length > 0">
+<div id="results" class="col-md-7 text-center" ng-show="searchResults.length > 0">
     <ul class="pagination">
         <li ng-click="previousPage()">
             <a href="" aria-label="Previous">
@@ -16,7 +16,15 @@
         </li>
     </ul>
 
-    <div class="btn btn-lg btn-default" ng-click="toggleAutoplay()">Turn autoplay {{autoplay ? 'OFF' : 'ON'}}</div>
+    <!-- <div ng-class="autoplay ? 'toggle-autoplay text-success' : 'toggle-autoplay text-danger'" ng-click="toggleAutoplay()"><span class="glyphicon glyphicon-play-circle"></span>{{autoplay ? 'Autoplay enabled' : 'Autoplay disabled'}}</div> -->
+
+    <div id="toggle-autoplay">
+      <toggle-switch
+        ng-model="autoplay"
+        class="switch-success switch-large"
+        knob-label="Autoplay">
+      </toggle-switch>
+    </div>
 
     <table class="table">
         <tbody>
@@ -53,12 +61,12 @@
                     <div class="dislikes"><small>Dislikes</small> {{video.dislikes}}</div>
                     <div class="video-buttons row">
                         <div class="col-md-12">
-                            <div class="download-mp3"><a class="btn btn-success" ng-show="!video.downloadAudioDisabled" target="_self" href="api/youtube/mp3/{{video.videoId}}/{{video.safeTitle}}" download="{{video.safeTitle + '.mp3'}}" ng-click="disableAudioDownload(video)"><span class="glyphicon glyphicon-download"></span>Download Audio (mp3)</a></div>
-                            <div class="download-mp3"><a class="btn btn-success" ng-show="video.downloadAudioDisabled" disabled><span class="glyphicon glyphicon-download"></span>Download Audio (mp3)</a></div>
+                            <div class="download-mp3"><a class="btn btn-success" ng-show="!video.downloadAudioDisabled" target="_self" href="api/youtube/mp3/{{video.videoId}}/{{video.safeTitle}}" download="{{video.safeTitle + '.mp3'}}" ng-click="disableAudioDownload(video)"><span class="glyphicon glyphicon-music"></span>Download Audio (mp3)</a></div>
+                            <div class="download-mp3"><a class="btn btn-success" ng-show="video.downloadAudioDisabled" disabled><span class="glyphicon glyphicon-music"></span>Download Audio (mp3)</a></div>
                         </div>
                         <div class="col-md-12">
-                            <div class="download-mp3"><a class="btn btn-success" ng-show="!video.downloadVideoDisabled" target="_self" href="api/youtube/mp4/{{video.videoId}}/{{video.safeTitle}}" download="{{video.safeTitle + '.mp4'}}" ng-click="disableVideoDownload(video)"><span class="glyphicon glyphicon-download"></span>Download Video (mp4)</a></div>
-                            <div class="download-mp3"><a class="btn btn-success" ng-show="video.downloadVideoDisabled" disabled><span class="glyphicon glyphicon-download"></span>Download Video (mp4)</a></div>
+                            <div class="download-mp3"><a class="btn btn-success" ng-show="!video.downloadVideoDisabled" target="_self" href="api/youtube/mp4/{{video.videoId}}/{{video.safeTitle}}" download="{{video.safeTitle + '.mp4'}}" ng-click="disableVideoDownload(video)"><span class="glyphicon glyphicon-video"></span>Download Video (mp4)</a></div>
+                            <div class="download-mp3"><a class="btn btn-success" ng-show="video.downloadVideoDisabled" disabled><span class="glyphicon glyphicon-video"></span>Download Video (mp4)</a></div>
                         </div>
                         <div class="col-md-12">
                             <div ng-if="AuthService.isLoggedIn()" class="add-playlist-button btn btn-success" ng-click="playlistService.addToPlaylist(video)"><span class="glyphicon glyphicon-plus"></span> Youtube playlist</div>

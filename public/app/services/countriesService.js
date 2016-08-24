@@ -12,11 +12,10 @@
                 return;
             }
           $http.get('api/countries').then(function(res){
-              $log.info(res);
               countries = res.data;
               deferred.resolve(countries);
           }, function(err){
-             $log.error(err);
+              $log.error(err);
               deferred.reject();
           });
             return deferred.promise;

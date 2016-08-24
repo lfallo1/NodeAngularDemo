@@ -235,14 +235,15 @@
             $scope.$on('youtube.player.error', handleYoutubeEnd);
 
             function handleYoutubeEnd($event, player) {
-               if($scope.nextVideo && $scope.autoplay){
-                 $scope.currentVideo.playing = false;
-                  $scope.setPlaying($scope.filteredResults[$scope.nextVideo], true, $scope.nextVideo);
-               }
-            };
-
-            $scope.toggleAutoplay = function(){
-              $scope.autoplay = !$scope.autoplay;
+              if($scope.autoplay){
+                //handle youtube player errors and end of video events - end of digest loop
+                $timeout(function(){
+                  if($scope.nextVideo){
+                    $scope.currentVideo.playing = false;
+                     $scope.setPlaying($scope.filteredResults[$scope.nextVideo], true, $scope.nextVideo);
+                  }
+                },0);
+              }
             };
 
             $scope.youtubePlayerOptions = {
@@ -252,9 +253,20 @@
             $scope.setPlaying = function(video, val, index){
                 video.playing = val;
                 if(video.playing){
+
+                  //if a video was already open, then close it
+                  if($scope.currentVideo){
+                    $scope.currentVideo.playing = false;
+                  }
+
+                  //set the current video to the selected option
                   $scope.currentVideo = video;
-                  $scope.nextVideo = index < ($scope.filteredResults.length - 1) ? (index+1) : undefined;
+
+                  //set the next video to be played, if autoplay is on
+                  $scope.nextVideo = $scope.autoplay && (index < ($scope.filteredResults.length - 1)) ? (index+1) : undefined;
                 } else{
+
+                  //if closing a video, just set the current video and next video to undefined
                   $scope.currentVideo = undefined;
                   $scope.nextVideo = undefined;
                 }
@@ -1146,7 +1158,8 @@
                 'quickFilterTerms': $scope.quickFilterTerms,
                 'searchParam': $scope.searchParam,
                 'quickFilterType': $scope.quickFilterType,
-                'searchMode' : $scope.searchMode
+                'searchMode' : $scope.searchMode,
+                'hashedResults' : $scope.hashedResults
               }
             };
 
@@ -1156,6 +1169,8 @@
                 toaster.pop('error', '', 'Unable to read file');
                 return;
               }
+
+              $scope.reset();
 
               $scope.searchResults = json.searchResults;
               $scope.sortField.value = json.sortField;
@@ -1171,6 +1186,7 @@
               $scope.quickFilterType = json.quickFilterType;
               $scope.searchParam = json.searchParam;
               $scope.searchMode = json.searchMode || $scope.TEXT_SEARCH;
+              $scope.hashedResults = json.hashedResults;
 
               //convert date properties (they come back as strings) on search results back to date objects
               $scope.searchResults.forEach(function(video){
@@ -1179,6 +1195,20 @@
 
               $scope.quickFilterReadonly = true;
               $scope.updateQuickFilter();
+
+              //backwards compatible hashed results
+              if(!$scope.hashedResults){
+                $scope.hashedResults = {};
+                for(var i = 0; i < $scope.searchResults.length; i++){
+                  var channelTitle = $scope.searchResults[i].channelTitle;
+                  if(!$scope.hashedResults[channelTitle]){
+                      $scope.hashedResults[channelTitle] = {count : 0, views : 0, videos : []};
+                  }
+                  $scope.hashedResults[channelTitle].videos.push($scope.searchResults[i]);
+                  $scope.hashedResults[channelTitle].views += $scope.searchResults[i].viewCount;
+                  $scope.hashedResults[channelTitle].count++;
+                }
+              }
             }
 
             $scope.filter = function(){
@@ -1313,8 +1343,8 @@
                 //get the file, and validate
                 var file = files[0];
 
-                if(file.size > 15728640 || file.type !== 'application/json'){
-                  //max file size 15mb and must be json
+                if(file.size > 26214400 || file.type !== 'application/json'){
+                  //max file size 25mb and must be json
                   toaster.pop('error','','Please upload a json file less than 15mb')
                   return;
                 }

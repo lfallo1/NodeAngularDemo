@@ -854,3 +854,12 @@ div.report-modal .modal-content {
     max-width: 500px !important;
     width: auto;
 }
+
+.ats-switch.switch-large .switch-left, .ats-switch.switch-large .switch-right, .ats-switch.switch-large .knob {
+    padding: 10px;
+    font-size: 20px;
+    line-height: normal;
+    min-height: 34px;
+    font-weight: bold;
+    color: #666;
+}

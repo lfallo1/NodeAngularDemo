@@ -1,8 +1,9 @@
 'use strict';
 
-angular.module('youtubeSearchApp', ['ui.router', 'youtube-embed', 'ngCookies', 'ngRoute', 'ngAnimate', 'toaster', 'ui.bootstrap', 'chart.js']).
-    config(['$stateProvider', '$locationProvider', '$urlRouterProvider', '$routeProvider', '$httpProvider', 'ChartJsProvider', '$compileProvider', function($stateProvider, $locationProvider, $urlRouterProvider, $routeProvider, $httpProvider, ChartJsProvider, $compileProvider) {
+angular.module('youtubeSearchApp', ['ui.router', 'youtube-embed', 'ngCookies', 'ngRoute', 'ngAnimate', 'toaster', 'ui.bootstrap', 'toggle-switch']).
+    config(['$stateProvider', '$locationProvider', '$urlRouterProvider', '$routeProvider', '$httpProvider', '$compileProvider', function($stateProvider, $locationProvider, $urlRouterProvider, $routeProvider, $httpProvider, $compileProvider) {
 
+        //enable json file downloading through href tag
         $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|file|blob|mailto|chrome-extension):/);
 
         //$httpProvider.interceptors.push('httpRequestInterceptor');
@@ -10,12 +11,7 @@ angular.module('youtubeSearchApp', ['ui.router', 'youtube-embed', 'ngCookies', '
         delete $httpProvider.defaults.headers.common['X-Requested-With'];
         delete $httpProvider.defaults.headers.common['X-Frame-Options'];
 
-        ChartJsProvider.setOptions({
-            colours: ['#0D47A1', '#00ADF9'],
-            text : 'Video Summary',
-            responsive: false
-        });
-
+        //configure routing
         $routeProvider.
             when('/', {
                 templateUrl : 'partials/home',
@@ -33,7 +29,6 @@ angular.module('youtubeSearchApp', ['ui.router', 'youtube-embed', 'ngCookies', '
     }]).run(['$rootScope', '$log', '$http', 'AuthService', function($rootScope, $log, $http, AuthService){
 
         $http.get('api/config').then(function(res){
-            $log.info('config loaded');
             $rootScope.clientId = res.data.clientId;
             $rootScope.authCallbackUrl = res.data.authCallbackUrl;
         }, function(err){
