@@ -3,10 +3,10 @@
 
     <div id="selectedChannelsWrapper" ng-show="channelFilter.length > 0" class="col-md-12 well well-sm">
         <div id="selected-channels-enable-button">
-            <input type="checkbox" name="enableChannelFilter" ng-model="enableChannelFilter" ng-change="filterByChannel()"/>
+            <input type="checkbox" name="enableChannelFilter" ng-model="enableChannelFilter" ng-change="filter()"/>
             <span id="enable-channel-filter-checkbox">Enable Channel Filter</span>
         </div>
-        <div class="button-list-item" ng-repeat="channel in channelFilter" ng-click="removeChannelFilter(idx)">
+        <div class="button-list-item" ng-repeat="channel in channelFilter" ng-click="removeChannelFilter(channel)">
             {{channel}}<span class="glyphicon glyphicon-remove"></span>
         </div>
     </div>

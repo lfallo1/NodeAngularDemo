@@ -1011,9 +1011,11 @@
 
                 //on resolution or dismiss call filterByChannel
                 modalInstance.result.then(function () {
-                    $scope.filterByChannel();
+                    $scope.enableChannelFilter = $scope.channelFilter && $scope.channelFilter.length > 0;
+                    $scope.filter();
                 }, function () {
-                    $scope.filterByChannel();
+                  $scope.enableChannelFilter = $scope.channelFilter && $scope.channelFilter.length > 0;
+                    $scope.filter();
                 });
             };
 
@@ -1140,38 +1142,21 @@
               $scope.filter();
             }
 
-            /**
-             * Filter by the selected channel(s).
-             * When this method is called, it ignores the other filters.
-             * If, however, the channelList array is empty, then standard filter is called.  This is because the user
-             * can clear out all channel filters in the channel filter / summary modal.  When they resolve the modal, this
-             * method is invoked regardless.  So if they clear out all channel filter entries, then normal filter is called.
-             */
-            $scope.filterByChannel = function(){
-                if($scope.channelFilter.length === 0 || !$scope.enableChannelFilter){
-                    $scope.filter();
-                    return;
-                }
-
-                $scope.isChannelFilterEnabled = true;
-                $scope.filteredResults = $scope.searchResults.filter(function(d){
-                 if(!$scope.channelFilter || $scope.channelFilter.length === 0){
-                     $scope.isChannelFilterEnabled = false;
-                     return d;
-                 }
-                  for(var i = 0; i < $scope.channelFilter.length; i++){
-                      if(d.channelTitle.toLowerCase() === $scope.channelFilter[i]){
-                          return d;
-                      }
-                  }
-                 });
-                $scope.paginate();
-            };
+            var performChannelFilter = function(video){
+              if(!$scope.enableChannelFilter || !$scope.channelFilter || $scope.channelFilter.length === 0){
+                  return true;
+              }
+               for(var i = 0; i < $scope.channelFilter.length; i++){
+                   if(video.channelTitle.toLowerCase() === $scope.channelFilter[i]){
+                       return true;
+                   }
+               }
+            }
 
             $scope.removeChannelFilter = function(channelTitle){
                 var idx = $scope.channelFilter.indexOf(channelTitle);
                 $scope.channelFilter.splice(idx, 1);
-                $scope.channelFilter.length > 0 ? $scope.filterByChannel() : $scope.filter();
+                $scope.filter();
             };
 
             $scope.sort = function(){
@@ -1295,7 +1280,7 @@
             }
 
             $scope.filter = function(){
-                if((!$scope.filterText || $scope.filterText.trim().length === 0) && !$scope.minViews && (!$scope.minDislikes && $scope.minDislikes !== 0) && !$scope.minDate && !$scope.shorterThanFilter && !$scope.longerThanFilter && !$scope.minRating){
+                if((!$scope.enableChannelFilter || !$scope.channelFilter || $scope.channelFilter.length === 0) && (!$scope.filterText || $scope.filterText.trim().length === 0) && !$scope.minViews && (!$scope.minDislikes && $scope.minDislikes !== 0) && !$scope.minDate && !$scope.shorterThanFilter && !$scope.longerThanFilter && !$scope.minRating){
                     $scope.filteredResults = $scope.searchResults;
                 }
                 else{
@@ -1304,7 +1289,7 @@
                             (!$scope.minViews || d.viewCount >= $scope.minViews) &&
                             (!$scope.minRating || d.pctLikes >= $scope.minRating) &&
                             (!$scope.maxDate || d.created <= $scope.maxDate) &&
-                            (!$scope.minDate || d.created >= $scope.minDate) && durationFilter(d) && quickFilter(d)){
+                            (!$scope.minDate || d.created >= $scope.minDate) && durationFilter(d) && quickFilter(d) && performChannelFilter(d)){
                             return d;
                         }
                     });
