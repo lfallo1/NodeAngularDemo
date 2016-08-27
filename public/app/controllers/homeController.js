@@ -55,8 +55,11 @@
 
                 var time = maxDate - minDate;
                 var mostViewedSearchInterval = -1;
-                //check > 30 days... yes same result as above, but if included in condition above, then would still need to check date validity in subsequent calls. so just splitting it up for clarity
-                if(time > 2 * millisConstants.YEAR){
+
+                if(time > 4 * millisConstants.YEAR){
+                  mostViewedSearchInterval = 25;
+                }
+                else if(time > 2 * millisConstants.YEAR){
                   mostViewedSearchInterval = 20;
                 }
                 else if(time > 180*millisConstants.DAY){
