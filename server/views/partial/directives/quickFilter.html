@@ -1,7 +1,7 @@
 <!-- QUICK FILTERS / WATCH LIST / BULK PLAYLIST -->
 <div id="quick-filter" class="row">
 
-    <div id="selectedChannelsWrapper" ng-show="channelFilter.length > 0" class="col-md-12 well well-sm">
+    <div id="selectedChannelsWrapper" ng-show="channelFilter.length > 0 && quickFilterVisible" class="col-md-12 well well-sm">
         <div id="selected-channels-enable-button">
             <input type="checkbox" name="enableChannelFilter" ng-model="enableChannelFilter" ng-change="filter()"/>
             <span id="enable-channel-filter-checkbox">Enable Channel Filter</span>
