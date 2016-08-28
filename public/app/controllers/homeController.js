@@ -35,6 +35,7 @@
               $scope.preSearchMinDate = date;
               $scope.preSearchMaxDate = new Date();
               $scope.searchParam = '';
+              $scope.checkDisablePostFilter();
             };
 
             //define search interval for most viewed youtube video searches
@@ -433,7 +434,7 @@
             $scope.doSearch = function(){
 
                 //if already searching, just return immediately
-                $scope.searchParam = $scope.searchMode === $scope.MOST_VIEWED_SEARCH ? generalSearch : $scope.searchParam.trim();
+                $scope.searchParam = $scope.searchMode === $scope.MOST_VIEWED_SEARCH && !$scope.searchParam ? generalSearch : $scope.searchParam.trim();
                 if($scope.fetching || !$scope.searchParam){
                     return;
                 }
@@ -1486,10 +1487,10 @@
             };
 
             $scope.checkDisablePostFilter = function(){
+              $scope.maxDate = $scope.preSearchMaxDate;
+              $scope.minDate = $scope.preSearchMinDate;
               if($scope.preSearchMinDate || $scope.preSearchMaxDate){
                 $scope.disablePostDateFilters = true;
-                $scope.maxDate = $scope.preSearchMaxDate;
-                $scope.minDate = $scope.preSearchMinDate;
               } else{
                 $scope.disablePostDateFilters = false;
               }
@@ -1501,7 +1502,7 @@
               } else if($scope.searchMode === $scope.PLAYLIST_SEARCH){
                 return 'Enter a youtube playlist id or video id';
               } else if($scope.searchMode === $scope.MOST_VIEWED_SEARCH){
-                return 'Search most viewed videos on Youtube';
+                return 'Search term (optional)';
               }
             };
 

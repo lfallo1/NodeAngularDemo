@@ -12,7 +12,7 @@
 
       <form ng-show="searchMode !== POPULAR_SEARCH" ng-submit="doSearch()">
           <div class="input-group">
-              <input class="form-control" ng-disabled="searchMode === MOST_VIEWED_SEARCH" type="text" ng-model="searchParam" ng-attr-placeholder="{{getSearchBoxPlaceholder()}}" autofocus />
+              <input class="form-control" type="text" ng-model="searchParam" ng-attr-placeholder="{{getSearchBoxPlaceholder()}}" autofocus />
               <div id="searchButton" ng-if="!fetching" class="notta-button input-group-addon" ng-click="doSearch()"><span class="glyphicon glyphicon-search"></span>Search</div>
               <div id="stopButton" ng-if="fetching" class="notta-button input-group-addon" ng-click="interrupt()"><span class="glyphicon glyphicon-stop"></span>Stop</div>
           </div>
