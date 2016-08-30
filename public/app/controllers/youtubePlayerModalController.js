@@ -13,7 +13,7 @@ angular.module('youtubeSearchApp').controller('YoutubePlayerModalCtrl', [ '$root
         $timeout(function(){
           if($scope.nextVideo){
             $scope.currentVideo.playing = false;
-            $scope.start(filteredResults[$scope.nextVideo], $scope.nextVideo, true);
+            $scope.start(filteredResults[$scope.nextVideo], $scope.nextVideo);
           }
         },50);
       }
@@ -27,7 +27,7 @@ angular.module('youtubeSearchApp').controller('YoutubePlayerModalCtrl', [ '$root
       $scope.start(filteredResults[idx], idx);
     };
 
-    $scope.start = function(video, index, isTotalIndex){
+    $scope.start = function(video, index){
       $scope.currentVideo = video;
       $scope.currIndex = index || 0;
 
@@ -36,9 +36,8 @@ angular.module('youtubeSearchApp').controller('YoutubePlayerModalCtrl', [ '$root
 
       if(!isNaN(index)){
         //set the next video to be played, if $scope.autoplay is on
-        var totalIndex = isTotalIndex ? index : index + (pagination.currentPage-1)*pagination.resultsPerPage;
-        $scope.nextVideo = (totalIndex < (filteredResults.length - 1)) ? (totalIndex+1) : undefined;
-        $scope.previousVideo = totalIndex > 0 ? (totalIndex-1) : undefined;
+        $scope.nextVideo = (index < (filteredResults.length - 1)) ? (index+1) : undefined;
+        $scope.previousVideo = index > 0 ? (index-1) : undefined;
 
         $scope.nextDetails = $scope.nextVideo ? filteredResults[$scope.nextVideo] : {};
         $scope.prevDetails = $scope.previousVideo ? filteredResults[$scope.previousVideo] : {};

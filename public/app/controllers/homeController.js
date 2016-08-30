@@ -354,6 +354,7 @@
             };
 
             $scope.playVideo = function(video, val, index){
+              var index = ($scope.pagination.currentPage - 1) * $scope.pagination.resultsPerPage + index;
               $location.path('/' + video.videoId, true).search({q:null, m:null});
               var modalInstance = $uibModal.open({
                   templateUrl: 'partials/playerModal.html',
