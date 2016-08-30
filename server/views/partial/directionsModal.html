@@ -1,0 +1,11 @@
+<div id="directions-modal-head" class="modal-header">
+    <div>{{title}}</div>
+</div>
+<div id="directions-modal-body" class="modal-body">
+    <div ng-bind-html="body"></div>
+</div>
+<div class="directions-footer">
+    <button class="btn btn-danger" ng-show="hasPrev" ng-click="goBack()">GO BACK</button>
+    <button class="btn btn-primary" ng-click="getNext()">{{hasNext ? 'NEXT' : 'FINISH'}}</button>
+    <button class="btn-link" ng-click="cancel()" ng-show="hasNext">I got it, skip the tutorial!</button>
+</div>

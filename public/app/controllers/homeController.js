@@ -3,8 +3,38 @@
  */
 (function(){
     angular.module('youtubeSearchApp').controller('HomeCtrl', [
-        '$rootScope', '$scope', '$http', '$q', '$log', '$timeout', '$location', 'TimeService', 'toaster', '$window', '$uibModal', 'AuthService', 'PlaylistService', '$sce', 'CountriesService', '$anchorScroll', '$cookies',
-        function($rootScope, $scope, $http, $q, $log, $timeout, $location, TimeService, toaster, $window, $uibModal, AuthService, PlaylistService, $sce, CountriesService, $anchorScroll, $cookies){
+        '$rootScope', '$scope', '$http', '$q', '$log', '$timeout', '$location', 'TimeService', 'toaster', '$window', '$uibModal', 'AuthService', 'PlaylistService', '$sce', 'CountriesService', '$anchorScroll', '$cookies', 'DirectionsService',
+        function($rootScope, $scope, $http, $q, $log, $timeout, $location, TimeService, toaster, $window, $uibModal, AuthService, PlaylistService, $sce, CountriesService, $anchorScroll, $cookies, DirectionsService){
+
+            var showTutorial = function(direction){
+              var direction = direction || DirectionsService.getNext();
+              if(direction.element){
+                  $scope.scrollToElement(direction.element);
+              }
+              var modalInstance = $uibModal.open({
+                  templateUrl: 'partials/directionsModal.html',
+                  controller: 'DirectionsModalCtrl',
+                  size: 'lg',
+                  resolve: {
+                      content: function () {
+                          return {
+                              'direction' : direction
+                          }
+                      }
+                  }
+              });
+
+              modalInstance.result.then(function(data){
+                if(data){
+                  showTutorial(data);
+                  return;
+                }
+                $scope.scrollToElement('title-text');
+              }, function(){
+                $scope.scrollToElement('title-text');
+                console.log('tut ended');
+              });
+            };
 
             var youtubeSearchBase = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=';
             var youtubeVideoBase = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=';
@@ -236,6 +266,11 @@
              * setup view
              */
             var init = function(){
+
+                if(!$cookies.get("tutorial")){
+                  $cookies.put("tutorial", true);
+                  showTutorial();
+                }
 
                 $scope.autoplay = true;
 
