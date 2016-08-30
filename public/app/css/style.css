@@ -917,3 +917,68 @@ div.report-modal .modal-content {
     margin-top: 10px;
     box-shadow: 2px 4px 8px gray;
 }
+
+#player-modal-body iframe{
+    width: 100%;
+}
+
+#player-modal-footer{
+    padding: 30px;
+    text-align: center;
+}
+
+#player-modal-footer button{
+    font-size: 40px;
+    padding: 0px;
+}
+
+#player-modal-footer .btn-link{
+    font-size: 18px;
+    float: right;
+    margin-top: 30px;
+    margin-right: 20px;
+    color: #a94442;
+}
+
+#player-modal-head{
+    background: #111;
+    color: white;
+
+}
+
+#player-modal-footer{
+    padding: 0px
+}
+
+#player-modal-footer button{
+    border: none;
+    color: #fff;
+    font-size: 50px;
+    background: none;
+}
+
+#player-modal-footer button:hover{
+    background: black !important;
+    opacity: 0.8;
+}
+
+#player-modal-footer{
+    background: black;
+}
+
+#player-modal-body{
+    background: #000;
+}
+
+.video-image-container:hover{
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+#video-overlay-text{
+    position: absolute;
+    font-size: 110px;
+    color: white;
+    left: 100px;;
+    opacity: 0.6;
+}

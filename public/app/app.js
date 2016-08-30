@@ -13,7 +13,7 @@ angular.module('youtubeSearchApp', ['ui.router', 'youtube-embed', 'ngCookies', '
 
         //configure routing
         $routeProvider.
-            when('/', {
+            when('/:id?', {
                 templateUrl : 'partials/home',
                 controller: 'HomeCtrl'
             }).
@@ -26,7 +26,7 @@ angular.module('youtubeSearchApp', ['ui.router', 'youtube-embed', 'ngCookies', '
             });
 
         $locationProvider.html5Mode(true);
-    }]).run(['$rootScope', '$log', '$http', 'AuthService', function($rootScope, $log, $http, AuthService){
+    }]).run(['$rootScope', '$log', '$http', '$location','$route', 'AuthService', function($rootScope, $log, $http, $location, $route, AuthService){
 
         $http.get('api/config').then(function(res){
             $rootScope.clientId = res.data.clientId;
@@ -43,5 +43,17 @@ angular.module('youtubeSearchApp', ['ui.router', 'youtube-embed', 'ngCookies', '
 
         //set the onSignIn event on the window object
         window.onSignIn = AuthService.onSignIn;
+
+        var original = $location.path;
+        $location.path = function (path, reload) {
+            if (reload === false) {
+                var lastRoute = $route.current;
+                var un = $rootScope.$on('$locationChangeSuccess', function () {
+                    $route.current = lastRoute;
+                    un();
+                });
+            }
+            return original.apply($location, [path]);
+        };
 
     }]);

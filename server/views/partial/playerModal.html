@@ -1,0 +1,12 @@
+<div id="player-modal-head" class="modal-header">
+    <div>{{currentVideo.title}}</div>
+</div>
+<div id="player-modal-body" class="modal-body">
+    <youtube-video video-url="getIFrameSrc(currentVideo.videoId)" player-vars="youtubePlayerOptions"></youtube-video>
+</div>
+<div id="player-modal-footer">
+    <!-- <button class="btn btn-danger" ng-show="hasPrev" ng-click="previous()">Previous Video</button> -->
+    <button class="btn btn-default" ng-disabled="!previousVideo" ng-click="goto(previousVideo)"><span class="glyphicon glyphicon-step-backward"></span></button>
+    <button class="btn btn-default" ng-disabled="!nextVideo" ng-click="goto(nextVideo)"><span class="glyphicon glyphicon-step-forward"></span></button>
+    <button class="btn-link" ng-click="close()">Close</button>
+</div>

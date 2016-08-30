@@ -3,8 +3,8 @@
  */
 (function(){
     angular.module('youtubeSearchApp').controller('HomeCtrl', [
-        '$rootScope', '$scope', '$http', '$q', '$log', '$timeout', '$location', 'TimeService', 'toaster', '$window', '$uibModal', 'AuthService', 'PlaylistService', '$sce', 'CountriesService', '$anchorScroll', '$cookies', 'DirectionsService',
-        function($rootScope, $scope, $http, $q, $log, $timeout, $location, TimeService, toaster, $window, $uibModal, AuthService, PlaylistService, $sce, CountriesService, $anchorScroll, $cookies, DirectionsService){
+        '$rootScope', '$scope', '$http', '$q', '$routeParams', '$log', '$timeout', '$location', 'TimeService', 'toaster', '$window', '$uibModal', 'AuthService', 'PlaylistService', '$sce', 'CountriesService', '$anchorScroll', '$cookies', 'DirectionsService',
+        function($rootScope, $scope, $http, $q, $routeParams, $log, $timeout, $location, TimeService, toaster, $window, $uibModal, AuthService, PlaylistService, $sce, CountriesService, $anchorScroll, $cookies, DirectionsService){
 
             var showTutorial = function(direction){
               var direction = direction || DirectionsService.getNext();
@@ -324,6 +324,12 @@
                 $scope.enableChannelFilter = true;
 
                 checkCookies();
+
+                if($routeParams.id){
+                  getVideoById($routeParams.id).then(function(res){
+                      $scope.playVideo($scope.searchResults[0]);
+                  })
+                }
             };
 
             $scope.reset = function(){
@@ -338,64 +344,30 @@
                 };
             };
 
-            $scope.$on('youtube.player.ended', handleYoutubeEnd);
-            $scope.$on('youtube.player.error', handleYoutubeEnd);
-
-            function handleYoutubeEnd($event, player) {
-              if($scope.autoplay){
-                //handle youtube player errors and end of video events - end of digest loop
-                $timeout(function(){
-                  if($scope.nextVideo){
-                    $scope.currentVideo.playing = false;
-                    if(($scope.nextVideo % $scope.pagination.resultsPerPage) === 0){
-                      $scope.gotoPage($scope.pagination.currentPage+1);
-                    }
-                    $scope.setPlaying($scope.filteredResults[$scope.nextVideo], true, $scope.nextVideo, true);
-                  }
-                },0);
-              }
-            };
-
-            $scope.youtubePlayerOptions = {
-              autoplay : 1
-            };
-
-            $scope.setPlaying = function(video, val, index, isTotalIndex){
-                video.playing = val;
-                if(video.playing){
-
-                  //if a video was already open, then close it
-                  if($scope.currentVideo){
-                    $scope.currentVideo.playing = false;
-                  }
-
-                  //set the current video to the selected option
-                  $scope.currentVideo = video;
-
-                  //set the next video to be played, if autoplay is on
-                  var totalIndex = isTotalIndex ? index : index + ($scope.pagination.currentPage-1)*$scope.pagination.resultsPerPage;
-                  $scope.nextVideo = $scope.autoplay && (totalIndex < ($scope.filteredResults.length - 1)) ? (totalIndex+1) : undefined;
-                } else{
-
-                  //if closing a video, just set the current video and next video to undefined
-                  $scope.currentVideo = undefined;
-                  $scope.nextVideo = undefined;
-                }
-
-                //when video player expands, it can cause page to scroll away from desired / expanded video.
-                //this adds the scroll to method to end of digest loop, so that once video loads / expands, the page will correctly set its posision
-                $timeout(function(){
-                    $scope.scrollToElement(video.videoId);
-                },0);
-            };
-
-            $scope.getIFrameSrc = function (videoId) {
-                return 'https://www.youtube.com/embed/' + videoId;
-            };
-
             $scope.sortOptionChanged = function(option){
                 $scope.sortField.value = option.value;
                 $scope.sort();
+            };
+
+            $scope.playVideo = function(video, val, index){
+              $location.path('/' + video.videoId, false);
+              var modalInstance = $uibModal.open({
+                  templateUrl: 'partials/playerModal.html',
+                  controller: 'YoutubePlayerModalCtrl',
+                  size: 'lg',
+                  resolve: {
+                      content: function () {
+                          return {
+                              'autoplay' : $scope.autoplay,
+                              'pagination' : $scope.pagination,
+                              'filteredResults' : $scope.filteredResults,
+                              'video' : video,
+                              'val' : val,
+                              'index' : index
+                          }
+                      }
+                  }
+              });
             };
 
             /**
@@ -467,6 +439,8 @@
              * perform a new search
              */
             $scope.doSearch = function(){
+
+                $location.path('/', false);
 
                 //if already searching, just return immediately
                 $scope.searchParam = $scope.searchMode === $scope.MOST_VIEWED_SEARCH && !$scope.searchParam ? generalSearch : $scope.searchParam.trim();
@@ -1374,18 +1348,24 @@
               video.downloadVideoDisabled = true;
             };
 
-            var getVideoById = function(){
-              $http.post('api/youtube/get', {url : youtubeVideoBase + $scope.searchParam}).then(function(res){
+            var getVideoById = function(id){
+              var deferred = $q.defer();
+              var id = id || $scope.searchParam;
+              $http.post('api/youtube/get', {url : youtubeVideoBase + id}).then(function(res){
                 if(res.data.items.length > 0){
                     addVideosToList(res.data.items);
                     $scope.sort();
                     $scope.fetching = false;
+                    deferred.resolve();
                     return;
                 }
+                deferred.reject();
                 stopSearch('Could not find playlist or video', 'warning');
               }, function(err){
+                deferred.reject();
                 stopSearch('Could not find playlist or video', 'warning');
               });
+              return deferred.promise;
             };
 
             var getVideosInPlaylist = function(){

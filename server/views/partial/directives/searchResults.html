@@ -30,17 +30,10 @@
         <tbody>
         <tr ng-repeat="video in displayList track by $index">
             <td id="{{video.videoId}}">
-                <div ng-if="!video.playing" class="video-image-container">
-                    <a ng-href="{{'https://www.youtube.com/watch?v=' + video.videoId}}" target="_blank">
-                        <img src="{{video.thumbnail.url}}" width="250px" class="thumbnail" />
-                    </a>
+                <div class="video-image-container" ng-click="playVideo(video, true, $index)">
+                    <div id="video-overlay-text"><span class="glyphicon glyphicon-play"></span></div>
+                    <img src="{{video.thumbnail.url}}" width="250px" class="thumbnail" />
                 </div>
-                <div ng-if="video.playing" class="player">
-                    <youtube-video video-url="getIFrameSrc(video.videoId)" player-vars="youtubePlayerOptions"></youtube-video>
-                    <!-- <iframe width="560" onStateChange="{{alert('state change')}}" height="315" src="{{getIFrameSrc(video.videoId)}}" frameborder="0" allowfullscreen></iframe> -->
-                </div>
-                <div ng-if="!video.playing" class="play-video-button btn btn-default" ng-click="setPlaying(video, true, $index)"><span class="glyphicon glyphicon-play"></span></div>
-                <div ng-if="video.playing" class="hide-video-button btn btn-default" ng-click="setPlaying(video, false, $index)"><span class="glyphicon glyphicon-stop"></span></div>
                 <div ng-if="!isVideoInList(video, watchlist)" class="add-to-watchlist text-info" ng-click="toggleVideoInList(video, watchlist)"><span class="glyphicon glyphicon-plus"></span>Add to watchlist</div>
                 <div ng-if="isVideoInList(video, watchlist)" class="add-to-watchlist text-danger" ng-click="toggleVideoInList(video, watchlist)"><span class="glyphicon glyphicon-remove"></span>Remove from watchlist</div>
                 <div ng-if="!isVideoInList(video, selectedVideos) && AuthService.isLoggedIn()" class="add-to-multivid-playlist text-success" ng-click="toggleVideoInList(video, selectedVideos)"><span class="glyphicon glyphicon-plus"></span>Add to playlist queue</div>
