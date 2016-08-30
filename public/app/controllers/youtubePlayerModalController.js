@@ -40,7 +40,7 @@ angular.module('youtubeSearchApp').controller('YoutubePlayerModalCtrl', [ '$root
         $scope.previousVideo = index > 0 ? (index-1) : undefined;
 
         $scope.nextDetails = $scope.nextVideo ? filteredResults[$scope.nextVideo] : {};
-        $scope.prevDetails = $scope.previousVideo > 0 ? filteredResults[$scope.previousVideo] : {};
+        $scope.prevDetails = $scope.previousVideo >= 0 ? filteredResults[$scope.previousVideo] : {};
       }
 
     };
