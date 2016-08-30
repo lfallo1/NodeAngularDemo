@@ -1032,13 +1032,12 @@ div.report-modal .modal-content {
     border: none;
     color: white;
     font-weight: bold;
-    color: #337ab7;
     font-size: 17px;
     border-radius: 8px !important;
 }
 
 #player-modal-actions .btn-default:hover{
-    border: 1px solid #337ab7;
+    border: 1px solid white;
 }
 
 
