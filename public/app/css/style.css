@@ -931,8 +931,17 @@ div.report-modal .modal-content {
 }
 
 #player-modal-head{
-    background: #111;
+    background: #110;
     color: white;
+}
+
+#player-modal-head .glyphicon{
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+#player-modal-head{
+    font-size: 18px;
 }
 
 #player-modal-footer{
@@ -1016,4 +1025,24 @@ div.report-modal .modal-content {
 
 .knob, .switch-left, .switch-right{
     font-size: 18px !important;
+}
+
+#player-modal-actions .btn-default{
+    background-color: black !important;
+    border: none;
+    color: white;
+    font-weight: bold;
+    color: #337ab7;
+    font-size: 17px;
+    border-radius: 8px !important;
+}
+
+#player-modal-actions .btn-default:hover{
+    border: 1px solid #337ab7;
+}
+
+
+#player-modal-head .rating-value{
+    font-weight: bolder;
+    text-shadow: 1px 2px 4px rgba(145, 155, 188, .8);
 }

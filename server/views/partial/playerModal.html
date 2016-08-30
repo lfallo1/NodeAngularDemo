@@ -1,5 +1,13 @@
 <div id="player-modal-head" class="modal-header">
-    <div>{{currentVideo.title}} <small>({{getVideoPosition()}})</small></div>
+    <div class="left">
+      <div>{{currentVideo.title}} - {{currentVideo.duration}} <small>({{getVideoPosition()}})</small></div>
+      <div class="rating">
+          <span class="rating-value">{{currentVideo.pctLikes | number:2}}%</span>
+          <span class="video-rating glyphicon glyphicon-thumbs-up text-success"></span> {{currentVideo.likes}}
+          <span class="video-rating glyphicon glyphicon-thumbs-down text-danger"></span> {{currentVideo.dislikes}}
+      </div>
+      <div class="view-count">{{currentVideo.viewCount | number:0}} <small>views</small></div>
+    </div>
     <button class="btn-link" ng-click="close()">Close</button>
 </div>
 <div id="player-modal-body" class="modal-body">
@@ -20,13 +28,6 @@
             </toggle-switch>
           </div>
           <youtube-video video-url="getIFrameSrc(currentVideo.videoId)" player-vars="youtubePlayerOptions"></youtube-video>
-          <div id="hover-popover-details-current">
-            <div class="duration">{{currentVideo.duration}}</div>
-            <div class="rating"><small>Rating</small> {{currentVideo.pctLikes | number:2}}</div>
-            <div class="view-count"><small>Views</small> {{currentVideo.viewCount}}</div>
-            <div class="likes"><small>Likes</small> {{currentVideo.likes}}</div>
-            <div class="dislikes"><small>Dislikes</small> {{currentVideo.dislikes}}</div>
-          </div>
         </div>
         <div class="col-xs-2">
           <img
