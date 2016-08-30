@@ -1,12 +1,48 @@
 <div id="player-modal-head" class="modal-header">
-    <div>{{currentVideo.title}}</div>
+    <div>{{currentVideo.title}} <small>({{getVideoPosition()}})</small></div>
+    <button class="btn-link" ng-click="close()">Close</button>
 </div>
 <div id="player-modal-body" class="modal-body">
-    <youtube-video video-url="getIFrameSrc(currentVideo.videoId)" player-vars="youtubePlayerOptions"></youtube-video>
+    <div class="row vertical-align">
+        <div class="col-xs-2">
+          <img
+            uib-popover-template="popoverTemplate.prevVideo"
+            popover-trigger="mouseenter"
+            popover-placement="top"
+            ng-show="previousVideo > -1" src="{{getImageByIndex(previousVideo)}}" ng-click="goto(previousVideo)" />
+        </div>
+        <div class="col-xs-8">
+          <div id="toggle-autoplay">
+            <toggle-switch
+              ng-model="autoplay"
+              class="switch-success switch-large"
+              knob-label="Autoplay">
+            </toggle-switch>
+          </div>
+          <youtube-video video-url="getIFrameSrc(currentVideo.videoId)" player-vars="youtubePlayerOptions"></youtube-video>
+          <div id="hover-popover-details-current">
+            <div class="duration">{{currentVideo.duration}}</div>
+            <div class="rating"><small>Rating</small> {{currentVideo.pctLikes | number:2}}</div>
+            <div class="view-count"><small>Views</small> {{currentVideo.viewCount}}</div>
+            <div class="likes"><small>Likes</small> {{currentVideo.likes}}</div>
+            <div class="dislikes"><small>Dislikes</small> {{currentVideo.dislikes}}</div>
+          </div>
+        </div>
+        <div class="col-xs-2">
+          <img
+            uib-popover-template="popoverTemplate.nextVideo"
+            popover-trigger="mouseenter"
+            popover-placement="top"
+            ng-show="nextVideo" src="{{getImageByIndex(nextVideo)}}" ng-click="goto(nextVideo)" />
+        </div>
+    </div>
+    <div id="player-modal-actions" class="btn-group btn-group-justified">
+        <a class="btn btn-default" ng-disabled="currentVideo.downloadAudioDisabled" target="_self" href="api/youtube/mp3/{{currentVideo.videoId}}/{{currentVideo.safeTitle}}" download="{{currentVideo.safeTitle + '.mp3'}}" ng-click="currentVideo.downloadAudioDisabled = true"><span class="glyphicon glyphicon-music"></span>Download Audio (mp3)</a>
+        <a class="btn btn-default" ng-disabled="currentVideo.downloadVideoDisabled" target="_self" href="api/youtube/mp4/{{currentVideo.videoId}}/{{currentVideo.safeTitle}}" download="{{currentVideo.safeTitle + '.mp4'}}" ng-click="currentVideo.downloadVideoDisabled = true"><span class="glyphicon glyphicon-film"></span>Download Video (mp4)</a>
+        <a href="" ng-if="AuthService.isLoggedIn()" class="btn btn-default" ng-click="playlistService.addToPlaylist(currentVideo)"><span class="glyphicon glyphicon-plus"></span> Youtube playlist</a>
+    </div>
+</div>
 </div>
 <div id="player-modal-footer">
-    <!-- <button class="btn btn-danger" ng-show="hasPrev" ng-click="previous()">Previous Video</button> -->
-    <button class="btn btn-default" ng-disabled="!previousVideo" ng-click="goto(previousVideo)"><span class="glyphicon glyphicon-step-backward"></span></button>
-    <button class="btn btn-default" ng-disabled="!nextVideo" ng-click="goto(nextVideo)"><span class="glyphicon glyphicon-step-forward"></span></button>
-    <button class="btn-link" ng-click="close()">Close</button>
+
 </div>

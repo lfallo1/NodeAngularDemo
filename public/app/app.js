@@ -45,8 +45,8 @@ angular.module('youtubeSearchApp', ['ui.router', 'youtube-embed', 'ngCookies', '
         window.onSignIn = AuthService.onSignIn;
 
         var original = $location.path;
-        $location.path = function (path, reload) {
-            if (reload === false) {
+        $location.path = function (path, preventReload) {
+            if (preventReload) {
                 var lastRoute = $route.current;
                 var un = $rootScope.$on('$locationChangeSuccess', function () {
                     $route.current = lastRoute;

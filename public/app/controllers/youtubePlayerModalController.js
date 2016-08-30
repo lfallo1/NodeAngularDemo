@@ -1,21 +1,18 @@
-angular.module('youtubeSearchApp').controller('YoutubePlayerModalCtrl', [ '$scope', '$timeout', 'content', '$uibModalInstance', function($scope, $timeout, content, $uibModalInstance){
+angular.module('youtubeSearchApp').controller('YoutubePlayerModalCtrl', [ '$rootScope', '$scope', '$timeout', 'content', '$uibModalInstance', 'PlaylistService', '$location', function($rootScope, $scope, $timeout, content, $uibModalInstance, PlaylistService, $location){
 
     var pagination = {};
     var filteredResults = [];
-    var autoplay = true;
+    $scope.autoplay = true;
 
     $scope.$on('youtube.player.ended', handleYoutubeEnd);
     $scope.$on('youtube.player.error', handleYoutubeEnd);
 
     function handleYoutubeEnd($event, player) {
-      if(autoplay){
+      if($scope.autoplay){
         //handle youtube player errors and end of video events - end of digest loop
         $timeout(function(){
           if($scope.nextVideo){
             $scope.currentVideo.playing = false;
-            if(($scope.nextVideo % pagination.resultsPerPage) === 0){
-              $scope.gotoPage(pagination.currentPage+1);
-            }
             $scope.start(filteredResults[$scope.nextVideo], $scope.nextVideo, true);
           }
         },50);
@@ -32,12 +29,19 @@ angular.module('youtubeSearchApp').controller('YoutubePlayerModalCtrl', [ '$scop
 
     $scope.start = function(video, index, isTotalIndex){
       $scope.currentVideo = video;
+      $scope.currIndex = index || 0;
+
+      $rootScope.currentPageTitle = video.title;
+      $location.path('/' + video.videoId, true).search({q:null, m:null});
 
       if(!isNaN(index)){
-        //set the next video to be played, if autoplay is on
+        //set the next video to be played, if $scope.autoplay is on
         var totalIndex = isTotalIndex ? index : index + (pagination.currentPage-1)*pagination.resultsPerPage;
         $scope.nextVideo = (totalIndex < (filteredResults.length - 1)) ? (totalIndex+1) : undefined;
         $scope.previousVideo = totalIndex > 0 ? (totalIndex-1) : undefined;
+
+        $scope.nextDetails = $scope.nextVideo ? filteredResults[$scope.nextVideo] : {};
+        $scope.prevDetails = $scope.previousVideo ? filteredResults[$scope.previousVideo] : {};
       }
 
     };
@@ -47,15 +51,32 @@ angular.module('youtubeSearchApp').controller('YoutubePlayerModalCtrl', [ '$scop
     };
 
     $scope.close = function(){
-      $uibModalInstance.dismiss();
+      $uibModalInstance.dismiss($scope.currIndex);
     };
 
+    $scope.getImageByIndex = function(idx){
+      if(!isNaN(idx)){
+          return filteredResults[idx].thumbnail.url;
+      }
+    };
+
+    $scope.getVideoPosition = function(){
+      return ($scope.currIndex + 1) + ' of ' + filteredResults.length;
+    }
+
+    $scope.playlistService = PlaylistService;
+
     var init = function(){
+
+      $scope.popoverTemplate = {
+          prevVideo : 'partials/previousVideoDetailsPopover.html',
+          nextVideo : 'partials/nextVideoDetailsPopover.html'
+      };
+
       pagination = content.pagination;
       filteredResults = content.filteredResults;
-      autoplay = content.autoplay;
-
-      $scope.start(content.video, content.index)
+      $scope.autoplay = content.autoplay;
+      $scope.start(content.video, content.index);
     };
 
     init();

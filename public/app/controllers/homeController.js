@@ -267,11 +267,6 @@
              */
             var init = function(){
 
-                if(!$cookies.get("tutorial")){
-                  $cookies.put("tutorial", true);
-                  showTutorial();
-                }
-
                 $scope.autoplay = true;
 
                 resetPagination();
@@ -325,10 +320,18 @@
 
                 checkCookies();
 
-                if($routeParams.id){
+                if(!$cookies.get("tutorial")){
+                  $cookies.put("tutorial", true);
+                  showTutorial();
+                }
+                else if($routeParams.id){
                   getVideoById($routeParams.id).then(function(res){
                       $scope.playVideo($scope.searchResults[0]);
                   })
+                } else if($routeParams.m && $routeParams.q && !isNaN($routeParams.m) && ( Number($routeParams.m) <= 4 && Number($routeParams.m) >= 1)){
+                  $scope.searchMode = Number($routeParams.m);
+                  $scope.searchParam = $routeParams.q;
+                  $scope.doSearch();
                 }
             };
 
@@ -342,6 +345,7 @@
                     resultsPerPage : 50,
                     totalPages : 0
                 };
+                $location.path('/', true).search({q:null, m:null});
             };
 
             $scope.sortOptionChanged = function(option){
@@ -350,10 +354,11 @@
             };
 
             $scope.playVideo = function(video, val, index){
-              $location.path('/' + video.videoId, false);
+              $location.path('/' + video.videoId, true).search({q:null, m:null});
               var modalInstance = $uibModal.open({
                   templateUrl: 'partials/playerModal.html',
                   controller: 'YoutubePlayerModalCtrl',
+                  backdrop : 'static',
                   size: 'lg',
                   resolve: {
                       content: function () {
@@ -368,6 +373,18 @@
                       }
                   }
               });
+
+              modalInstance.result.then(function(data){
+                $scope.gotoPage(Math.floor(data / $scope.pagination.resultsPerPage) + 1);
+                $scope.scrollToElement($scope.filteredResults[data].videoId, true);
+                $location.path('/', true).search({q:null, m:null});
+                $rootScope.currentPageTitle = 'Youtube Agent - Sort, Filter, Download, Analyze - Your Ultimate Youtube Search Tool';
+              }, function(data){
+                $scope.gotoPage(Math.floor(data / $scope.pagination.resultsPerPage) + 1);
+                $scope.scrollToElement($scope.filteredResults[data].videoId, true);
+                $location.path('/', true).search({q:null, m:null});
+                $rootScope.currentPageTitle = 'Youtube Agent - Sort, Filter, Download, Analyze - Your Ultimate Youtube Search Tool';
+              })
             };
 
             /**
@@ -433,14 +450,14 @@
               $scope.tableData = [];
 
               $scope.wasInterrupted = undefined;
+
+              $location.path('/', true).search({q:null, m:null});
             };
 
             /**
              * perform a new search
              */
             $scope.doSearch = function(){
-
-                $location.path('/', false);
 
                 //if already searching, just return immediately
                 $scope.searchParam = $scope.searchMode === $scope.MOST_VIEWED_SEARCH && !$scope.searchParam ? generalSearch : $scope.searchParam.trim();
@@ -449,6 +466,8 @@
                 }
 
                 resetAll();
+
+                $location.path('', true).search({m : $scope.searchMode, q : $scope.searchParam});
 
                 if($scope.searchMode === $scope.TEXT_SEARCH || $scope.searchMode === $scope.MOST_VIEWED_SEARCH){
 
