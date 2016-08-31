@@ -952,17 +952,24 @@ div.report-modal .modal-content {
     background: #000;
 }
 
+.video-image-container{
+    position: relative;
+}
+
 .video-image-container:hover{
     cursor: pointer;
     opacity: 0.8;
 }
 
 #video-overlay-text{
-    position: absolute;
-    font-size: 110px;
     color: white;
-    left: 100px;;
     opacity: 0.6;
+    font-size: 75px;
+    left: 0;
+    position:absolute;
+    text-align:center;
+    top: 30px;
+    width: 100%
 }
 
 #player-modal-body img{
