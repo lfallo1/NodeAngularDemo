@@ -6,6 +6,8 @@
         '$rootScope', '$scope', '$http', '$q', '$routeParams', '$log', '$timeout', '$location', 'TimeService', 'toaster', '$window', '$uibModal', 'AuthService', 'PlaylistService', '$sce', 'CountriesService', '$anchorScroll', '$cookies', 'DirectionsService',
         function($rootScope, $scope, $http, $q, $routeParams, $log, $timeout, $location, TimeService, toaster, $window, $uibModal, AuthService, PlaylistService, $sce, CountriesService, $anchorScroll, $cookies, DirectionsService){
 
+            $scope.getHistory = PlaylistService.history;
+
             var showTutorial = function(direction){
               var direction = direction || DirectionsService.getNext();
               if(direction.element){

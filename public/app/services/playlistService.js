@@ -28,6 +28,15 @@
           }
         };
 
+        service.history = function(){
+          var token = gapi.auth2.getAuthInstance().currentUser.get().Zi.access_token;
+          var url = 'https://www.googleapis.com/youtube/v3/channels?part=contentDetails&mine=true&access_token=' + token;
+          $http.get(url).then(function(res){
+            console.log(res.data);
+            service.getVideosInPlaylist(res.data.items[0].contentDetails.relatedPlaylists.watchHistory)
+          });
+        }
+
         /**
          * load the users playlists. currently only grabbing first 50.
          * In future, could use next page token to get all playlists, but 50 seems like enough for now.
@@ -38,7 +47,7 @@
             var deferred = $q.defer();
 
             //get token & create url
-            var token = gapi.auth2.getAuthInstance().currentUser.get().hg.access_token;
+            var token = gapi.auth2.getAuthInstance().currentUser.get().Zi.access_token;
             var url = 'https://www.googleapis.com/youtube/v3/playlists?part=snippet,id&mine=true&maxResults=50&access_token=' + token;
 
             //perform request
@@ -70,7 +79,7 @@
          */
         service.addPlaylist = function(playlistName){
             var deferred = $q.defer();
-            var token = gapi.auth2.getAuthInstance().currentUser.get().hg.access_token;
+            var token = gapi.auth2.getAuthInstance().currentUser.get().Zi.access_token;
             var url = 'https://www.googleapis.com/youtube/v3/playlists?part=snippet&access_token=' + token;
             var playlistResource = generatePlaylistResource(playlistName);
             $http.post(url, playlistResource).then(function(res){
@@ -130,7 +139,7 @@
         };
 
         service.getVideosInPlaylist = function(id, videos, pageToken, deferred){
-          var accessToken = AuthService.isLoggedIn() ? '&access_token=' + gapi.auth2.getAuthInstance().currentUser.get().hg.access_token : '';
+          var accessToken = AuthService.isLoggedIn() ? '&access_token=' + gapi.auth2.getAuthInstance().currentUser.get().Zi.access_token : '';
           var pageToken = pageToken ? '&pageToken=' + pageToken : '';
           var deferred = deferred || $q.defer();
           var videos = videos || [];
@@ -210,7 +219,7 @@
 
         var saveVideoToPlaylist = function(video, playlist){
             var deferred = $q.defer();
-            var token = gapi.auth2.getAuthInstance().currentUser.get().hg.access_token;
+            var token = gapi.auth2.getAuthInstance().currentUser.get().Zi.access_token;
             var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&access_token=' + token;
             var playlistItemResource = generatePlaylistItemResource(video, playlist);
             $http.post(url, playlistItemResource).then(function(res){
