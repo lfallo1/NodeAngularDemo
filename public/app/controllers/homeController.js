@@ -6,7 +6,7 @@
         '$rootScope', '$scope', '$http', '$q', '$routeParams', '$log', '$timeout', '$location', 'TimeService', 'toaster', '$window', '$uibModal', 'AuthService', 'PlaylistService', '$sce', 'CountriesService', '$anchorScroll', '$cookies', 'DirectionsService',
         function($rootScope, $scope, $http, $q, $routeParams, $log, $timeout, $location, TimeService, toaster, $window, $uibModal, AuthService, PlaylistService, $sce, CountriesService, $anchorScroll, $cookies, DirectionsService){
 
-            $scope.getHistory = PlaylistService.history;
+            $scope.userPlaylist = {};
 
             var showTutorial = function(direction){
               var direction = direction || DirectionsService.getNext();
@@ -457,6 +457,13 @@
               $location.path('/', true).search({q:null, m:null});
             };
 
+            $scope.loadUserPlaylist = function(){
+              if($scope.userPlaylist.selectedPlaylist && $scope.userPlaylist.selectedPlaylist.val){
+                  resetAll();
+                  getVideosInPlaylist($scope.userPlaylist.selectedPlaylist.val);
+              }
+            };
+
             /**
              * perform a new search
              */
@@ -502,6 +509,8 @@
                     console.log('playlist not found, trying video id search');
                     getVideoById();
                   })
+                } else if($scope.searchMode === $scope.USER_PLAYLIST){
+                  getVideosInPlaylist();
                 }
             };
 
@@ -1390,10 +1399,11 @@
               return deferred.promise;
             };
 
-            var getVideosInPlaylist = function(){
+            var getVideosInPlaylist = function(searchParam){
+              var searchParam = searchParam || $scope.searchParam;
               var deferred = $q.defer();
               $scope.fetching = true;
-              PlaylistService.getVideosInPlaylist($scope.searchParam).then(function(videos){
+              PlaylistService.getVideosInPlaylist(searchParam).then(function(videos){
                 var nonDups = getNonDuplicates(videos);
 
                 var promises = createBatchVideoRequest(nonDups);

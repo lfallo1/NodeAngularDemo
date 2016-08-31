@@ -60,5 +60,21 @@
               <div ng-if="fetching" class="btn btn-danger btn-lg" ng-click="interrupt()"><span class="glyphicon glyphicon-stop"></span>Stop</div>
           </div>
       </div>
+
+      <div ng-show="AuthService.isLoggedIn() && !fetching">
+        <button class="btn btn-default btn-md" id="show-user-playlist-button" ng-click="showAccountPlaylists = true" ng-show="!showAccountPlaylists">Click to select one of your playlists</button>
+        <div id="user-playlist-wrapper" ng-show="showAccountPlaylists" class="alert alert-warning">
+          <label for="userplaylists">Logged in as <span class="logged-in-highlight">{{AuthService.getName()}}</span>. Load videos from one your playlists</label>
+          <select id="user-playlists-dropdown" name="userplaylists"
+                  ng-model="userPlaylist.selectedPlaylist"
+                  ng-options="playlist.name for playlist in AuthService.getAuthorizedPlaylists()"
+                  placeholder="Select an account playlist">
+                  <option value="">Select a playlist</option>
+          </select>
+          <button class="btn btn-default btn-md" ng-click="loadUserPlaylist()">Load User Playlist</button>
+        </div>
+        <button class="btn btn-default btn-md" id="hide-account-playlists" ng-show="showAccountPlaylists" ng-click="showAccountPlaylists = false">Hide</button>
+      </div>
+
   </div>
 </div>

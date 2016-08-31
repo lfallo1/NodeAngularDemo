@@ -28,48 +28,19 @@
           }
         };
 
-        service.history = function(){
-          var token = gapi.auth2.getAuthInstance().currentUser.get().Zi.access_token;
-          var url = 'https://www.googleapis.com/youtube/v3/channels?part=contentDetails&mine=true&access_token=' + token;
-          $http.get(url).then(function(res){
-            console.log(res.data);
-            service.getVideosInPlaylist(res.data.items[0].contentDetails.relatedPlaylists.watchHistory)
-          });
-        }
-
         /**
          * load the users playlists. currently only grabbing first 50.
          * In future, could use next page token to get all playlists, but 50 seems like enough for now.
          * @returns {*}
          */
         service.loadPlaylists = function(){
-
             var deferred = $q.defer();
-
-            //get token & create url
-            var token = gapi.auth2.getAuthInstance().currentUser.get().Zi.access_token;
-            var url = 'https://www.googleapis.com/youtube/v3/playlists?part=snippet,id&mine=true&maxResults=50&access_token=' + token;
-
-            //perform request
-            $http.get(url).then(function(res){
-                $log.info(res);
-                deferred.resolve(res.data.items);
+            AuthService.loadEditableUserPlaylists().then(function(res){
+              $log.info(res);
+              deferred.resolve(res.data.items);
             }, function(err){
-                $log.error(err);
-
-                //if no auth error, it means the user has not granted access to their youtube account.  Redirect to page, requesting
-                //them allow access.
-                if(err.status === 401 || err.status === 403){
-                    location.href = "https://accounts.google.com/o/oauth2/auth?client_id=" + $rootScope.clientId + "&redirect_uri=" + $rootScope.authCallbackUrl + "&scope=https://www.googleapis.com/auth/youtube https://www.googleapis.com/auth/youtubepartner&response_type=token";
-                }
-                else if(err.status === 404){
-                    //404 means they haven't setup a youtube channel / page yet.  just show a basic message asking them to do so
-                    //if they want to use the playlist feature
-                    toaster.pop('info', '', 'Looks like you haven\'t setup a YouTube channel yet.  Once you get one setup, give this another try');
-                    ;                }
-                deferred.reject();
+              deferred.reject();
             });
-            return deferred.promise
         };
 
         /**
@@ -79,7 +50,7 @@
          */
         service.addPlaylist = function(playlistName){
             var deferred = $q.defer();
-            var token = gapi.auth2.getAuthInstance().currentUser.get().Zi.access_token;
+            var token = AuthService.getAccessToken();
             var url = 'https://www.googleapis.com/youtube/v3/playlists?part=snippet&access_token=' + token;
             var playlistResource = generatePlaylistResource(playlistName);
             $http.post(url, playlistResource).then(function(res){
@@ -139,7 +110,7 @@
         };
 
         service.getVideosInPlaylist = function(id, videos, pageToken, deferred){
-          var accessToken = AuthService.isLoggedIn() ? '&access_token=' + gapi.auth2.getAuthInstance().currentUser.get().Zi.access_token : '';
+          var accessToken = AuthService.getAccessToken() ? '&access_token=' + AuthService.getAccessToken() : '';
           var pageToken = pageToken ? '&pageToken=' + pageToken : '';
           var deferred = deferred || $q.defer();
           var videos = videos || [];
@@ -219,7 +190,7 @@
 
         var saveVideoToPlaylist = function(video, playlist){
             var deferred = $q.defer();
-            var token = gapi.auth2.getAuthInstance().currentUser.get().Zi.access_token;
+            var token = AuthService.getAccessToken();
             var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&access_token=' + token;
             var playlistItemResource = generatePlaylistItemResource(video, playlist);
             $http.post(url, playlistItemResource).then(function(res){
