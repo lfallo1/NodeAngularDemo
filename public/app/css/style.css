@@ -1053,6 +1053,10 @@ div.report-modal .modal-content {
     text-shadow: 1px 2px 4px rgba(145, 155, 188, .8);
 }
 
+#user-playlist-wrapper, #show-user-playlist-button{
+    margin-top: 15px;
+}
+
 #user-playlist-wrapper select{
     font-size: 16px;
 }
@@ -1068,9 +1072,14 @@ div.report-modal .modal-content {
     font-size: 16px;
 }
 
-#user-playlist-wrapper button:hover{
+#user-playlist-wrapper button:hover, #hide-account-playlists.btn:hover, #show-user-playlist-button:hover{
     background: #8a6d3b !important;
     color: white;
+}
+
+#hide-account-playlists.btn, #show-user-playlist-button{
+    font-size: 18px;
+    color: #8a6d3b;
 }
 
 .logged-in-highlight{
