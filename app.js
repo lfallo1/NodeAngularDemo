@@ -3,6 +3,7 @@ var express = require('express'),
 
 var countriesAPI = require('./server/services/countriesAPI.js');
 var youtubeAPI = require('./server/services/youtubeAPI.js');
+var videoApi = require('./server/services/videoApi.js');
 
 var app = express();
 
@@ -40,12 +41,10 @@ app.get('/partials/directives/:name', function(req, res){
 
 //Endpoints
 app.use('/api/countries', countriesAPI.getAll);
-app.use('/api/youtube/get', youtubeAPI.get);
-app.use('/api/youtube/mp3/:id/:title', youtubeAPI.toMp3);
-app.use('/api/youtube/mp4/:id/:title', youtubeAPI.toMp4);
+app.use('/api/youtube', youtubeAPI);
 app.use('/api/config', function(req,res,next){
     res.json({'clientId' : clientId, 'authCallbackUrl' : authCallbackUrl});
-})
+});
 
 // redirect all others to the index (HTML5 history)
 app.get('*', function(req, res){

@@ -1569,6 +1569,12 @@
               }
             };
 
+            $scope.postit = function(video){
+              $http.post('api/video', {video : video}).then(function(){
+                console.log('guess it worked?');
+              });
+            };
+
             init();
 
         }]);
