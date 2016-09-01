@@ -41,6 +41,7 @@
             }, function(err){
               deferred.reject();
             });
+            return deferred.promise;
         };
 
         /**
