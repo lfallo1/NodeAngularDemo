@@ -610,36 +610,55 @@
                     //otherwise there are items
                     var nonDuplicates = getNonDuplicates(res);
 
-                    //send requests / store promises
-                    var promises = createBatchVideoRequest(nonDuplicates);
-
-                    if(promises.length === 0){
-                        deferred.resolve();
-                        return;
+                    var checkLocalPromises = [];
+                    for(var i = 0; i < nonDuplicates.length; i++){
+                      checkLocalPromises.push($http.get('api/video/get/' + nonDuplicates[i].id.videoId));
                     }
 
-                    //wait for request to finish
-                    $q.all(promises).then(function (res) {
-
-                        var data = [];
-                        for (var i = 0; i < res.length; i++) {
-                            data = data.concat(res[i].data.items);
+                    $q.all(checkLocalPromises).then(function(res){
+                      res.forEach(function(response){
+                        if(response.data && response.data.id){
+                          for(var j = nonDuplicates.length - 1; j >= 0; j--){
+                            if(nonDuplicates[j].id.videoId == response.data.id){
+                              nonDuplicates.splice(i,1);
+                              $scope.searchResults.push(response.data);
+                            }
+                          }  
                         }
+                      });
 
-                        //populated related video id's (for now, only populating during first pass)
-                        if(relatedPending && $scope.nextRelated.length === 0){
-                            getRelatedVideos(data);
-                        }
+                      //send requests / store promises
+                      var promises = createBatchVideoRequest(nonDuplicates);
 
-                        addVideosToList(data);
+                      if(promises.length === 0){
+                          deferred.resolve();
+                          return;
+                      }
 
-                        $scope.sort();
+                      //wait for request to finish
+                      $q.all(promises).then(function (res) {
 
-                        fetchResults(dateSmall, dateLarge, deferred);
-                    }, function (err) {
-                        deferred.reject();
-                        stopSearch('Service unavailable', 'error');
-                    })
+                          var data = [];
+                          for (var i = 0; i < res.length; i++) {
+                              data = data.concat(res[i].data.items);
+                          }
+
+                          //populated related video id's (for now, only populating during first pass)
+                          if(relatedPending && $scope.nextRelated.length === 0){
+                              getRelatedVideos(data);
+                          }
+
+                          addVideosToList(data);
+
+                          $scope.sort();
+
+                          fetchResults(dateSmall, dateLarge, deferred);
+                      }, function (err) {
+                          deferred.reject();
+                          stopSearch('Service unavailable', 'error');
+                      })
+
+                    });
 
                 }, function (err) {
                     deferred.reject();
@@ -879,6 +898,12 @@
                         $scope.hashedResults[channelTitle].videos.push(videoObject);
                         $scope.hashedResults[channelTitle].views += videoObject.viewCount;
                         $scope.hashedResults[channelTitle].count++;
+
+                        $http.post('api/video/add', {video : videoObject}).then(function(res){
+                          console.log('added');
+                        }, function(err){
+                          console.log(err);
+                        });
                     }
                 }
             };
@@ -1570,8 +1595,10 @@
             };
 
             $scope.postit = function(video){
-              $http.post('api/video', {video : video}).then(function(){
+              $http.post('api/video/add', {video : video}).then(function(){
                 console.log('guess it worked?');
+              }, function(err){
+                console.log(err);
               });
             };
 

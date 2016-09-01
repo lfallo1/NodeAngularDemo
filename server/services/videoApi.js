@@ -1,33 +1,62 @@
 var express = require('express');
 var router = express.Router();
+var pgp = require('pg-promise')(/*options*/);
 var pg = require('pg');
-var conString = "postgres://postgres:admin@localhost:5432/MyGene2";
+var cn = {
+    host: 'localhost', // server name or IP address;
+    port: 5432,
+    database: 'YoutubeAgent',
+    user: 'postgres',
+    password: 'admin'
+};
+var insertVideo = function(req, res, next){
 
-router.get('/:id', function(req, res, next){
+    var video = req.body.video;
+
+    pg.connect("postgres://postgres:admin@localhost:5432/YoutubeAgent", function(err, client, done) {
+        // Handle connection errors
+        if(err) {
+          done();
+          console.log(err);
+          return res.status(500).json({ success: false, data: err});
+        }
+
+        var sql = "INSERT INTO video(id, title, safe_title, channel_title, channel_id, created, pct_likes,view_count, likes, dislikes, thumbnail, duration, duration_minutes) VALUES ($1, $2, $3, $4, $5, $6, $7,$8, $9, $10, $11, $12, $13);";
+        // SQL Query > Insert Data
+        client.query(sql, [video.videoId, video.title, video.safeTitle, video.channelTitle, video.channelId, video.created, video.pctLikes, video.viewCount, video.likes, video.dislikes, video.thumbnail.url, video.duration, video.durationMinutes], function(err, result){
+          if(err){
+            res.status('500').send(err);
+          } else{
+            res.status('200').send({status : 'inserted'});
+          }
+        });
+    });
+};
+
+var getVideoById = function(req, res, next){
+
   var id = req.params.id;
-  var client = new pg.Client(conString);
-  client.connect();
+  var db = pgp(cn); // database instance;
 
-  var query = client.query("SELECT * FROM video WHERE id = $1 LIMIT 1", id);
-  //fired after last row is emitted
+  pg.connect("postgres://postgres:admin@localhost:5432/YoutubeAgent", function(err, client, done) {
+      // Handle connection errors
+      if(err) {
+        done();
+        console.log(err);
+        res.send(err);
+      }
 
-  query.on('row', function(row) {
-      console.log(row.username);
+      var query = client.query("select * from video where id = $1 limit 1", [id]);
+
+      // Stream results back one row at a time
+      query.on('row', function(row) {
+        done();
+        res.send(row);
+      });
   });
+};
 
-  query.on('end', function() {
-      client.end();
-  });
-});
-
-router.post('/', function(req, res, next){
-  var video = req.body.video;
-  console.log(video);
-  client.query({
-      name: 'insert video',
-      text: "INSERT INTO video(id, created, title, safeTitle, channelId, channelTitle, date, duration, pctLikes, dislikes, likes, url, thumbnail, duration, durationMinutes, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
-      values: [video.videoId, video.created, video.title, video.safeTitle, video.channelId, video.channelTitle, video.date, video.duration, video.pctLikes, video.dislikes, video.likes, video.url, video.thumbnail.url, video.duration, video.durationMinutes]
-  });
-});
+router.get('/get/:id', getVideoById);
+router.post('/add', insertVideo);
 
 module.exports = router;
