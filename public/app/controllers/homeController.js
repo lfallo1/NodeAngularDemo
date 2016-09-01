@@ -329,6 +329,8 @@
                 else if($routeParams.id){
                   getVideoById($routeParams.id).then(function(res){
                       $scope.playVideo($scope.searchResults[0]);
+                  }, function(err){
+                    stopSearch('Could not find video', 'warning');
                   })
                 } else if($routeParams.m && $routeParams.q && !isNaN($routeParams.m) && ( Number($routeParams.m) <= 4 && Number($routeParams.m) >= 1)){
                   $scope.searchMode = Number($routeParams.m);
@@ -499,6 +501,10 @@
                         $scope.alerts = [{type:'danger', msg:'Warning!  With the Interval option selected, results take considerably longer to retrieve.  Please click STOP and uncheck the option if you wish to perform a faster search.'}];
                     }
 
+                    if($scope.searchMode == $scope.MOST_VIEWED_SEARCH){
+                      $scope.extendedSearch = false;
+                    }
+
                     //call the wrapper
                     fetchResultsWrapper();
                 }
@@ -506,11 +512,14 @@
                   getVideosInPlaylist().then(function(res){
                     console.log('playlist retrieved');
                   }, function(){
-                    console.log('playlist not found, trying video id search');
-                    getVideoById();
+                    //handle rejection in get video playlist and try to search by video
+                    getVideoById().then(function(){
+
+                    }, function(err){
+                      //if also errored out here, then neither video nor playlist was retrieved
+                      stopSearch('Could not find playlist or video', 'warning');
+                    })
                   })
-                } else if($scope.searchMode === $scope.USER_PLAYLIST){
-                  getVideosInPlaylist();
                 }
             };
 
@@ -1391,10 +1400,29 @@
                     return;
                 }
                 deferred.reject();
-                stopSearch('Could not find playlist or video', 'warning');
               }, function(err){
                 deferred.reject();
-                stopSearch('Could not find playlist or video', 'warning');
+              });
+              return deferred.promise;
+            };
+
+            var getVideosInPlaylistCallback = function(videos){
+              var deferred = $q.defer();
+              var nonDups = getNonDuplicates(videos);
+
+              var promises = createBatchVideoRequest(nonDups);
+
+              $q.all(promises).then(function (res) {
+                  var data = [];
+                  for (var i = 0; i < res.length; i++) {
+                      data = data.concat(res[i].data.items);
+                  }
+
+                  addVideosToList(data);
+                  $scope.sort();
+                  deferred.resolve();
+              }, function(err){
+                deferred.reject();
               });
               return deferred.promise;
             };
@@ -1403,28 +1431,14 @@
               var searchParam = searchParam || $scope.searchParam;
               var deferred = $q.defer();
               $scope.fetching = true;
-              PlaylistService.getVideosInPlaylist(searchParam).then(function(videos){
-                var nonDups = getNonDuplicates(videos);
+              PlaylistService.getVideosInPlaylist(searchParam, getVideosInPlaylistCallback).then(function(){
 
-                var promises = createBatchVideoRequest(nonDups);
-
-                $q.all(promises).then(function (res) {
-                    var data = [];
-                    for (var i = 0; i < res.length; i++) {
-                        data = data.concat(res[i].data.items);
-                    }
-
-                    addVideosToList(data);
-                    $scope.sort();
-
-                    $scope.fetching = false;
-
-                    deferred.resolve();
-                }, function (err) {
-                    deferred.resolve();
-                    stopSearch('Service unavailable', 'error');
-                })
+                //search finished
+                $scope.fetching = false;
+                deferred.resolve();
               }, function(err){
+
+                //if rejects here, it's because playlist does not exist or not accessible by user
                 deferred.reject();
               });
 
@@ -1541,6 +1555,8 @@
               } else{
                 $scope.disablePostDateFilters = false;
               }
+
+              $scope.filter()
             };
 
             $scope.getSearchBoxPlaceholder = function(){

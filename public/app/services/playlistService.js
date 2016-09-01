@@ -110,21 +110,34 @@
             return deferred.promise;
         };
 
-        service.getVideosInPlaylist = function(id, videos, pageToken, deferred){
+        service.getVideosInPlaylist = function(id, callback, pageToken, deferred){
           var accessToken = AuthService.getAccessToken() ? '&access_token=' + AuthService.getAccessToken() : '';
           var pageToken = pageToken ? '&pageToken=' + pageToken : '';
           var deferred = deferred || $q.defer();
-          var videos = videos || [];
           var playlistId = '&playlistId=' + id;
           var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50' + playlistId + pageToken + accessToken;
+
+          //make request
           $http.get(url).then(function(res){
-            videos.push(res);
-            if(res.data.nextPageToken){
-              service.getVideosInPlaylist(id, videos, res.data.nextPageToken, deferred);
-              return;
-            }
-            deferred.resolve(videos);
+            //execute callback / forces ui updates
+            callback(new Array(res)).then(function(){
+
+              //if a next page exists
+              if(res.data.nextPageToken){
+                service.getVideosInPlaylist(id, callback, res.data.nextPageToken, deferred);
+                return;
+              }
+
+              //otherwise resolve
+              deferred.resolve();
+            }, function(err){
+
+              //if error occurs here, just resolve (i'll write an explanation later)
+              deferred.resolve();
+            });
           }, function(err){
+
+            //if error here, it's because the playlist is not available (auth) or does not exist
             deferred.reject(err);
           });
           return deferred.promise;
