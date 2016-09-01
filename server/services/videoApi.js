@@ -38,22 +38,14 @@ var getVideoById = function(req, res, next){
   var id = req.params.id;
   var db = pgp(cn); // database instance;
 
-  pg.connect("postgres://postgres:admin@localhost:5432/YoutubeAgent", function(err, client, done) {
-      // Handle connection errors
-      if(err) {
-        done();
-        console.log(err);
-        res.send(err);
-      }
-
-      var query = client.query("select * from video where id = $1 limit 1", [id]);
-
-      // Stream results back one row at a time
-      query.on('row', function(row) {
-        done();
-        res.send(row);
+  // select and return user name from id:
+  db.one("select * from video where id=$1", id)
+      .then(function (video) {
+          res.send(video);
+      })
+      .catch(function (error) {
+          res.send({});
       });
-  });
 };
 
 router.get('/get/:id', getVideoById);

@@ -620,10 +620,10 @@
                         if(response.data && response.data.id){
                           for(var j = nonDuplicates.length - 1; j >= 0; j--){
                             if(nonDuplicates[j].id.videoId == response.data.id){
-                              nonDuplicates.splice(i,1);
+                              nonDuplicates.splice(j,1);
                               $scope.searchResults.push(response.data);
                             }
-                          }  
+                          }
                         }
                       });
 
