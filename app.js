@@ -45,7 +45,7 @@ app.use('/api/youtube', youtubeAPI);
 app.use('/api/config', function(req,res,next){
     res.json({'clientId' : clientId, 'authCallbackUrl' : authCallbackUrl});
 });
-app.use('/api/video', videoApi);
+// app.use('/api/video', videoApi);
 
 // redirect all others to the index (HTML5 history)
 app.get('*', function(req, res){
