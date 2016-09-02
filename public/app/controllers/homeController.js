@@ -610,30 +610,18 @@
                     //otherwise there are items
                     var nonDuplicates = getNonDuplicates(res);
 
-                    var checkLocalPromises = [];
-                    for(var i = 0; i < nonDuplicates.length; i++){
-                      checkLocalPromises.push($http.get('api/video/get/' + nonDuplicates[i].id.videoId));
-                    }
-
-                    $q.all(checkLocalPromises).then(function(res){
-                      res.forEach(function(response){
-                        if(response.data && response.data.id){
-                          for(var j = nonDuplicates.length - 1; j >= 0; j--){
-                            if(nonDuplicates[j].id.videoId == response.data.id){
-                              nonDuplicates.splice(j,1);
-                              $scope.searchResults.push(response.data);
-                            }
+                    $http.post('api/video/get', { videos : nonDuplicates.map(function(v){return v.id.videoId})}).then(function(res){
+                      res.data.forEach(function(id){
+                        for(var j = nonDuplicates.length - 1; j >= 0; j--){
+                          if(nonDuplicates[j].id.videoId == id){
+                            nonDuplicates.splice(j,1);
+                            $scope.searchResults.push(video);
                           }
                         }
                       });
 
                       //send requests / store promises
                       var promises = createBatchVideoRequest(nonDuplicates);
-
-                      if(promises.length === 0){
-                          deferred.resolve();
-                          return;
-                      }
 
                       //wait for request to finish
                       $q.all(promises).then(function (res) {
@@ -648,11 +636,10 @@
                               getRelatedVideos(data);
                           }
 
-                          addVideosToList(data);
-
-                          $scope.sort();
-
-                          fetchResults(dateSmall, dateLarge, deferred);
+                          addVideosToList(data).then(function(){
+                            $scope.sort();
+                            fetchResults(dateSmall, dateLarge, deferred);
+                          });
                       }, function (err) {
                           deferred.reject();
                           stopSearch('Service unavailable', 'error');
@@ -771,11 +758,11 @@
                             data = data.concat(res[i].data.items);
                         }
 
-                        addVideosToList(data);
+                        addVideosToList(data).then(function(){
+                          $scope.sort();
+                          $scope.fetchPopularByCountryAll(countryAlphaCode, nextPageToken);
+                        });
 
-                        $scope.sort();
-
-                        $scope.fetchPopularByCountryAll(countryAlphaCode, nextPageToken);
                     }, function (err) {
                         stopSearch('Service unavailable', 'error');
                     });
@@ -821,11 +808,11 @@
                                 data = data.concat(res[i].data.items);
                             }
 
-                            addVideosToList(data);
+                            addVideosToList(data).then(function(){
+                              $scope.sort();
+                              $scope.fetchPopularByCountryAndCategory(countryAlphaCode, category, nextPageToken);
+                            });
 
-                            $scope.sort();
-
-                            $scope.fetchPopularByCountryAndCategory(countryAlphaCode, category, nextPageToken);
                         }, function (err) {
                             stopSearch('Service unavailable', 'error');
                         });
@@ -841,6 +828,10 @@
              * @param data
              */
             var addVideosToList = function(data){
+
+              var deferred = $q.defer();
+              var saveToDbList = [];
+
                 //for each video, add to the list
                 for (var i = 0; i < data.length; i++) {
                     var datastats = data[i];
@@ -899,13 +890,19 @@
                         $scope.hashedResults[channelTitle].views += videoObject.viewCount;
                         $scope.hashedResults[channelTitle].count++;
 
-                        $http.post('api/video/add', {video : videoObject}).then(function(res){
-                          console.log('added');
-                        }, function(err){
-                          console.log(err);
-                        });
+                        saveToDbList.push(videoObject);
                     }
                 }
+
+                $http.post('api/video/add', {videos : saveToDbList}).then(function(res){
+                  console.log(res);
+                  deferred.resolve();
+                }, function(err){
+                  console.log(err);
+                  deferred.resolve();
+                });
+
+                return deferred.promise;
             };
 
             /**
@@ -1418,11 +1415,12 @@
               var id = id || $scope.searchParam;
               $http.post('api/youtube/get', {url : youtubeVideoBase + id}).then(function(res){
                 if(res.data.items.length > 0){
-                    addVideosToList(res.data.items);
-                    $scope.sort();
-                    $scope.fetching = false;
-                    deferred.resolve();
-                    return;
+                    addVideosToList(res.data.items).then(function(){
+                      $scope.sort();
+                      $scope.fetching = false;
+                      deferred.resolve();
+                      return;
+                    });
                 }
                 deferred.reject();
               }, function(err){
@@ -1443,9 +1441,10 @@
                       data = data.concat(res[i].data.items);
                   }
 
-                  addVideosToList(data);
-                  $scope.sort();
-                  deferred.resolve();
+                  addVideosToList(data).then(function(){
+                    $scope.sort();
+                    deferred.resolve();
+                  })
               }, function(err){
                 deferred.reject();
               });
@@ -1592,14 +1591,6 @@
               } else if($scope.searchMode === $scope.MOST_VIEWED_SEARCH){
                 return 'Search term (optional)';
               }
-            };
-
-            $scope.postit = function(video){
-              $http.post('api/video/add', {video : video}).then(function(){
-                console.log('guess it worked?');
-              }, function(err){
-                console.log(err);
-              });
             };
 
             init();

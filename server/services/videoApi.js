@@ -9,46 +9,70 @@ var cn = {
     user: 'postgres',
     password: 'admin'
 };
-var insertVideo = function(req, res, next){
 
-    var video = req.body.video;
-
-    pg.connect("postgres://postgres:admin@localhost:5432/YoutubeAgent", function(err, client, done) {
-        // Handle connection errors
-        if(err) {
-          done();
-          console.log(err);
-          return res.status(500).json({ success: false, data: err});
-        }
-
-        var sql = "INSERT INTO video(id, title, safe_title, channel_title, channel_id, created, pct_likes,view_count, likes, dislikes, thumbnail, duration, duration_minutes) VALUES ($1, $2, $3, $4, $5, $6, $7,$8, $9, $10, $11, $12, $13);";
-        // SQL Query > Insert Data
-        client.query(sql, [video.videoId, video.title, video.safeTitle, video.channelTitle, video.channelId, video.created, video.pctLikes, video.viewCount, video.likes, video.dislikes, video.thumbnail.url, video.duration, video.durationMinutes], function(err, result){
-          if(err){
-            res.status('500').send(err);
-          } else{
-            res.status('200').send({status : 'inserted'});
-          }
-        });
-    });
+var dbFormat = function(val, excludeComma){
+  var endComma = excludeComma ? "" : ",";
+  if(isNaN(val)){
+    var re = new RegExp("'", 'g');
+    val = val.replace(re, '');
+    return "'" + val.toString() + "'" + endComma;
+  }
+  return val + endComma;
 };
 
-var getVideoById = function(req, res, next){
+var getValues = function(videos){
+  return videos.map(function(video){
+    return "("+ dbFormat(video.videoId) + dbFormat(video.title) + dbFormat(video.safeTitle) + dbFormat(video.channelTitle) + dbFormat(video.channelId) + dbFormat(video.created) + dbFormat(video.pctLikes) + dbFormat(video.viewCount) + dbFormat(video.likes) + dbFormat(video.dislikes) + dbFormat(video.thumbnail.url) + dbFormat(video.duration) + dbFormat(video.durationMinutes, true) +")"
+  }).join(",");
+};
 
-  var id = req.params.id;
+var insertVideo = function(req, res, next){
+    var videos = req.body.videos;
+
+    pg.connect("postgres://postgres:admin@localhost:5432/YoutubeAgent", function(err, client, done) {
+            // Handle connection errors
+      if(err) {
+        done();
+        console.log(err);
+        res.send({});
+        res.end();
+      }
+
+      // var sql = "INSERT INTO video(id, title, safe_title, channel_title, channel_id, created, pct_likes,view_count, likes, dislikes, thumbnail, duration, duration_minutes) VALUES ($1, $2, $3, $4, $5, $6, $7,$8, $9, $10, $11, $12, $13);";
+      var sql = "INSERT INTO video(id, title, safe_title, channel_title, channel_id, created, pct_likes,view_count, likes, dislikes, thumbnail, duration, duration_minutes) VALUES "+ getValues(videos) +";";
+      // SQL Query > Insert Data
+      client.query(sql, function(err, result){
+        if(err){
+          res.send({});
+          res.end();
+        } else{
+          res.send({});
+          res.end();
+        }
+      });
+  });
+};
+
+var getVideos = function(req, res, next){
+
   var db = pgp(cn); // database instance;
 
+  var videoIds = req.body.videos.map(function(v){return "'" + v + "'"}).join(",")
+console.log(videoIds);
+  var sql = "select * from video where id in ("+ videoIds +")";
   // select and return user name from id:
-  db.one("select * from video where id=$1", id)
-      .then(function (video) {
-          res.send(video);
+  db.query(sql)
+      .then(function (videos) {
+        var ids = videos.map(function(video){return video.id});
+        console.log(ids);
+          res.send(ids);
       })
       .catch(function (error) {
-          res.send({});
+          res.send(error);
       });
 };
 
-router.get('/get/:id', getVideoById);
+router.post('/get', getVideos);
 router.post('/add', insertVideo);
 
 module.exports = router;
