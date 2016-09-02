@@ -1028,6 +1028,7 @@ div.report-modal .modal-content {
 
 #toggle-autoplay .ats-switch{
     border: none !important;
+    margin-right: 20px;
 }
 
 .knob, .switch-left, .switch-right{

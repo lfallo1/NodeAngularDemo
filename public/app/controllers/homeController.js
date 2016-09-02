@@ -328,6 +328,8 @@
                 }
                 else if($routeParams.id){
                   getVideoById($routeParams.id).then(function(res){
+                      resetPostFilters();
+                      $scope.sort();
                       $scope.playVideo($scope.searchResults[0]);
                   }, function(err){
                     stopSearch('Could not find video', 'warning');
@@ -338,6 +340,16 @@
                   $scope.doSearch();
                 }
             };
+
+            var resetPostFilters = function(){
+              $scope.minViews = undefined;
+              $scope.minDislikes = undefined;
+              $scope.minDate = undefined;
+              $scope.maxDate = undefined;
+              $scope.minRating = undefined;
+              $scope.shorterThanFilter = undefined;
+              $scope.longerThanFilter = undefined;
+            }
 
             $scope.reset = function(){
                 $scope.searchResults = [];
@@ -613,6 +625,11 @@
                     //send requests / store promises
                     var promises = createBatchVideoRequest(nonDuplicates);
 
+                    if(promises.length === 0){
+                        deferred.resolve();
+                        return;
+                    }
+
                     //wait for request to finish
                     $q.all(promises).then(function (res) {
 
@@ -626,14 +643,15 @@
                             getRelatedVideos(data);
                         }
 
-                        addVideosToList(data).then(function(){
-                          $scope.sort();
-                          fetchResults(dateSmall, dateLarge, deferred);
-                        });
+                        addVideosToList(data);
+
+                        $scope.sort();
+
+                        fetchResults(dateSmall, dateLarge, deferred);
                     }, function (err) {
                         deferred.reject();
                         stopSearch('Service unavailable', 'error');
-                    });
+                    })
 
                 }, function (err) {
                     deferred.reject();
@@ -746,11 +764,11 @@
                             data = data.concat(res[i].data.items);
                         }
 
-                        addVideosToList(data).then(function(){
-                          $scope.sort();
-                          $scope.fetchPopularByCountryAll(countryAlphaCode, nextPageToken);
-                        });
+                        addVideosToList(data);
 
+                        $scope.sort();
+
+                        $scope.fetchPopularByCountryAll(countryAlphaCode, nextPageToken);
                     }, function (err) {
                         stopSearch('Service unavailable', 'error');
                     });
@@ -796,11 +814,11 @@
                                 data = data.concat(res[i].data.items);
                             }
 
-                            addVideosToList(data).then(function(){
-                              $scope.sort();
-                              $scope.fetchPopularByCountryAndCategory(countryAlphaCode, category, nextPageToken);
-                            });
+                            addVideosToList(data);
 
+                            $scope.sort();
+
+                            $scope.fetchPopularByCountryAndCategory(countryAlphaCode, category, nextPageToken);
                         }, function (err) {
                             stopSearch('Service unavailable', 'error');
                         });
@@ -816,71 +834,65 @@
              * @param data
              */
             var addVideosToList = function(data){
+                //for each video, add to the list
+                for (var i = 0; i < data.length; i++) {
+                    var datastats = data[i];
+                    if (datastats) {
+                        var title = datastats.snippet.title;
+                        var channelTitle = datastats.snippet.channelTitle;
+                        var channelId = datastats.snippet.channelId;
+                        var created = new Date(datastats.snippet.publishedAt);
+                        var id = datastats.id;
 
-              var deferred = $q.defer();
+                        //format the pct likes
+                        var pctLikes;
+                        if (datastats.statistics.likeCount) {
+                            pctLikes = (Number(datastats.statistics.likeCount) / (Number(datastats.statistics.likeCount) + Number(datastats.statistics.dislikeCount))) * 100
+                        }
+                        else if (datastats.statistics.dislikeCount) {
+                            pctLikes = 0;
+                        }
+                        else {
+                            pctLikes = undefined;
+                        }
 
-              //for each video, add to the list
-              for (var i = 0; i < data.length; i++) {
-                  var datastats = data[i];
-                  if (datastats) {
-                      var title = datastats.snippet.title;
-                      var channelTitle = datastats.snippet.channelTitle;
-                      var channelId = datastats.snippet.channelId;
-                      var created = new Date(datastats.snippet.publishedAt);
-                      var id = datastats.id;
+                        var viewCount = datastats.statistics.viewCount;
+                        var likes = datastats.statistics.likeCount;
+                        var dislikes = datastats.statistics.dislikeCount;
 
-                      //format the pct likes
-                      var pctLikes;
-                      if (datastats.statistics.likeCount) {
-                          pctLikes = (Number(datastats.statistics.likeCount) / (Number(datastats.statistics.likeCount) + Number(datastats.statistics.dislikeCount))) * 100
-                      }
-                      else if (datastats.statistics.dislikeCount) {
-                          pctLikes = 0;
-                      }
-                      else {
-                          pctLikes = undefined;
-                      }
+                        //extract duration from ISO 8601 (PT#H#M#S)
+                        var duration = {};
+                        if (datastats.contentDetails) {
+                            duration = TimeService.isoToDuration(datastats.contentDetails.duration);
+                        }
 
-                      var viewCount = datastats.statistics.viewCount;
-                      var likes = datastats.statistics.likeCount;
-                      var dislikes = datastats.statistics.dislikeCount;
+                        var videoObject = {
+                            "title": title,
+                            "safeTitle": title.substring(0,60).trim().replace(/\W+/g, "_"),
+                            "channelTitle": channelTitle,
+                            "channelId": channelId,
+                            "created": created,
+                            "videoId": id,
+                            "pctLikes": pctLikes || 0,
+                            "viewCount": Number(viewCount),
+                            "likes": Number(likes) || 0,
+                            "dislikes": Number(dislikes) || 0,
+                            "thumbnail": datastats.snippet.thumbnails.medium,
+                            "duration": duration.formatted || null,
+                            "durationMinutes": duration.approxMinutes || null
+                        };
 
-                      //extract duration from ISO 8601 (PT#H#M#S)
-                      var duration = {};
-                      if (datastats.contentDetails) {
-                          duration = TimeService.isoToDuration(datastats.contentDetails.duration);
-                      }
+                        //add object to search results
+                        $scope.searchResults.push(videoObject);
 
-                      var videoObject = {
-                          "title": title,
-                          "safeTitle": title.substring(0,60).trim().replace(/\W+/g, "_"),
-                          "channelTitle": channelTitle,
-                          "channelId": channelId,
-                          "created": created,
-                          "videoId": id,
-                          "pctLikes": pctLikes || 0,
-                          "viewCount": Number(viewCount),
-                          "likes": Number(likes) || 0,
-                          "dislikes": Number(dislikes) || 0,
-                          "thumbnail": datastats.snippet.thumbnails.medium,
-                          "duration": duration.formatted || null,
-                          "durationMinutes": duration.approxMinutes || null
-                      };
-
-                      //add object to search results
-                      $scope.searchResults.push(videoObject);
-
-                      if(!$scope.hashedResults[channelTitle]){
-                          $scope.hashedResults[channelTitle] = {count : 0, views : 0, videos : []};
-                      }
-                      $scope.hashedResults[channelTitle].videos.push(videoObject);
-                      $scope.hashedResults[channelTitle].views += videoObject.viewCount;
-                      $scope.hashedResults[channelTitle].count++;
-                  }
-              }
-              deferred.resolve();
-
-              return deferred.promise;
+                        if(!$scope.hashedResults[channelTitle]){
+                            $scope.hashedResults[channelTitle] = {count : 0, views : 0, videos : []};
+                        }
+                        $scope.hashedResults[channelTitle].videos.push(videoObject);
+                        $scope.hashedResults[channelTitle].views += videoObject.viewCount;
+                        $scope.hashedResults[channelTitle].count++;
+                    }
+                }
             };
 
             /**
@@ -1393,12 +1405,11 @@
               var id = id || $scope.searchParam;
               $http.post('api/youtube/get', {url : youtubeVideoBase + id}).then(function(res){
                 if(res.data.items.length > 0){
-                    addVideosToList(res.data.items).then(function(){
-                      $scope.sort();
-                      $scope.fetching = false;
-                      deferred.resolve();
-                      return;
-                    });
+                    addVideosToList(res.data.items);
+                    $scope.sort();
+                    $scope.fetching = false;
+                    deferred.resolve();
+                    return;
                 }
                 deferred.reject();
               }, function(err){
@@ -1419,10 +1430,9 @@
                       data = data.concat(res[i].data.items);
                   }
 
-                  addVideosToList(data).then(function(){
-                    $scope.sort();
-                    deferred.resolve();
-                  })
+                  addVideosToList(data);
+                  $scope.sort();
+                  deferred.resolve();
               }, function(err){
                 deferred.reject();
               });

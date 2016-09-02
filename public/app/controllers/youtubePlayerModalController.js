@@ -11,7 +11,7 @@ angular.module('youtubeSearchApp').controller('YoutubePlayerModalCtrl', [ '$root
       if($scope.autoplay){
         //handle youtube player errors and end of video events - end of digest loop
         $timeout(function(){
-          if($scope.nextVideo){
+          if($scope.nextVideo >= 0){
             $scope.currentVideo.playing = false;
             $scope.start(filteredResults[$scope.nextVideo], $scope.nextVideo);
           }
@@ -36,13 +36,21 @@ angular.module('youtubeSearchApp').controller('YoutubePlayerModalCtrl', [ '$root
 
       if(!isNaN(index)){
         //set the next video to be played, if $scope.autoplay is on
-        $scope.nextVideo = (index < (filteredResults.length - 1)) ? (index+1) : undefined;
+        $scope.nextVideo = (index < (filteredResults.length - 1)) ? (index+1) : $scope.repeat ? 0 : undefined;
         $scope.previousVideo = index > 0 ? (index-1) : undefined;
 
-        $scope.nextDetails = $scope.nextVideo ? filteredResults[$scope.nextVideo] : {};
+        $scope.nextDetails = $scope.nextVideo >= 0 ? filteredResults[$scope.nextVideo] : {};
         $scope.prevDetails = $scope.previousVideo >= 0 ? filteredResults[$scope.previousVideo] : {};
       }
+    };
 
+    $scope.updateNextPrevious = function(){
+      var index = $scope.currIndex;
+      $scope.nextVideo = (index < (filteredResults.length - 1)) ? (index+1) : $scope.repeat ? 0 : undefined;
+      $scope.previousVideo = index > 0 ? (index-1) : undefined;
+
+      $scope.nextDetails = $scope.nextVideo >= 0 ? filteredResults[$scope.nextVideo] : {};
+      $scope.prevDetails = $scope.previousVideo >= 0 ? filteredResults[$scope.previousVideo] : {};
     };
 
     $scope.getIFrameSrc = function (videoId) {
@@ -73,7 +81,7 @@ angular.module('youtubeSearchApp').controller('YoutubePlayerModalCtrl', [ '$root
       };
 
       pagination = content.pagination;
-      filteredResults = content.filteredResults;
+      filteredResults = content.filteredResults.length > 0 ? content.filteredResults : new Array(content.video);
       $scope.autoplay = content.autoplay;
       $scope.start(content.video, content.index);
     };

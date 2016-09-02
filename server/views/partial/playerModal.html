@@ -17,7 +17,7 @@
             uib-popover-template="popoverTemplate.prevVideo"
             popover-trigger="mouseenter"
             popover-placement="top"
-            ng-show="previousVideo > -1" src="{{getImageByIndex(previousVideo)}}" ng-click="goto(previousVideo)" />
+            ng-show="previousVideo >= 0" src="{{getImageByIndex(previousVideo)}}" ng-click="goto(previousVideo)" />
         </div>
         <div class="col-xs-8">
           <div id="toggle-autoplay">
@@ -25,6 +25,11 @@
               ng-model="autoplay"
               class="switch-success switch-large"
               knob-label="Autoplay">
+            </toggle-switch>
+            <toggle-switch
+              ng-model="repeat"
+              class="switch-primary switch-large"
+              knob-label="Repeat" ng-change="updateNextPrevious()">
             </toggle-switch>
           </div>
           <youtube-video video-url="getIFrameSrc(currentVideo.videoId)" player-vars="youtubePlayerOptions"></youtube-video>
@@ -34,7 +39,7 @@
             uib-popover-template="popoverTemplate.nextVideo"
             popover-trigger="mouseenter"
             popover-placement="top"
-            ng-show="nextVideo" src="{{getImageByIndex(nextVideo)}}" ng-click="goto(nextVideo)" />
+            ng-show="nextVideo >= 0" src="{{getImageByIndex(nextVideo)}}" ng-click="goto(nextVideo)" />
         </div>
     </div>
     <div id="player-modal-actions" class="btn-group btn-group-justified">
