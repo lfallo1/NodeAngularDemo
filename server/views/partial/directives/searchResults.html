@@ -38,7 +38,6 @@
                             {{video.title}}
                         </div>
                     </a>
-                    <button class="btn btn-primary" ng-click="postit(video)">CLICK IT</button>
                     <div class="created"><a href="https://www.youtube.com/channel/{{video.channelId}}" target="_blank">{{video.channelTitle}}</a> - {{video.created | date:'MM-dd-yyyy'}}</div>
                     <div class="duration">{{video.duration}}</div>
                     <div class="rating"><small>Rating</small> {{video.pctLikes | number:2}}</div>

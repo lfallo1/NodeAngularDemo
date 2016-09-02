@@ -610,41 +610,29 @@
                     //otherwise there are items
                     var nonDuplicates = getNonDuplicates(res);
 
-                    $http.post('api/video/get', { videos : nonDuplicates.map(function(v){return v.id.videoId})}).then(function(res){
-                      res.data.forEach(function(id){
-                        for(var j = nonDuplicates.length - 1; j >= 0; j--){
-                          if(nonDuplicates[j].id.videoId == id){
-                            nonDuplicates.splice(j,1);
-                            $scope.searchResults.push(video);
-                          }
+                    //send requests / store promises
+                    var promises = createBatchVideoRequest(nonDuplicates);
+
+                    //wait for request to finish
+                    $q.all(promises).then(function (res) {
+
+                        var data = [];
+                        for (var i = 0; i < res.length; i++) {
+                            data = data.concat(res[i].data.items);
                         }
-                      });
 
-                      //send requests / store promises
-                      var promises = createBatchVideoRequest(nonDuplicates);
+                        //populated related video id's (for now, only populating during first pass)
+                        if(relatedPending && $scope.nextRelated.length === 0){
+                            getRelatedVideos(data);
+                        }
 
-                      //wait for request to finish
-                      $q.all(promises).then(function (res) {
-
-                          var data = [];
-                          for (var i = 0; i < res.length; i++) {
-                              data = data.concat(res[i].data.items);
-                          }
-
-                          //populated related video id's (for now, only populating during first pass)
-                          if(relatedPending && $scope.nextRelated.length === 0){
-                              getRelatedVideos(data);
-                          }
-
-                          addVideosToList(data).then(function(){
-                            $scope.sort();
-                            fetchResults(dateSmall, dateLarge, deferred);
-                          });
-                      }, function (err) {
-                          deferred.reject();
-                          stopSearch('Service unavailable', 'error');
-                      })
-
+                        addVideosToList(data).then(function(){
+                          $scope.sort();
+                          fetchResults(dateSmall, dateLarge, deferred);
+                        });
+                    }, function (err) {
+                        deferred.reject();
+                        stopSearch('Service unavailable', 'error');
                     });
 
                 }, function (err) {
@@ -830,79 +818,69 @@
             var addVideosToList = function(data){
 
               var deferred = $q.defer();
-              var saveToDbList = [];
 
-                //for each video, add to the list
-                for (var i = 0; i < data.length; i++) {
-                    var datastats = data[i];
-                    if (datastats) {
-                        var title = datastats.snippet.title;
-                        var channelTitle = datastats.snippet.channelTitle;
-                        var channelId = datastats.snippet.channelId;
-                        var created = new Date(datastats.snippet.publishedAt);
-                        var id = datastats.id;
+              //for each video, add to the list
+              for (var i = 0; i < data.length; i++) {
+                  var datastats = data[i];
+                  if (datastats) {
+                      var title = datastats.snippet.title;
+                      var channelTitle = datastats.snippet.channelTitle;
+                      var channelId = datastats.snippet.channelId;
+                      var created = new Date(datastats.snippet.publishedAt);
+                      var id = datastats.id;
 
-                        //format the pct likes
-                        var pctLikes;
-                        if (datastats.statistics.likeCount) {
-                            pctLikes = (Number(datastats.statistics.likeCount) / (Number(datastats.statistics.likeCount) + Number(datastats.statistics.dislikeCount))) * 100
-                        }
-                        else if (datastats.statistics.dislikeCount) {
-                            pctLikes = 0;
-                        }
-                        else {
-                            pctLikes = undefined;
-                        }
+                      //format the pct likes
+                      var pctLikes;
+                      if (datastats.statistics.likeCount) {
+                          pctLikes = (Number(datastats.statistics.likeCount) / (Number(datastats.statistics.likeCount) + Number(datastats.statistics.dislikeCount))) * 100
+                      }
+                      else if (datastats.statistics.dislikeCount) {
+                          pctLikes = 0;
+                      }
+                      else {
+                          pctLikes = undefined;
+                      }
 
-                        var viewCount = datastats.statistics.viewCount;
-                        var likes = datastats.statistics.likeCount;
-                        var dislikes = datastats.statistics.dislikeCount;
+                      var viewCount = datastats.statistics.viewCount;
+                      var likes = datastats.statistics.likeCount;
+                      var dislikes = datastats.statistics.dislikeCount;
 
-                        //extract duration from ISO 8601 (PT#H#M#S)
-                        var duration = {};
-                        if (datastats.contentDetails) {
-                            duration = TimeService.isoToDuration(datastats.contentDetails.duration);
-                        }
+                      //extract duration from ISO 8601 (PT#H#M#S)
+                      var duration = {};
+                      if (datastats.contentDetails) {
+                          duration = TimeService.isoToDuration(datastats.contentDetails.duration);
+                      }
 
-                        var videoObject = {
-                            "title": title,
-                            "safeTitle": title.substring(0,60).trim().replace(/\W+/g, "_"),
-                            "channelTitle": channelTitle,
-                            "channelId": channelId,
-                            "created": created,
-                            "videoId": id,
-                            "pctLikes": pctLikes || 0,
-                            "viewCount": Number(viewCount),
-                            "likes": Number(likes) || 0,
-                            "dislikes": Number(dislikes) || 0,
-                            "thumbnail": datastats.snippet.thumbnails.medium,
-                            "duration": duration.formatted || null,
-                            "durationMinutes": duration.approxMinutes || null
-                        };
+                      var videoObject = {
+                          "title": title,
+                          "safeTitle": title.substring(0,60).trim().replace(/\W+/g, "_"),
+                          "channelTitle": channelTitle,
+                          "channelId": channelId,
+                          "created": created,
+                          "videoId": id,
+                          "pctLikes": pctLikes || 0,
+                          "viewCount": Number(viewCount),
+                          "likes": Number(likes) || 0,
+                          "dislikes": Number(dislikes) || 0,
+                          "thumbnail": datastats.snippet.thumbnails.medium,
+                          "duration": duration.formatted || null,
+                          "durationMinutes": duration.approxMinutes || null
+                      };
 
-                        //add object to search results
-                        $scope.searchResults.push(videoObject);
+                      //add object to search results
+                      $scope.searchResults.push(videoObject);
 
-                        if(!$scope.hashedResults[channelTitle]){
-                            $scope.hashedResults[channelTitle] = {count : 0, views : 0, videos : []};
-                        }
-                        $scope.hashedResults[channelTitle].videos.push(videoObject);
-                        $scope.hashedResults[channelTitle].views += videoObject.viewCount;
-                        $scope.hashedResults[channelTitle].count++;
+                      if(!$scope.hashedResults[channelTitle]){
+                          $scope.hashedResults[channelTitle] = {count : 0, views : 0, videos : []};
+                      }
+                      $scope.hashedResults[channelTitle].videos.push(videoObject);
+                      $scope.hashedResults[channelTitle].views += videoObject.viewCount;
+                      $scope.hashedResults[channelTitle].count++;
+                  }
+              }
+              deferred.resolve();
 
-                        saveToDbList.push(videoObject);
-                    }
-                }
-
-                $http.post('api/video/add', {videos : saveToDbList}).then(function(res){
-                  console.log(res);
-                  deferred.resolve();
-                }, function(err){
-                  console.log(err);
-                  deferred.resolve();
-                });
-
-                return deferred.promise;
+              return deferred.promise;
             };
 
             /**
