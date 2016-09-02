@@ -12,7 +12,7 @@ var cn = {
 
 var dbFormat = function(val, excludeComma){
   var endComma = excludeComma ? "" : ",";
-  if(isNaN(val)){
+  if((!val && val !== 0) || isNaN(val)){
     var re = new RegExp("'", 'g');
     val = val.replace(re, '');
     return "'" + val.toString() + "'" + endComma;
@@ -22,7 +22,7 @@ var dbFormat = function(val, excludeComma){
 
 var getValues = function(videos){
   return videos.map(function(video){
-    return "("+ dbFormat(video.videoId) + dbFormat(video.title) + dbFormat(video.safeTitle) + dbFormat(video.channelTitle) + dbFormat(video.channelId) + dbFormat(video.created) + dbFormat(video.pctLikes) + dbFormat(video.viewCount) + dbFormat(video.likes) + dbFormat(video.dislikes) + dbFormat(video.thumbnail.url) + dbFormat(video.duration) + dbFormat(video.durationMinutes, true) +")"
+    return "("+ dbFormat(video.videoId) + dbFormat(video.title) + dbFormat(video.safeTitle) + dbFormat(video.channelTitle) + dbFormat(video.channelId) + dbFormat(video.created) + dbFormat(video.pctLikes) + dbFormat(video.viewCount) + dbFormat(video.likes) + dbFormat(video.dislikes) + dbFormat(video.thumbnail.url) + dbFormat(video.duration) + dbFormat(video.durationMinutes) + dbFormat(video.tags, true) +")"
   }).join(",");
 };
 
@@ -34,16 +34,17 @@ var insertVideo = function(req, res, next){
       if(err) {
         done();
         console.log(err);
-        res.send({});
+        res.send(err);
         res.end();
       }
 
       // var sql = "INSERT INTO video(id, title, safe_title, channel_title, channel_id, created, pct_likes,view_count, likes, dislikes, thumbnail, duration, duration_minutes) VALUES ($1, $2, $3, $4, $5, $6, $7,$8, $9, $10, $11, $12, $13);";
-      var sql = "INSERT INTO video(id, title, safe_title, channel_title, channel_id, created, pct_likes,view_count, likes, dislikes, thumbnail, duration, duration_minutes) VALUES "+ getValues(videos) +";";
+      var sql = "INSERT INTO video(id, title, safe_title, channel_title, channel_id, created, pct_likes,view_count, likes, dislikes, thumbnail, duration, duration_minutes, tags) VALUES "+ getValues(videos) +";";
       // SQL Query > Insert Data
+      console.log(sql);
       client.query(sql, function(err, result){
         if(err){
-          res.send({});
+          res.send(err);
           res.end();
         } else{
           res.send({});
@@ -58,14 +59,26 @@ var getVideos = function(req, res, next){
   var db = pgp(cn); // database instance;
 
   var videoIds = req.body.videos.map(function(v){return "'" + v + "'"}).join(",")
-console.log(videoIds);
   var sql = "select * from video where id in ("+ videoIds +")";
   // select and return user name from id:
   db.query(sql)
       .then(function (videos) {
         var ids = videos.map(function(video){return video.id});
-        console.log(ids);
-          res.send(ids);
+        res.send(ids);
+      })
+      .catch(function (error) {
+          res.send(error);
+      });
+};
+
+var getList = function(req, res, next){
+  var db = pgp(cn); // database instance;
+  var ids = req.body.ids.map(function(id){return "'" + id + "'"}).join(",")
+  var sql = "select * from video where id in ("+ ids +")";
+  // select and return user name from id:
+  db.query(sql)
+      .then(function (videos) {
+          res.send(videos);
       })
       .catch(function (error) {
           res.send(error);
@@ -74,5 +87,6 @@ console.log(videoIds);
 
 router.post('/get', getVideos);
 router.post('/add', insertVideo);
+router.post('/list', getList);
 
 module.exports = router;

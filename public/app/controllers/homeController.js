@@ -609,42 +609,63 @@
 
                     //otherwise there are items
                     var nonDuplicates = getNonDuplicates(res);
+                    var loadFromDatabase = [];
 
                     $http.post('api/video/get', { videos : nonDuplicates.map(function(v){return v.id.videoId})}).then(function(res){
                       res.data.forEach(function(id){
                         for(var j = nonDuplicates.length - 1; j >= 0; j--){
                           if(nonDuplicates[j].id.videoId == id){
                             nonDuplicates.splice(j,1);
-                            $scope.searchResults.push(video);
+                            loadFromDatabase.push(id);
                           }
                         }
                       });
 
-                      //send requests / store promises
-                      var promises = createBatchVideoRequest(nonDuplicates);
+                      var loadFromDatabasePromises = [];
+                      for(var i = 0; i < loadFromDatabase.length/50; i++){
+                        loadFromDatabasePromises.push($http.post('api/video/list',{ids : loadFromDatabase.slice(i*50,i*50+50)}));
+                      }
 
-                      //wait for request to finish
-                      $q.all(promises).then(function (res) {
+                      $q.all(loadFromDatabasePromises).then(function(res){
 
-                          var data = [];
-                          for (var i = 0; i < res.length; i++) {
-                              data = data.concat(res[i].data.items);
-                          }
-
-                          //populated related video id's (for now, only populating during first pass)
-                          if(relatedPending && $scope.nextRelated.length === 0){
-                              getRelatedVideos(data);
-                          }
-
-                          addVideosToList(data).then(function(){
-                            $scope.sort();
-                            fetchResults(dateSmall, dateLarge, deferred);
+                        //add existing videos
+                        var shouldContinue = false;
+                        res.forEach(function(response){
+                          response.data.forEach(function(video){
+                            $scope.searchResults.push(video);
+                            getRelatedByTagsAndTitle(video.id, video.tags, video.title);
+                            shouldContinue = true;
                           });
-                      }, function (err) {
-                          deferred.reject();
-                          stopSearch('Service unavailable', 'error');
-                      })
+                        });
+                        $scope.sort();
 
+                        if(nonDuplicates.length > 0){
+                          var promises = createBatchVideoRequest(nonDuplicates);
+                          //wait for request to finish
+                          $q.all(promises).then(function (res) {
+
+                              var data = [];
+                              for (var i = 0; i < res.length; i++) {
+                                  data = data.concat(res[i].data.items);
+                              }
+
+                              //populated related video id's (for now, only populating during first pass)
+                              if(relatedPending && $scope.nextRelated.length === 0){
+                                  getRelatedVideos(data);
+                              }
+
+                              addVideosToList(data).then(function(){
+                                $scope.sort();
+                                fetchResults(dateSmall, dateLarge, deferred);
+                              });
+                          }, function (err) {
+                              deferred.reject();
+                              stopSearch('Service unavailable', 'error');
+                          });
+                        } else if(shouldContinue){
+                          fetchResults(dateSmall, dateLarge, deferred);
+                        }
+                      });
                     });
 
                 }, function (err) {
@@ -842,6 +863,8 @@
                         var created = new Date(datastats.snippet.publishedAt);
                         var id = datastats.id;
 
+                        var tags = datastats.snippet.tags ? datastats.snippet.tags.toString() : '';
+
                         //format the pct likes
                         var pctLikes;
                         if (datastats.statistics.likeCount) {
@@ -877,7 +900,8 @@
                             "dislikes": Number(dislikes) || 0,
                             "thumbnail": datastats.snippet.thumbnails.medium,
                             "duration": duration.formatted || null,
-                            "durationMinutes": duration.approxMinutes || null
+                            "durationMinutes": duration.approxMinutes || null,
+                            "tags" : tags
                         };
 
                         //add object to search results
@@ -894,7 +918,12 @@
                     }
                 }
 
-                $http.post('api/video/add', {videos : saveToDbList}).then(function(res){
+                var savePromises = [];
+                for(var i = 0; i < saveToDbList.length / 60; i++){
+                  savePromises.push($http.post('api/video/add', {videos : saveToDbList.slice(i*60, i*60+60)}));
+                }
+
+                $q.all(savePromises).then(function(res){
                   console.log(res);
                   deferred.resolve();
                 }, function(err){
@@ -910,53 +939,58 @@
              * @param data
              */
             var getRelatedVideos = function(data){
-                //split search term(s) into array
-                var parts = $scope.searchParam.toLowerCase().split(' ' );
 
                 //loop over each returned video
                 for(var count = data.length - 1; count >= 0; count--){
-
-                    //if the video has tags
-                    if(data[count].snippet.tags){
-
-                        //get the tags
-                        var terms = data[count].snippet.tags.toString().toLowerCase();
-
-                        var isRelevant = true;
-
-                        //check if tags match what we searched for
-                        for(var i = 0; i < parts.length; i++){
-
-                            //if for any term in our search, it does NOT exist in the videos's tags, then we consider it not a relevant match
-                            if(terms.toLowerCase().indexOf(parts[i]) < 0){
-                                isRelevant = false;
-                                break;
-                            }
-                        }
-
-                        if(!isRelevant){
-                            terms = data[count].snippet.title.toString().toLowerCase();
-                            for(var i = 0; i < parts.length; i++){
-
-                                //if for any term in our search, it does NOT exist in the videos's tags, then we consider it not a relevant match
-                                if(terms.toLowerCase().indexOf(parts[i]) < 0){
-                                    isRelevant = false;
-                                    break;
-                                }
-                            }
-                        }
-
-                        //if relevant (terms are similar), then add to related list
-                        if(isRelevant){
-                            $scope.nextRelated.push(data[count].id);
-                        }
-                    }
+                  getRelatedByTagsAndTitle(data[count].id, data[count].snippet.tags, data[count].snippet.title);
                 }
 
                 //nextRelated gets spliced and does not retain its initial size.
                 //in order to easily track progress of the extended search progress, I am saving the
                 //total number of related videos in a variable that will not be altered
                 $scope.nextRelatedInitialLength = $scope.nextRelated.length;
+            };
+
+            getRelatedByTagsAndTitle = function(id, tags, title){
+
+              //split search term(s) into array
+              var parts = $scope.searchParam.toLowerCase().split(' ' );
+
+              //if the video has tags
+              if(tags){
+
+                  //get the tags
+                  var terms = tags.toString().toLowerCase();
+
+                  var isRelevant = true;
+
+                  //check if tags match what we searched for
+                  for(var i = 0; i < parts.length; i++){
+
+                      //if for any term in our search, it does NOT exist in the videos's tags, then we consider it not a relevant match
+                      if(terms.toLowerCase().indexOf(parts[i]) < 0){
+                          isRelevant = false;
+                          break;
+                      }
+                  }
+
+                  if(!isRelevant){
+                      terms = title.toString().toLowerCase();
+                      for(var i = 0; i < parts.length; i++){
+
+                          //if for any term in our search, it does NOT exist in the videos's tags, then we consider it not a relevant match
+                          if(terms.toLowerCase().indexOf(parts[i]) < 0){
+                              isRelevant = false;
+                              break;
+                          }
+                      }
+                  }
+
+                  //if relevant (terms are similar), then add to related list
+                  if(isRelevant){
+                      $scope.nextRelated.push(id);
+                  }
+              }
             };
 
             /**
