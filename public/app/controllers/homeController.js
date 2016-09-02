@@ -471,6 +471,8 @@
               $location.path('/', true).search({q:null, m:null});
             };
 
+            $scope.hasWatched = AuthService.hasWatched;
+
             $scope.loadUserPlaylist = function(){
               if($scope.userPlaylist.selectedPlaylist && $scope.userPlaylist.selectedPlaylist.val){
                   resetAll();

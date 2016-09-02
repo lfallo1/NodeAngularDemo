@@ -6,6 +6,7 @@
     angular.module('youtubeSearchApp').service('AuthService', [ '$window', '$log', '$http', '$q', function($window, $log, $http, $q){
         var newToken = undefined;
         var userPlaylists = [];
+        var watchHistory = [];
 
         var service = {};
 
@@ -26,7 +27,9 @@
             //     gapi.auth2.getAuthInstance().currentUser.get().Zi.access_token = newToken;
             // }
             gapi.auth2.getAuthInstance().isSignedIn.listen(authListener);
-            loadUserPlaylists();
+            if(userPlaylists.length === 0){
+                loadUserPlaylists();
+            }
         };
 
         service.getAccessToken = function(){
@@ -62,6 +65,8 @@
         var authListener = function(signedIn){
           if(!signedIn && typeof gapi !== 'undefined'){
               gapi.auth2.getAuthInstance().signOut();
+              watchHistory = [];
+              userPlaylists = [];
           }
         };
 
@@ -94,6 +99,10 @@
 
         };
 
+        service.hasWatched = function(id){
+          return watchHistory.indexOf(id) > -1;
+        };
+
         //load editable / non-editable playlists. runs when user logs in or on app-startup if already logged in
         var loadUserPlaylists = function(){
           userPlaylists = [];
@@ -107,6 +116,11 @@
                 val:playlists[prop]
               });
             }
+
+            //pop;ulate the videos in their watch history
+            getVideosInPlaylist(playlists.watchHistory);
+
+            //load the rest of their playlists (just playlists, not playlist videos)
             service.loadEditableUserPlaylists().then(function(res){
               $log.info(res);
               for(var i = 0; i < res.data.items.length; i++){
@@ -122,6 +136,23 @@
               console.log("Unable to load playlists: " + err);
             });
 
+          }, function(err){
+            console.log(err);
+          });
+        };
+
+        var getVideosInPlaylist = function(id, pageToken){
+
+          var accessToken = service.getAccessToken() ? '&access_token=' + service.getAccessToken() : '';
+          var pageToken = pageToken ? '&pageToken=' + pageToken : '';
+          var playlistId = '&playlistId=' + id;
+          var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50' + playlistId + pageToken + accessToken;
+          //make request
+          $http.get(url).then(function(res){
+              watchHistory = watchHistory.concat(res.data.items.map(function(video){return video.contentDetails.videoId}));
+              if(res.data.nextPageToken){
+                getVideosInPlaylist(id, res.data.nextPageToken);
+              }
           }, function(err){
             console.log(err);
           });
