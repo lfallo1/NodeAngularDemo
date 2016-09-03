@@ -39,6 +39,7 @@
           gapi.auth2.getAuthInstance().then(function(auth){
             auth.isSignedIn.listen(authListener);
             auth.currentUser.get().reloadAuthResponse().then(function(){
+              pendingGoogleActivation = false;
               auth.isSignedIn.listen(authListener);
               if(userPlaylists.length === 0){
                 loadUserPlaylists();

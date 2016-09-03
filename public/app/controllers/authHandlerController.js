@@ -8,7 +8,6 @@
 
             //add to end of digest loop
             $timeout(function () {
-              $rootScope.pendingGoogleActivation = false;
               $location.url('/');
               //
               // if($location.$$hash.indexOf('error') > -1){
