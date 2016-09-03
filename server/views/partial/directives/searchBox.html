@@ -76,7 +76,7 @@
         <button class="btn btn-default btn-md" id="hide-account-playlists" ng-show="showAccountPlaylists" ng-click="showAccountPlaylists = false">Hide</button>
       </div>
 
-      <div id="connect-with-google" ng-if="pendingGoogleActivation">
+      <div id="connect-with-google" ng-show="AuthService.getPendingGoogleActivation()">
           <div ng-click="AuthService.connectWithGoogle()" class="btn btn-danger">
               <span class="glyphicon glyphicon-user"></span>Connect YoutubeAgent With Google Account
           </div>

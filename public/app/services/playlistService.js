@@ -36,13 +36,13 @@
         service.loadPlaylists = function(){
             var deferred = $q.defer();
             AuthService.loadEditableUserPlaylists().then(function(res){
-              $rootScope.pendingGoogleActivation = false;
+              AuthService.setPendingGoogleActivation(false);
               $log.info(res);
               deferred.resolve(res.data.items);
             }, function(err){
               if(err.status === 401 || err.status === 403){
                 toaster.pop({ type : 'info', title : '', body : 'Please click the "Connect YoutubeAgent With Google Account" button at the top to edit your playlist.  If you have already done this, please click signin again to refresh your account.', timeout : 10000});
-                $rootScope.pendingGoogleActivation = true;
+                AuthService.setPendingGoogleActivation(true);
               }
               else if(err.status === 404){
                 toaster.pop('info', '', 'Looks like you haven\'t setup a YouTube channel yet.  Once you get one setup, give this another try');
@@ -59,14 +59,18 @@
          */
         service.addPlaylist = function(playlistName){
             var deferred = $q.defer();
-            var token = AuthService.getAccessToken();
-            var url = 'https://www.googleapis.com/youtube/v3/playlists?part=snippet&access_token=' + token;
-            var playlistResource = generatePlaylistResource(playlistName);
-            $http.post(url, playlistResource).then(function(res){
-                deferred.resolve(res.data);
+            AuthService.getAccessToken().then(function(token){
+              var url = 'https://www.googleapis.com/youtube/v3/playlists?part=snippet&access_token=' + token;
+              var playlistResource = generatePlaylistResource(playlistName);
+              $http.post(url, playlistResource).then(function(res){
+                  deferred.resolve(res.data);
+              }, function(err){
+                  $log.error(err);
+                  deferred.reject(err);
+              });
+
             }, function(err){
-                $log.error(err);
-                deferred.reject(err);
+              deferred.reject();
             });
             return deferred.promise;
         };
@@ -119,39 +123,41 @@
         };
 
         service.getVideosInPlaylist = function(id, callback, pageToken, deferred){
-          var accessToken = AuthService.getAccessToken() ? '&access_token=' + AuthService.getAccessToken() : '';
-          var pageToken = pageToken ? '&pageToken=' + pageToken : '';
           var deferred = deferred || $q.defer();
-          var playlistId = '&playlistId=' + id;
-          var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50' + playlistId + pageToken + accessToken;
+          AuthService.getAccessToken().then(function(token){
+            var accessToken = token ? '&access_token=' + token : '';
+            var pageToken = pageToken ? '&pageToken=' + pageToken : '';
+            var playlistId = '&playlistId=' + id;
+            var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50' + playlistId + pageToken + accessToken;
 
-          //make request
-          $http.get(url).then(function(res){
-            $rootScope.pendingGoogleActivation = false;
-            //execute callback / forces ui updates
-            callback(new Array(res)).then(function(){
+            //make request
+            $http.get(url).then(function(res){
+              AuthService.setPendingGoogleActivation(false);
+              //execute callback / forces ui updates
+              callback(new Array(res)).then(function(){
 
-              //if a next page exists
-              if(res.data.nextPageToken){
-                service.getVideosInPlaylist(id, callback, res.data.nextPageToken, deferred);
-                return;
-              }
+                //if a next page exists
+                if(res.data.nextPageToken){
+                  service.getVideosInPlaylist(id, callback, res.data.nextPageToken, deferred);
+                  return;
+                }
 
-              //otherwise resolve
-              deferred.resolve();
+                //otherwise resolve
+                deferred.resolve();
+              }, function(err){
+
+                //if error occurs here, just resolve (i'll write an explanation later)
+                deferred.resolve();
+              });
             }, function(err){
 
-              //if error occurs here, just resolve (i'll write an explanation later)
-              deferred.resolve();
+              if(err.status === 401 || err.status === 403){
+                AuthService.setPendingGoogleActivation(true);
+              }
+
+              //if error here, it's because the playlist is not available (auth) or does not exist
+              deferred.reject(err);
             });
-          }, function(err){
-
-            if(err.status === 401 || err.status === 403){
-              $rootScope.pendingGoogleActivation = true;
-            }
-
-            //if error here, it's because the playlist is not available (auth) or does not exist
-            deferred.reject(err);
           });
           return deferred.promise;
         };
@@ -216,17 +222,18 @@
 
         var saveVideoToPlaylist = function(video, playlist){
             var deferred = $q.defer();
-            var token = AuthService.getAccessToken();
-            var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&access_token=' + token;
-            var playlistItemResource = generatePlaylistItemResource(video, playlist);
-            $http.post(url, playlistItemResource).then(function(res){
-                $log.info(res);
-                deferred.resolve();
-            }, function(err){
-                $log.error(err);
-                deferred.reject();
-            });
+            AuthService.getAccessToken().then(function(token){
+              var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&access_token=' + token;
+              var playlistItemResource = generatePlaylistItemResource(video, playlist);
+              $http.post(url, playlistItemResource).then(function(res){
+                  $log.info(res);
+                  deferred.resolve();
+              }, function(err){
+                  $log.error(err);
+                  deferred.reject();
+              });
             return deferred.promise;
+          });
         }
 
         return service;
