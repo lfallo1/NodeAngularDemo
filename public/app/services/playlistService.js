@@ -221,19 +221,19 @@
         };
 
         var saveVideoToPlaylist = function(video, playlist){
-            var deferred = $q.defer();
-            AuthService.getAccessToken().then(function(token){
-              var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&access_token=' + token;
-              var playlistItemResource = generatePlaylistItemResource(video, playlist);
-              $http.post(url, playlistItemResource).then(function(res){
-                  $log.info(res);
-                  deferred.resolve();
-              }, function(err){
-                  $log.error(err);
-                  deferred.reject();
-              });
-            return deferred.promise;
+          var deferred = $q.defer();
+          AuthService.getAccessToken().then(function(token){
+            var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&access_token=' + token;
+            var playlistItemResource = generatePlaylistItemResource(video, playlist);
+            $http.post(url, playlistItemResource).then(function(res){
+                $log.info(res);
+                deferred.resolve();
+            }, function(err){
+                $log.error(err);
+                deferred.reject();
+            });
           });
+          return deferred.promise;
         }
 
         return service;
