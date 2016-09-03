@@ -61,7 +61,7 @@
           </div>
       </div>
 
-      <div ng-show="AuthService.isLoggedIn() && !fetching">
+      <div ng-show="AuthService.getAuthorizedPlaylists().length > 0 && !fetching && !pendingGoogleActivation">
         <button class="btn btn-default btn-md" id="show-user-playlist-button" ng-click="showAccountPlaylists = true" ng-show="!showAccountPlaylists">Click to select one of your playlists</button>
         <div id="user-playlist-wrapper" ng-show="showAccountPlaylists" class="alert alert-warning">
           <label for="userplaylists">Logged in as <span class="logged-in-highlight">{{AuthService.getName()}}</span>. Load videos from one your playlists</label>
@@ -74,6 +74,13 @@
           <button class="btn btn-default btn-md" ng-click="loadUserPlaylist()">Load Playlist</button>
         </div>
         <button class="btn btn-default btn-md" id="hide-account-playlists" ng-show="showAccountPlaylists" ng-click="showAccountPlaylists = false">Hide</button>
+      </div>
+
+      <div id="connect-with-google" ng-if="pendingGoogleActivation">
+          <div ng-click="AuthService.connectWithGoogle()" class="btn btn-danger">
+              <span class="glyphicon glyphicon-user"></span>Connect YoutubeAgent With Google Account
+          </div>
+          <div id="connect-text-extra">If you are seeing this button after connecting your account, please click the google-signin button (upper-right) and refreshing the page to update your account</div>
       </div>
 
   </div>

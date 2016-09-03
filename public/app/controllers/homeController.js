@@ -332,7 +332,8 @@
                       $scope.sort();
                       $scope.playVideo($scope.searchResults[0]);
                   }, function(err){
-                    stopSearch('Could not find video', 'warning');
+                    $scope.alerts = [];
+                    $scope.fetching = false;
                   })
                 } else if($routeParams.m && $routeParams.q && !isNaN($routeParams.m) && ( Number($routeParams.m) <= 4 && Number($routeParams.m) >= 1)){
                   $scope.searchMode = Number($routeParams.m);
@@ -476,7 +477,11 @@
             $scope.loadUserPlaylist = function(){
               if($scope.userPlaylist.selectedPlaylist && $scope.userPlaylist.selectedPlaylist.val){
                   resetAll();
-                  getVideosInPlaylist($scope.userPlaylist.selectedPlaylist.val);
+                  getVideosInPlaylist($scope.userPlaylist.selectedPlaylist.val).then(function(){
+
+                  }, function(err){
+                    toaster.pop({type : 'error', title: '', body : 'Unable to load playlist. Please make sure you have connected your account to YoutubeAgent using the red button below', timeout : 10000});
+                  });
               }
             };
 

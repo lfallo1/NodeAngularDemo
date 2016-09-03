@@ -1113,3 +1113,18 @@ div.report-modal .modal-content {
     margin-top: 3px;
     text-shadow: 1px 2px 2px black;
 }
+
+#connect-with-google{
+    text-align: center;
+    margin-top: 15px;
+}
+
+#connect-with-google .btn{
+    font-size: 20px;
+}
+
+#connect-text-extra{
+    color: white;
+    width: 55%;
+    margin: 0px auto;
+}

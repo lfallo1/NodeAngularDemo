@@ -2,7 +2,7 @@
  * PlaylistService- Handle functionality related to creating / updating playlists
  */
 (function(){
-    angular.module('youtubeSearchApp').service('PlaylistService', ['$http', '$q', '$log', '$uibModal', '$timeout', 'toaster', 'AuthService', function($http, $q, $log, $uibModal, $timeout, toaster, AuthService){
+    angular.module('youtubeSearchApp').service('PlaylistService', ['$rootScope', '$http', '$q', '$log', '$uibModal', '$timeout', 'toaster', 'AuthService', function($rootScope, $http, $q, $log, $uibModal, $timeout, toaster, AuthService){
 
         var service = {};
 
@@ -36,9 +36,17 @@
         service.loadPlaylists = function(){
             var deferred = $q.defer();
             AuthService.loadEditableUserPlaylists().then(function(res){
+              $rootScope.pendingGoogleActivation = false;
               $log.info(res);
               deferred.resolve(res.data.items);
             }, function(err){
+              if(err.status === 401 || err.status === 403){
+                toaster.pop({ type : 'info', title : '', body : 'Please click the "Connect YoutubeAgent With Google Account" button at the top to edit your playlist.  If you have already done this, please click signin again to refresh your account.', timeout : 10000});
+                $rootScope.pendingGoogleActivation = true;
+              }
+              else if(err.status === 404){
+                toaster.pop('info', '', 'Looks like you haven\'t setup a YouTube channel yet.  Once you get one setup, give this another try');
+              }
               deferred.reject();
             });
             return deferred.promise;
@@ -119,6 +127,7 @@
 
           //make request
           $http.get(url).then(function(res){
+            $rootScope.pendingGoogleActivation = false;
             //execute callback / forces ui updates
             callback(new Array(res)).then(function(){
 
@@ -136,6 +145,10 @@
               deferred.resolve();
             });
           }, function(err){
+
+            if(err.status === 401 || err.status === 403){
+              $rootScope.pendingGoogleActivation = true;
+            }
 
             //if error here, it's because the playlist is not available (auth) or does not exist
             deferred.reject(err);
@@ -195,7 +208,6 @@
                 });
 
             }, function(err){
-                toaster.pop('error', '', 'Having trouble loading your playlists. Try clicking the google signin button in the upper right and give it another shot.');
                 deferred.reject(err);
             });
 

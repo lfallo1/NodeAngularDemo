@@ -3,12 +3,16 @@
  */
 (function(){
 
-    angular.module('youtubeSearchApp').service('AuthService', [ '$window', '$log', '$http', '$q', function($window, $log, $http, $q){
+    angular.module('youtubeSearchApp').service('AuthService', [ '$window', '$log', '$http', '$q', '$rootScope', function($window, $log, $http, $q, $rootScope){
         var newToken = undefined;
         var userPlaylists = [];
         var watchHistory = [];
 
         var service = {};
+
+        service.connectWithGoogle = function(){
+          location.href = "https://accounts.google.com/o/oauth2/auth?client_id=" + $rootScope.clientId + "&redirect_uri=" + $rootScope.authCallbackUrl + "&scope=https://www.googleapis.com/auth/youtube https://www.googleapis.com/auth/youtubepartner&response_type=token";
+        };
 
         /**
          * helper method returning if user is logged in (certain elements are hidden if not logged in)
@@ -23,9 +27,9 @@
          * @param user
          */
         service.onSignIn = function(){
-            // if(newToken){
-            //     gapi.auth2.getAuthInstance().currentUser.get().Zi.access_token = newToken;
-            // }
+            if(newToken){
+                gapi.auth2.getAuthInstance().currentUser.get().Zi.access_token = newToken;
+            }
             gapi.auth2.getAuthInstance().isSignedIn.listen(authListener);
             if(userPlaylists.length === 0){
                 loadUserPlaylists();
@@ -78,22 +82,16 @@
 
           //perform request
           $http.get(url).then(function(res){
+              $rootScope.pendingGoogleActivation = false;
               $log.info(res);
               deferred.resolve(res);
           }, function(err){
-              $log.error(err);
+            if(err.status === 401 || err.status === 403){
+                $rootScope.pendingGoogleActivation = true;
+            }
 
-              //if no auth error, it means the user has not granted access to their youtube account.  Redirect to page, requesting
-              //them allow access.
-              if(err.status === 401 || err.status === 403){
-                  location.href = "https://accounts.google.com/o/oauth2/auth?client_id=" + $rootScope.clientId + "&redirect_uri=" + $rootScope.authCallbackUrl + "&scope=https://www.googleapis.com/auth/youtube https://www.googleapis.com/auth/youtubepartner&response_type=token";
-              }
-              else if(err.status === 404){
-                  //404 means they haven't setup a youtube channel / page yet.  just show a basic message asking them to do so
-                  //if they want to use the playlist feature
-                  toaster.pop('info', '', 'Looks like you haven\'t setup a YouTube channel yet.  Once you get one setup, give this another try');
-              }
-              deferred.reject(err);
+            $log.error(err);
+            deferred.reject(err);
           });
           return deferred.promise;
 
@@ -117,7 +115,7 @@
               });
             }
 
-            //pop;ulate the videos in their watch history
+            //populate the videos in their watch history
             getVideosInPlaylist(playlists.watchHistory);
 
             //load the rest of their playlists (just playlists, not playlist videos)
@@ -137,6 +135,11 @@
             });
 
           }, function(err){
+            //if no auth error, it means the user has not granted access to their youtube account.  Redirect to page, requesting
+            //them allow access.
+            if(err.status === 401 || err.status === 403){
+                $rootScope.pendingGoogleActivation = true;
+            }
             console.log(err);
           });
         };
