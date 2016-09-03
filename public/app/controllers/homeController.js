@@ -257,7 +257,8 @@
              * @param displayName
              * @constructor
              */
-            function SortOption(value, direction, glyph, displayName){
+            function SortOption(id, value, direction, glyph, displayName){
+                this.id = id;
                 this.value = value;
                 this.direction = direction;
                 this.glyph = glyph;
@@ -289,7 +290,8 @@
                 $scope.selectedVideos = [];
                 $scope.hashedResults = {};
 
-                $scope.sortField = {'value' : 'viewCount'};
+                $scope.sortField = {};
+                // $scope.sortField = {'id' : 1};
 
                 CountriesService.getCountries().then(function(countries){
                     $scope.countries = countries;
@@ -311,12 +313,14 @@
                 //setup sort options (each sort option will be used for a search). different sort options
                 //are used to increate search results
                 $scope.sortOptions = [
-                    new SortOption('viewCount', -1, 'user', 'Views'),
-                    new SortOption('likes', -1, 'thumbs-up', 'Likes'),
-                    new SortOption('dislikes', 1, 'thumbs-down', 'Dislikes'),
-                    new SortOption('pctLikes', -1, 'star', 'Rating')
+                    new SortOption(1, 'viewCount', -1, 'user', 'Views'),
+                    new SortOption(2, 'likes', -1, 'thumbs-up', 'Likes'),
+                    new SortOption(3, 'dislikes', 1, 'thumbs-down', 'Dislikes'),
+                    new SortOption(4, 'pctLikes', -1, 'star', 'Rating'),
+                    new SortOption(5, 'created', 1, 'calendar', 'Date Asc'),
+                    new SortOption(6, 'created', -1, 'calendar', 'Date Desc')
                 ];
-                $scope.sortField.value = $scope.sortOptions[0].value;
+                // $scope.sortField = $scope.sortOptions[0];
 
                 $scope.enableChannelFilter = true;
 
@@ -366,7 +370,7 @@
             };
 
             $scope.sortOptionChanged = function(option){
-                $scope.sortField.value = option.value;
+                $scope.sortField.id = option.id;
                 $scope.sort();
             };
 
@@ -1229,7 +1233,13 @@
             };
 
             $scope.sort = function(){
-                var sortObject = $scope.sortOptions.filter(function(d){if(d.value === $scope.sortField.value){return d;}})[0];
+                //backwards compatible
+                var sortObject = $scope.sortOptions[0];
+                if(isNaN($scope.sortField.id)){
+                  sortObject = $scope.sortOptions.filter(function(d){if(d.value === $scope.sortField.id){return d;}})[0];
+                } else{
+                    sortObject = $scope.sortOptions.filter(function(d){if(d.id === $scope.sortField.id){return d;}})[0];
+                }
                 $scope.searchResults = $scope.searchResults.sort(function(a,b){
                     if(a[sortObject.value] > b[sortObject.value]){
                         return sortObject.direction;
@@ -1248,7 +1258,14 @@
 
             var checkCookies = function(){
               if($cookies.get("youtubeagent_hasCookies") == 'true'){
-                $scope.sortField.value = $cookies.get('youtubeagent_sortField');
+                var sortField = null;
+                var cookieSortField = $cookies.get('youtubeagent_sortField');
+                if(isNaN(cookieSortField)){
+                  sortField = $scope.sortOptions.filter(function(d){if(d.value === cookieSortField){return d;}})[0];
+                } else{
+                  sortField = $scope.sortOptions.filter(function(d){if(d.id === cookieSortField){return d;}})[0];
+                }
+                $scope.sortField.id = sortField.id;
                 $scope.minViews = $cookies.get('youtubeagent_minViews') ? Number($cookies.get('youtubeagent_minViews')) : null;
                 $scope.minDislikes = $cookies.get('youtubeagent_minDislikes') ? Number($cookies.get('youtubeagent_minDislikes')) : null;
                 $scope.minDate = checkDate($cookies.get('youtubeagent_minDate')) ? new Date($cookies.get('youtubeagent_minDate')) : null;
@@ -1266,7 +1283,7 @@
             var setSortOptionCookies = function(){
                 $cookies.put('youtubeagent_hasCookies',true);
                 $cookies.put('youtubeagent_searchResults',$scope.searchResults);
-                $cookies.put('youtubeagent_sortField',$scope.sortField.value);
+                $cookies.put('youtubeagent_sortField',$scope.sortField.id);
                 $cookies.put('youtubeagent_minViews',$scope.minViews);
                 $cookies.put('youtubeagent_minDislikes',$scope.minDislikes);
                 $cookies.put('youtubeagent_minDate',$scope.minDate || null);
@@ -1283,7 +1300,7 @@
             var createJsonObjectForFile = function(){
               return {
                 'searchResults':$scope.searchResults,
-                'sortField': $scope.sortField.value,
+                'sortField': $scope.sortField.id,
                 'filterText': $scope.filterText,
                 'minViews': $scope.minViews,
                 'minDislikes': $scope.minDislikes,
@@ -1309,8 +1326,16 @@
 
               $scope.reset();
 
+              var sortField = null;
+              var jsonSortField = json.sortField;
+              if(jsonSortField){
+                sortField = $scope.sortOptions.filter(function(d){if(d.value === jsonSortField){return d;}})[0];
+              } else{
+                sortField = $scope.sortOptions.filter(function(d){if(d.id === jsonSortField){return d;}})[0];
+              }
+
               $scope.searchResults = json.searchResults;
-              $scope.sortField.value = json.sortField;
+              $scope.sortField.id = sortField.id;
               $scope.filterText = json.filterText;
               $scope.minViews = json.minViews;
               $scope.minDislikes = json.minDislikes;

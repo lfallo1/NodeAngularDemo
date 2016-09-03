@@ -1,6 +1,8 @@
 (function(){
     angular.module('youtubeSearchApp').controller('ReportModalCtrl', ['$scope', '$timeout', '$q', 'content', '$uibModalInstance', function($scope, $timeout, $q, content, $uibModalInstance){
 
+        var sortDirection = 1;
+
         var init = function(){
             $scope.limit = '';
             $scope.hashedResults = content.hashedResults;
@@ -33,6 +35,8 @@
                 }
                 $scope.hashedResults[v].averageRating = averageRating;
 
+                $scope.hashedResults[v].avgViewsPerVideo = ($scope.hashedResults[v].views / $scope.hashedResults[v].count);
+
                 //add hash entry to array for use in ng-repeat
                 $scope.tableData.push({'title' : v, 'channelSummary' : $scope.hashedResults[v]});
             });
@@ -48,6 +52,28 @@
 
             $scope.limit = Math.min($scope.tableData.length, 200);
             $scope.tableData = $scope.tableData.splice(0,$scope.limit);
+        };
+
+          /**
+         * sort the filtered list by the current property in the pagination object
+         */
+        $scope.sort = function(prop){
+          //split property by period
+          prop = prop.split('.');
+            var len = prop.length;
+
+            $scope.tableData = $scope.tableData.sort(function (a, b) {
+
+                //find property to sort by
+                var i = 0;
+                while( i < len ) {
+                  a = a[prop[i]]; b = b[prop[i]]; i++;
+                }
+
+                //perform sort
+                return a > b ? sortDirection : a < b ? -sortDirection : 0;
+            });
+            sortDirection = sortDirection*-1;
         };
 
         $scope.sortTable = function(key){

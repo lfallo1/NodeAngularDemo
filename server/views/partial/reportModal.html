@@ -11,10 +11,10 @@
             <table class="table table-responsive table-hover">
                 <thead>
                 <tr>
-                    <th>Channel</th>
-                    <th>Videos in Results</th>
-                    <th>Avg Rating</th>
-                    <th>Avg Views Per Video</th>
+                    <th ng-click="sort('title')">Channel</th>
+                    <th ng-click="sort('channelSummary.count')">Videos in Results</th>
+                    <th ng-click="sort('channelSummary.averageRating')">Avg Rating</th>
+                    <th ng-click="sort('channelSummary.avgViewsPerVideo')">Avg Views Per Video</th>
                     <th></th>
                 </tr>
                 </thead>
@@ -23,7 +23,7 @@
                     <td>{{channel.title}}</td>
                     <td>{{channel.channelSummary.count | number:0}}</td>
                     <td>{{channel.channelSummary.averageRating | number:2}}</td>
-                    <td>{{(channel.channelSummary.views / channel.channelSummary.count) | number:0}}</td>
+                    <td>{{channel.channelSummary.avgViewsPerVideo | number:0}}</td>
                     <td>
                         <button ng-show="!inChannelFilter(channel.title)" class="btn btn-success btn-md" ng-click="addChannelFilter(channel.title)"><span class="glyphicon glyphicon-plus"></span> Channel Filter</button>
                         <button ng-show="inChannelFilter(channel.title)" class="btn btn-danger btn-md" ng-click="removeChannelFilter(channel.title)"><span class="glyphicon glyphicon-minus"></span> Channel Filter</button>
