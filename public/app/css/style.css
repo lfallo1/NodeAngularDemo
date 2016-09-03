@@ -1128,3 +1128,14 @@ div.report-modal .modal-content {
     width: 55%;
     margin: 0px auto;
 }
+
+.btn-link.text-info{
+    margin-top: 5px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.btn-link.text-info:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}

@@ -8,7 +8,7 @@ var videoApi = require('./server/services/videoApi.js');
 var app = express();
 
 var port = process.env.PORT || 3000;
-var clientId = process.env.CLIENT_ID || "613015363976-0aodg2ib3dmv8m2g7gmknnglg29cmir9.apps.googleusercontent.com";
+var clientId = process.env.CLIENT_ID || "232820042865-5jhlraag8ku4s0i5a7fh3q51nnvngaqh.apps.googleusercontent.com";
 var authCallbackUrl = process.env.AUTH_CALLBACK_URL || "http://localhost:3000/oauthcallback";
 
 // Configuration
