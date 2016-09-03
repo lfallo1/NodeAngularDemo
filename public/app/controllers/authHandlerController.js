@@ -16,7 +16,7 @@
 
                 //if google api already initialized, then update the access_token to the newly acquired one
                 if(gapi.auth2 && gapi.auth2.getAuthInstance){
-                    gapi.auth2.getAuthInstance().currentUser.get().Zi.access_token = newToken;
+                    gapi.auth2.getAuthInstance().currentUser.get().Zi.access_token = access_token;
                     $location.url('/');
                     return;
                 }
