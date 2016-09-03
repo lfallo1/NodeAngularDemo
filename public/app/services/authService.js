@@ -38,6 +38,7 @@
         service.onSignIn = function(){
           gapi.auth2.getAuthInstance().then(function(auth){
             auth.isSignedIn.listen(authListener);
+            pendingGoogleActivation = true;
             auth.currentUser.get().reloadAuthResponse().then(function(){
               pendingGoogleActivation = false;
               auth.isSignedIn.listen(authListener);
@@ -45,7 +46,6 @@
                 loadUserPlaylists();
               }
             }, function(err){
-              pendingGoogleActivation = true;
               console.log(err);
               $rootScope.$apply();
             });
