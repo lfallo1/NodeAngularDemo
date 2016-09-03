@@ -27,9 +27,9 @@
          * @param user
          */
         service.onSignIn = function(){
-            if(newToken){
-                gapi.auth2.getAuthInstance().currentUser.get().Zi.access_token = newToken;
-            }
+            // if(newToken){
+            //     gapi.auth2.getAuthInstance().currentUser.get().Zi.access_token = newToken;
+            // }
             gapi.auth2.getAuthInstance().isSignedIn.listen(authListener);
             if(userPlaylists.length === 0){
                 loadUserPlaylists();
