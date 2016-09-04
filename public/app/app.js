@@ -60,6 +60,6 @@ angular.module('youtubeSearchApp', ['ui.router', 'youtube-embed', 'ngCookies', '
         $rootScope.safari = BrowserService.getBrowser().toLowerCase() == 'safari';
         if(BrowserService.isMobile()){
           $rootScope.isMobile = true;
-          alert('YoutubeAgent has not been optimized for mobile devices. While you can view and browse YoutubeAgent on a phone or tablet, please use a desktop computer for the best experience. I will consider developing a mobile friendly or mobile app if there is interest.');
+          alert('YoutubeAgent has not been optimized for mobile devices. While you can view and browse YoutubeAgent on a phone or tablet, please use a desktop browser for the best experience. I will consider developing a mobile friendly or mobile app if there is interest.');
         }
     }]);
