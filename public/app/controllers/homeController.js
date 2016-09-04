@@ -1329,10 +1329,10 @@
 
               var sortField = null;
               var jsonSortField = json.sortField;
-              if(jsonSortField){
-                sortField = $scope.sortOptions.filter(function(d){if(d.value === jsonSortField){return d;}})[0];
+              if(isNaN(jsonSortField)){
+                sortField = $scope.sortOptions.filter(function(d){if(d.value == jsonSortField){return d;}})[0];
               } else{
-                sortField = $scope.sortOptions.filter(function(d){if(d.id === jsonSortField){return d;}})[0];
+                sortField = $scope.sortOptions.filter(function(d){if(d.id == jsonSortField){return d;}})[0];
               }
 
               $scope.searchResults = json.searchResults;
