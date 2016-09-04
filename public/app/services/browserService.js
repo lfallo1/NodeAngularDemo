@@ -40,9 +40,5 @@ angular.module('youtubeSearchApp').service('BrowserService', ['$window', functio
      return 'unknown';
   };
 
-  service.isMobile = function(){
-
-  };
-
   return service;
 }]);
