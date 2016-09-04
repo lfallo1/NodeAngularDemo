@@ -32,7 +32,7 @@ angular.module('youtubeSearchApp').controller('YoutubePlayerModalCtrl', [ '$root
       $scope.currIndex = index || 0;
 
       $rootScope.currentPageTitle = video.title;
-      $location.path('/' + video.videoId, true).search({q:null, m:null});
+      // $location.path('/' + video.videoId, true).search({q:null, m:null});
 
       if(!isNaN(index)){
         //set the next video to be played, if $scope.autoplay is on

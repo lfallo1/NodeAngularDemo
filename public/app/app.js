@@ -13,13 +13,13 @@ angular.module('youtubeSearchApp', ['ui.router', 'youtube-embed', 'ngCookies', '
 
         //configure routing
         $routeProvider.
+            when('/', {
+                templateUrl : 'partials/home',
+                controller: 'HomeCtrl'
+            }).
             when('/oauthcallback', {
                templateUrl : 'partials/authHandler',
                 controller : 'AuthHandlerCtrl'
-            }).
-            when('/:id?', {
-                templateUrl : 'partials/home',
-                controller: 'HomeCtrl'
             }).
             otherwise({
                 redirectTo: '/'
