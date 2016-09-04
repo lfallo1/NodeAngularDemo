@@ -825,7 +825,7 @@ div.report-modal .modal-content {
 }
 
 #scrollToTopButton button{
-    width: 50%;
+    width: 100%;
     margin-bottom: 5px;
     font-size: 20px;
     font-weight: bolder;
