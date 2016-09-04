@@ -26,7 +26,7 @@ angular.module('youtubeSearchApp', ['ui.router', 'youtube-embed', 'ngCookies', '
             });
 
         $locationProvider.html5Mode(true);
-    }]).run(['$rootScope', '$log', '$http', '$location','$route', 'AuthService', function($rootScope, $log, $http, $location, $route, AuthService){
+    }]).run(['$rootScope', '$log', '$http', '$location','$route', 'AuthService', '$window', function($rootScope, $log, $http, $location, $route, AuthService, $window){
 
         $http.get('api/config').then(function(res){
             $rootScope.clientId = res.data.clientId;
@@ -55,5 +55,9 @@ angular.module('youtubeSearchApp', ['ui.router', 'youtube-embed', 'ngCookies', '
             }
             return original.apply($location, [path]);
         };
+
+        //if safari
+        // var userAgent = $window.navigator.userAgent;
+        // $rootScope.safari = /safari/i.test(userAgent);
 
     }]);

@@ -10,7 +10,7 @@ var router = express.Router();
 // var apiKey = process.env.YOUTUBE_API_KEY || 'AIzaSyC5yjrJfXxhqyjOGC52qlGqXa-fodne9JM';
 var apiKey = process.env.YOUTUBE_API_KEY || 'AIzaSyAdvomXbhYg3GeBGymbPVBg-aRJeIOfFyQ';
 
-var ffmpegLocation = process.env.FFMPEG || '/Users/lfallon/youtubeAgent/NodeAngularDemo/server/ffmpeg/mac/ffmpeg_10.6+/ffmpeg';
+var ffmpegLocation = process.env.FFMPEG || '/Users/lancefallon/Documents/angularProjects/NodeAngularDemo/server/ffmpeg/mac/ffmpeg_10.6+/ffmpeg';
 
 var YOUTUBE_BASE = 'https://www.youtube.com/watch?v=';
 

@@ -1241,6 +1241,10 @@
                 } else{
                     sortObject = $scope.sortOptions.filter(function(d){if(d.id === $scope.sortField.id){return d;}})[0];
                 }
+                if(!sortObject){
+                  sortObject = $scope.sortOptions[0];
+                  $scope.sortField = {id : 1};
+                }
                 $scope.searchResults = $scope.searchResults.sort(function(a,b){
                     if(a[sortObject.value] > b[sortObject.value]){
                         return sortObject.direction;
@@ -1261,7 +1265,10 @@
               if($cookies.get("youtubeagent_hasCookies") == 'true'){
                 var sortField = null;
                 var cookieSortField = $cookies.get('youtubeagent_sortField');
-                if(isNaN(cookieSortField)){
+                if(!cookieSortField){
+                  sortField = $scope.sortOptions[0];
+                }
+                else if(isNaN(cookieSortField)){
                   sortField = $scope.sortOptions.filter(function(d){if(d.value == cookieSortField){return d;}})[0];
                 } else{
                   sortField = $scope.sortOptions.filter(function(d){if(d.id == cookieSortField){return d;}})[0];
@@ -1301,7 +1308,7 @@
             var createJsonObjectForFile = function(){
               return {
                 'searchResults':$scope.searchResults,
-                'sortField': $scope.sortField.id,
+                'sortField': $scope.sortField ? $scope.sortField.id : $scope.sortOptions[0].id,
                 'filterText': $scope.filterText,
                 'minViews': $scope.minViews,
                 'minDislikes': $scope.minDislikes,
@@ -1329,7 +1336,10 @@
 
               var sortField = null;
               var jsonSortField = json.sortField;
-              if(isNaN(jsonSortField)){
+              if(!jsonSortField){
+                sortField = $scope.sortOptions[0];
+              }
+              else if(isNaN(jsonSortField)){
                 sortField = $scope.sortOptions.filter(function(d){if(d.value == jsonSortField){return d;}})[0];
               } else{
                 sortField = $scope.sortOptions.filter(function(d){if(d.id == jsonSortField){return d;}})[0];

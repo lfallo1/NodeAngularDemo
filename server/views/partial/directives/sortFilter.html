@@ -2,7 +2,7 @@
   <div id="sort-filter-column" class="col-md-3">
     <!-- upload json file -->
     <div id="choose-json-file" class="row">
-      <div class="fileUpload btn btn-warning">
+      <div class="fileUpload btn btn-warning" ng-if="!safari">
           <span><span class="glyphicon glyphicon-upload"></span> Upload previously saved JSON file</span>
           <input class="upload" type="file" name="file" onchange="angular.element(this).scope().uploadFile(this.files)"/>
       </div>
