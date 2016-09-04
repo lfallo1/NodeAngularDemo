@@ -1139,3 +1139,12 @@ div.report-modal .modal-content {
     cursor: pointer;
     text-decoration: underline;
 }
+
+.clickable-header{
+    color: #5cb85c;
+}
+
+.clickable-header:hover{
+    cursor: pointer;
+    opacity: 0.7;
+}

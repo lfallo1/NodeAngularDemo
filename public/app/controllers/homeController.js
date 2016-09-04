@@ -1261,9 +1261,9 @@
                 var sortField = null;
                 var cookieSortField = $cookies.get('youtubeagent_sortField');
                 if(isNaN(cookieSortField)){
-                  sortField = $scope.sortOptions.filter(function(d){if(d.value === cookieSortField){return d;}})[0];
+                  sortField = $scope.sortOptions.filter(function(d){if(d.value == cookieSortField){return d;}})[0];
                 } else{
-                  sortField = $scope.sortOptions.filter(function(d){if(d.id === cookieSortField){return d;}})[0];
+                  sortField = $scope.sortOptions.filter(function(d){if(d.id == cookieSortField){return d;}})[0];
                 }
                 $scope.sortField.id = sortField.id;
                 $scope.minViews = $cookies.get('youtubeagent_minViews') ? Number($cookies.get('youtubeagent_minViews')) : null;
