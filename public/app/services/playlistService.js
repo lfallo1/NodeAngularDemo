@@ -59,8 +59,8 @@
          */
         service.addPlaylist = function(playlistName){
             var deferred = $q.defer();
-            AuthService.getAccessToken().then(function(token){
-              var url = 'https://www.googleapis.com/youtube/v3/playlists?part=snippet&access_token=' + token;
+            AuthService.getAccessToken().then(function(response){
+              var url = 'https://www.googleapis.com/youtube/v3/playlists?part=snippet&access_token=' + response.token;
               var playlistResource = generatePlaylistResource(playlistName);
               $http.post(url, playlistResource).then(function(res){
                   deferred.resolve(res.data);
@@ -124,9 +124,9 @@
 
         service.getVideosInPlaylist = function(id, callback, pageToken, deferred){
           var deferred = deferred || $q.defer();
-          AuthService.getAccessToken().then(function(token){
-            var accessToken = token ? '&access_token=' + token : '';
-            var pageToken = pageToken ? '&pageToken=' + pageToken : '';
+          AuthService.getAccessToken({pageToken : pageToken}).then(function(response){
+            var accessToken = response.token ? '&access_token=' + response.token : '';
+            var pageToken = response.extra.pageToken ? '&pageToken=' + response.extra.pageToken : '';
             var playlistId = '&playlistId=' + id;
             var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50' + playlistId + pageToken + accessToken;
 
@@ -222,8 +222,8 @@
 
         var saveVideoToPlaylist = function(video, playlist){
           var deferred = $q.defer();
-          AuthService.getAccessToken().then(function(token){
-            var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&access_token=' + token;
+          AuthService.getAccessToken().then(function(response){
+            var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&access_token=' + response.token;
             var playlistItemResource = generatePlaylistItemResource(video, playlist);
             $http.post(url, playlistItemResource).then(function(res){
                 $log.info(res);

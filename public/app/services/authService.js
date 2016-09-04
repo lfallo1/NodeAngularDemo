@@ -52,11 +52,12 @@
           });
         };
 
-        service.getAccessToken = function(){
+        service.getAccessToken = function(extra){
+          var extra = extra || {};
           var deferred = $q.defer();
           if(service.isLoggedIn()){
             gapi.auth2.getAuthInstance().then(function(auth){
-              deferred.resolve(auth.currentUser.get().getAuthResponse(true).access_token);
+              deferred.resolve({token : auth.currentUser.get().getAuthResponse(true).access_token, extra : extra});
             }, function(err){
               deferred.resolve('');
             });
@@ -100,8 +101,8 @@
         //return the users editable playlists
         service.loadEditableUserPlaylists = function(){
           var deferred = $q.defer();
-          service.getAccessToken().then(function(token){
-            var url = 'https://www.googleapis.com/youtube/v3/playlists?part=snippet,id&mine=true&maxResults=50&access_token=' + token;
+          service.getAccessToken().then(function(response){
+            var url = 'https://www.googleapis.com/youtube/v3/playlists?part=snippet,id&mine=true&maxResults=50&access_token=' + response.token;
 
             //perform request
             $http.get(url).then(function(res){
@@ -133,8 +134,8 @@
         //load editable / non-editable playlists. runs when user logs in or on app-startup if already logged in
         var loadUserPlaylists = function(){
           userPlaylists = [];
-          service.getAccessToken().then(function(token){
-            var url = 'https://www.googleapis.com/youtube/v3/channels?part=contentDetails&mine=true&access_token=' + token;
+          service.getAccessToken().then(function(response){
+            var url = 'https://www.googleapis.com/youtube/v3/channels?part=contentDetails&mine=true&access_token=' + response.token;
             $http.get(url).then(function(res){
               var playlists = res.data.items[0].contentDetails.relatedPlaylists;
               for(prop in playlists){
@@ -170,9 +171,9 @@
         };
 
         var getVideosInPlaylist = function(id, pageToken){
-          service.getAccessToken().then(function(token){
-            var accessToken = token ? '&access_token=' + token : '';
-            var pageToken = pageToken ? '&pageToken=' + pageToken : '';
+          service.getAccessToken({pageToken : pageToken}).then(function(response){
+            var accessToken = response.token ? '&access_token=' + response.token : '';
+            var pageToken = response.extra.pageToken ? '&pageToken=' + response.extra.pageToken : '';
             var playlistId = '&playlistId=' + id;
             var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50' + playlistId + pageToken + accessToken;
             //make request

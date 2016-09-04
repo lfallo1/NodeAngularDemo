@@ -318,7 +318,8 @@
                     new SortOption(3, 'dislikes', 1, 'thumbs-down', 'Dislikes'),
                     new SortOption(4, 'pctLikes', -1, 'star', 'Rating'),
                     new SortOption(5, 'created', 1, 'calendar', 'Date Asc'),
-                    new SortOption(6, 'created', -1, 'calendar', 'Date Desc')
+                    new SortOption(6, 'created', -1, 'calendar', 'Date Desc'),
+                    new SortOption(7, 'durationMinutes', -1, 'time', 'Length')
                 ];
                 // $scope.sortField = $scope.sortOptions[0];
 
