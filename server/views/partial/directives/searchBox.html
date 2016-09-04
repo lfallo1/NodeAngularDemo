@@ -35,8 +35,9 @@
               </div>
               <div id="reset-results" class="btn btn-danger" ng-click="reset()"><span class="glyphicon glyphicon-retweet"></span> Reset results</div>
               <div ng-show="!fetching" id="open-report-button" class="btn btn-primary" ng-click="openReportModal()"><span class="glyphicon glyphicon-list-alt"></span> Search Results Summary</div>
-              <div class="btn btn-warning" id="download-json-results" ng-show="!safari && searchResults.length > 0 && saveUrl && !fetching"><a ng-href="{{saveUrl}}" download="{{saveName}}"><span class="glyphicon glyphicon-download"></span> Download results as json</a></div>
-              <div id="regenerate-json" class="text-info" ng-show="!safari && searchResults.length > 0 && saveUrl && !fetching" ng-click="setSaveUrl()">JSON link not working? Click to refresh</div>
+              <div class="btn btn-warning" id="download-json-results" ng-if="!safari && !isMobile && searchResults.length > 0 && saveUrl && !fetching"><a ng-href="{{saveUrl}}" download="{{saveName}}"><span class="glyphicon glyphicon-download"></span> Download results as json</a></div>
+              <div class="btn btn-warning" disabled id="download-json-results" ng-if="safari && searchResults.length > 0 && saveUrl && !fetching"><a ng-href="{{saveUrl}}" download="{{saveName}}"><span class="glyphicon glyphicon-download"></span> Use chrome or firefox to enable</a></div>
+              <div id="regenerate-json" class="text-info" ng-if="!safari && !isMobile && searchResults.length > 0 && saveUrl && !fetching" ng-click="setSaveUrl()">JSON link not working? Click to refresh</div>
           </div>
       </div>
       <div ng-show="searchMode === POPULAR_SEARCH" id="search-popular-wrapper" class="row">

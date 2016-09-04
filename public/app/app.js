@@ -26,7 +26,7 @@ angular.module('youtubeSearchApp', ['ui.router', 'youtube-embed', 'ngCookies', '
             });
 
         $locationProvider.html5Mode(true);
-    }]).run(['$rootScope', '$log', '$http', '$location','$route', 'AuthService', '$window', function($rootScope, $log, $http, $location, $route, AuthService, $window){
+    }]).run(['$rootScope', '$log', '$http', '$location','$route', 'AuthService', 'BrowserService', function($rootScope, $log, $http, $location, $route, AuthService, BrowserService){
 
         $http.get('api/config').then(function(res){
             $rootScope.clientId = res.data.clientId;
@@ -56,8 +56,10 @@ angular.module('youtubeSearchApp', ['ui.router', 'youtube-embed', 'ngCookies', '
             return original.apply($location, [path]);
         };
 
-        //if safari
-        // var userAgent = $window.navigator.userAgent;
-        // $rootScope.safari = /safari/i.test(userAgent);
-
+        //if safari / mobile
+        $rootScope.safari = BrowserService.getBrowser().toLowerCase() == 'safari';
+        if(BrowserService.isMobile()){
+          $rootScope.isMobile = true;
+          alert('YoutubeAgent has not been optimized for mobile devices. While you can view and browse YoutubeAgent on a phone or tablet, please use a desktop computer for the best experience. I will consider developing a mobile friendly or mobile app if there is interest.');
+        }
     }]);
