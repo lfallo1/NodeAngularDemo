@@ -367,7 +367,7 @@
                     resultsPerPage : 50,
                     totalPages : 0
                 };
-                $location.path('/', true).search({q:null, m:null});
+                // $location.path('/', true).search({q:null, m:null});
             };
 
             $scope.sortOptionChanged = function(option){
@@ -405,7 +405,7 @@
               }, function(data){
                 $scope.gotoPage(Math.floor(data / $scope.pagination.resultsPerPage) + 1);
                 $scope.scrollToElement($scope.filteredResults[data].videoId, true);
-                $location.path('/', true).search({q:null, m:null});
+                // $location.path('/', true).search({q:null, m:null});
                 $rootScope.currentPageTitle = 'Youtube Agent - Sort, Filter, Download, Analyze - Your Ultimate Youtube Search Tool';
               })
             };
@@ -474,7 +474,7 @@
 
               $scope.wasInterrupted = undefined;
 
-              $location.path('/', true).search({q:null, m:null});
+              // $location.path('/', true).search({q:null, m:null});
             };
 
             $scope.hasWatched = AuthService.hasWatched;
@@ -503,7 +503,7 @@
 
                 resetAll();
 
-                $location.path('', true).search({m : $scope.searchMode, q : $scope.searchParam});
+                // $location.path('', true).search({m : $scope.searchMode, q : $scope.searchParam});
 
                 if($scope.searchMode === $scope.TEXT_SEARCH || $scope.searchMode === $scope.MOST_VIEWED_SEARCH){
 
