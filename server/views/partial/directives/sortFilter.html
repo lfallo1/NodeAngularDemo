@@ -23,11 +23,15 @@
                   <div id="date-filter-wrapper">
                       <div class="form-group">
                           <label for="pre-search-min-date">Min Date</label>
-                          <input type="date" class="form-control" id="pre-search-min-date" ng-model="preSearchMinDate" ng-change="checkDisablePostFilter()">
+                          <input
+                            ng-click="openDatepicker('presearchMinDateOpen')" uib-datepicker-popup is-open="datepicker.presearchMinDateOpen" uib-datepicker-options="datepickerOptions"
+                            type="date" class="form-control" id="pre-search-min-date" ng-model="preSearchMinDate" ng-change="checkDisablePostFilter()" placeholder="mm-dd-yyyy">
                       </div>
                       <div class="form-group">
                           <label for="pre-search-max-date">Max Date</label>
-                          <input type="date" class="form-control" id="pre-search-max-date" ng-model="preSearchMaxDate" ng-change="checkDisablePostFilter()">
+                          <input
+                            ng-click="openDatepicker('presearchMaxDateOpen')" uib-datepicker-popup is-open="datepicker.presearchMaxDateOpen" uib-datepicker-options="datepickerOptions"
+                            type="date" class="form-control" id="pre-search-max-date" ng-model="preSearchMaxDate" ng-change="checkDisablePostFilter()" placeholder="mm-dd-yyyy">
                       </div>
                   </div>
                   <div id="category-wrapper">
@@ -141,11 +145,19 @@
                           </tr>
                           <tr class="row-padding">
                               <td class="filter-label"><span class="glyphicon glyphicon-calendar"></span>Min Date</td>
-                              <td class="filter-input"><input type="date" ng-blur="filter()" class="form-control" ng-disabled="disablePostDateFilters && (searchMode === TEXT_SEARCH || searchMode === MOST_VIEWED_SEARCH)" ng-model="minDate" placeholder="earliest date" /></td>
+                              <td class="filter-input">
+                                <input
+                                  ng-click="openDatepicker('postsearchMinDateOpen')" uib-datepicker-popup is-open="datepicker.postsearchMinDateOpen" uib-datepicker-options="datepickerOptions"
+                                  type="date" ng-blur="filter()" class="form-control" ng-disabled="disablePostDateFilters && (searchMode === TEXT_SEARCH || searchMode === MOST_VIEWED_SEARCH)" ng-model="minDate" placeholder="earliest date" />
+                              </td>
                           </tr>
                           <tr class="row-padding">
                               <td class="filter-label"><span class="glyphicon glyphicon-calendar"></span>Max Date</td>
-                              <td class="filter-input"><input type="date" ng-blur="filter()" class="form-control" ng-disabled="disablePostDateFilters && (searchMode === TEXT_SEARCH || searchMode === MOST_VIEWED_SEARCH)" ng-model="maxDate" placeholder="latest date" /></td>
+                              <td class="filter-input">
+                                <input
+                                  ng-click="openDatepicker('postsearchMaxDateOpen')" uib-datepicker-popup is-open="datepicker.postsearchMaxDateOpen" uib-datepicker-options="datepickerOptions"
+                                  type="date" ng-blur="filter()" class="form-control" ng-disabled="disablePostDateFilters && (searchMode === TEXT_SEARCH || searchMode === MOST_VIEWED_SEARCH)" ng-model="maxDate" placeholder="latest date" />
+                              </td>
                           </tr>
                           <tr class="row-padding">
                               <td class="filter-label"><span class="glyphicon glyphicon-time"></span>Duration</td>

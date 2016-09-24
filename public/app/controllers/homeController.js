@@ -8,7 +8,21 @@
 
             $scope.userPlaylist = {};
 
-            var showTutorial = function(direction){
+            //Datepicker
+            $scope.openDatepicker = function (prop) {
+                $scope.datepicker[prop] = true;
+                  return;
+            };
+
+            $scope.datepickerOptions = {
+                formatYear: 'yyyy',
+                startingDay: 1
+            };
+
+            $rootScope.showTutorial = function(start, direction){
+              if(start){
+                DirectionsService.reset();
+              }
               var direction = direction || DirectionsService.getNext();
               if(direction.element){
                   $scope.scrollToElement(direction.element);
@@ -28,7 +42,7 @@
 
               modalInstance.result.then(function(data){
                 if(data){
-                  showTutorial(data);
+                  $rootScope.showTutorial(false, data);
                   return;
                 }
                 $scope.scrollToElement('title-text');
@@ -274,6 +288,8 @@
 
                 resetPagination();
 
+                $scope.datepicker = {};
+
                 //reset quick filter
                 $scope.quickFilterType = "0";
                 $scope.quickFilterTerms = [];
@@ -325,12 +341,6 @@
 
                 $scope.enableChannelFilter = true;
 
-                checkCookies();
-
-                if(!$cookies.get("tutorial")){
-                  $cookies.put("tutorial", true);
-                  showTutorial();
-                }
                 // else if($routeParams.id){
                 //   getVideoById($routeParams.id).then(function(res){
                 //       resetPostFilters();

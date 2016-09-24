@@ -26,6 +26,10 @@
           }
         ];
 
+        service.reset = function(){
+          cursor = -1;
+        };
+
         service.getNext = function(){
           if(cursor < directions.length){
             cursor++;

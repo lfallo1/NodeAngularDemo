@@ -1160,3 +1160,7 @@ div.report-modal .modal-content {
 .disabled-feature:hover{
     cursor: not-allowed;
 }
+
+#show-walkthrough{
+    margin-left: 15px;
+}
