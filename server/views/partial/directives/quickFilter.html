@@ -19,7 +19,7 @@
         <button ng-disabled="savingToPlaylist" class="btn btn-success" ng-click="openListManagerModal(selectedVideos, BULK_PLAYLIST_MODAL_CTRL, 'bulkPlaylistModal.html')"><span class="glyphicon glyphicon-floppy-disk"></span>Selected videos ({{selectedVideos.length}} videos)</button>
     </div>
 
-    <div class="col-md-12">
+    <div class="col-md-12" id="quick-filter-container">
         <div id="quick-filter-title" ng-click="toggleQuickFilter()" title="Wrap multi-word terms in quotes, and negate terms by preceding with bang operator (!)">
             <span class="glyphicon glyphicon-filter"></span>Advanced filter / tools
             <span ng-if="quickFilterVisible" class="glyphicon glyphicon-minus"></span>
@@ -37,16 +37,16 @@
               </div>
           </div>
 
-          <div>
+          <div id="quick-filter-input-container">
 
-            <div ng-repeat="filter in quickFilterObjects track by $index">
-              <div>{{filter.quickfilterType}} <button class="btn btn-sm btn-success" ng-click="addFilterTerm(filter)"><span class="glyphicon glyphicon-plus"></span></button></div>
-              <div ng-repeat="termObject in filter.terms">
+            <div class="quick-filter-mode-container" ng-repeat="filter in quickFilterObjects track by $index">
+              <div class="quick-filter-mode-label">{{filter.quickfilterType}} <button class="btn btn-sm btn-success" ng-click="addFilterTerm(filter)"><span class="glyphicon glyphicon-plus"></span>Add row</button></div>
+              <div class="quick-filter-item" ng-repeat="termObject in filter.terms">
                 <input ng-model="termObject.term" type="text" />
-                <button ng-click="removeFilterTerm(filter.terms, $index)">Remove</button>
+                <div class="remove-quick-filter-item" ng-click="removeFilterTerm(filter.terms, $index)"><span class="glyphicon glyphicon-minus-sign"></span></div>
               </div>
             </div>
-            <button class="btn btn-primary" ng-click="updateQuickFilterTerms(); filter()"></button>
+            <button class="quick-filter-refresh-button btn btn-default" ng-click="filter()">Refresh<span class="glyphicon glyphicon-refresh"></span></button>
               <!-- <input ng-show="!quickFilterReadonly" type="text" ng-blur="updateQuickFilter(); filter(); quickFilterReadonly = true; scrollToElement('results', true);" class="form-control" ng-model="filterText" placeholder="Filter artist and title."/>
             <div ng-show="quickFilterReadonly" class="readonly-quickfilter" ng-click="quickFilterReadonly = false">
               <span ng-show="quickFilterTerms.length > 0" ng-repeat="term in quickFilterTerms" ng-class="term.negate ? 'quickfilter-negate-term' : 'quickfilter-include-term'">{{term.value}}</span>

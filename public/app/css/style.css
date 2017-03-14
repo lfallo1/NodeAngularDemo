@@ -513,11 +513,12 @@ body{
 
 #quick-filter-title{
     text-align: center;
-    background-color: #337ab7;
+    background-color: #222;
     color: white;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
-    font-size: 16px;
+    font-size: 24px;
+    padding: 20px;
 }
 
 #quick-filter input{
@@ -1163,4 +1164,43 @@ div.report-modal .modal-content {
 
 #show-walkthrough{
     margin-left: 15px;
+}
+
+.remove-quick-filter-item{
+    display: inline;
+    color: #a94442;
+    font-size: 24px;
+}
+
+.remove-quick-filter-item:hover{
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.quick-filter-item input{
+    width: 92%;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.quick-filter-mode-label{
+    color: #aaa;
+    font-size: 24px;
+    text-align: center;
+}
+
+.quick-filter-mode-container{
+    margin-bottom: 35px;
+}
+
+.quick-filter-refresh-button{
+    width: 100%;
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+#quick-filter-container{
+    background: #222;
+    border-radius: 8px;
 }

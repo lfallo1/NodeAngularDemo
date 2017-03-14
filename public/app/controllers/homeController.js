@@ -213,7 +213,7 @@
             $scope.videoDurationOptions = ['any','long','medium','short'];
             $scope.safeSearchOptions = ['moderate', 'none', 'strict'];
 
-            $scope.quickFilterVisible = true;
+            $scope.quickFilterVisible = false;
 
             $scope.toggleQuickFilter = function(){
               $scope.quickFilterVisible = !$scope.quickFilterVisible;
@@ -278,23 +278,6 @@
                 this.glyph = glyph;
                 this.displayName = displayName;
             };
-
-            //------------ start quick filter -----------------
-
-            $scope.removeFilterTerm = function(terms, index){
-              if(terms.length > 1){
-                terms.splice(1,index);
-              }
-            };
-
-            $scope.addFilterTerm = function(quickfilterObject){
-              var nextId = quickfilterObject.terms.sort(function(a,b){
-                return a.id < b.id ? 1 : a.id > b.id ? -1 : 0;
-              })[0].id + 1;
-              quickfilterObject.terms.push({id:nextId,term:''});
-            };
-
-            //------------ end quick filter -------------------
 
             /**
              * setup view
@@ -1137,65 +1120,91 @@
               });
             };
 
-            $scope.updateQuickFilter = function(){
+            // $scope.updateQuickFilter = function(){
+            //
+            //   if(!$scope.filterText || $scope.filterText.trim().length === 0){
+            //       $scope.quickFilterTerms = [];
+            //       return;
+            //   }
+            //
+            //   var searchText = $scope.filterText.toLowerCase().trim();
+            //   $scope.quickFilterTerms = [];
+            //
+            //   var terms = [];
+            //   var temp = '';
+            //   for(var i = 0; i < searchText.length; i++){
+            //      if(searchText.charAt(i) === ' ' || i === (searchText.length - 1)){
+            //        if(temp.length > 0){
+            //          temp += searchText.charAt(i) === '"' ? '' : searchText.charAt(i);
+            //          addQuickFilterTerm(temp);
+            //          temp = '';
+            //        }
+            //      }
+            //      else if(searchText.charAt(i) === '"'){
+            //        //if temp is not empty, then the quote occurred after a non-space, so add current temp string to term list
+            //        if(temp.length > 0){
+            //          addQuickFilterTerm(temp);
+            //          temp = '';
+            //        }
+            //
+            //       //if quote occurs as last character and is not a closing quote, then break
+            //        if(i === (searchText.length - 1)){
+            //          break;
+            //        }
+            //
+            //       //find the closing quote
+            //        var closeQuoteIndex = searchText.substring(i+1).indexOf('"');
+            //
+            //        //if no closing quote, then split on spaces and bail
+            //        if(closeQuoteIndex < 0){
+            //          searchText.substring(i+1).replace('"','').split(" ").forEach(function(str){
+            //            addQuickFilterTerm(str);
+            //          });
+            //          break;
+            //        } else{
+            //          closeQuoteIndex = i + searchText.substring(i+1).indexOf('"') + 1;
+            //          //otherwise push the quote wrapped string to end of array
+            //          var newTerm = searchText.substring(i+1, closeQuoteIndex).trim();
+            //          if(newTerm){
+            //             addQuickFilterTerm(newTerm);
+            //          }
+            //
+            //          //place iterator after closing quote
+            //          i = closeQuoteIndex;
+            //        }
+            //      }
+            //      else{
+            //         //not a space or quote,then add character to temp string
+            //          temp += searchText.charAt(i);
+            //      }
+            //   }
+            //
+            // };
 
-              if(!$scope.filterText || $scope.filterText.trim().length === 0){
-                  $scope.quickFilterTerms = [];
-                  return;
+            //------------ start quick filter -----------------
+
+            var hasQuickFilter = function(){
+              for(var i =0; i < $scope.quickFilterObjects.length; i++){
+                for(var j = 0; j < $scope.quickFilterObjects[i].terms.length; j++){
+                  if($scope.quickFilterObjects[i].terms[j].term){
+                    return true;
+                  }
+                }
+              };
+              return false;
+            };
+
+            $scope.removeFilterTerm = function(terms, index){
+              if(terms.length > 1){
+                terms.splice(index, 1);
               }
+            };
 
-              var searchText = $scope.filterText.toLowerCase().trim();
-              $scope.quickFilterTerms = [];
-
-              var terms = [];
-              var temp = '';
-              for(var i = 0; i < searchText.length; i++){
-                 if(searchText.charAt(i) === ' ' || i === (searchText.length - 1)){
-                   if(temp.length > 0){
-                     temp += searchText.charAt(i) === '"' ? '' : searchText.charAt(i);
-                     addQuickFilterTerm(temp);
-                     temp = '';
-                   }
-                 }
-                 else if(searchText.charAt(i) === '"'){
-                   //if temp is not empty, then the quote occurred after a non-space, so add current temp string to term list
-                   if(temp.length > 0){
-                     addQuickFilterTerm(temp);
-                     temp = '';
-                   }
-
-                  //if quote occurs as last character and is not a closing quote, then break
-                   if(i === (searchText.length - 1)){
-                     break;
-                   }
-
-                  //find the closing quote
-                   var closeQuoteIndex = searchText.substring(i+1).indexOf('"');
-
-                   //if no closing quote, then split on spaces and bail
-                   if(closeQuoteIndex < 0){
-                     searchText.substring(i+1).replace('"','').split(" ").forEach(function(str){
-                       addQuickFilterTerm(str);
-                     });
-                     break;
-                   } else{
-                     closeQuoteIndex = i + searchText.substring(i+1).indexOf('"') + 1;
-                     //otherwise push the quote wrapped string to end of array
-                     var newTerm = searchText.substring(i+1, closeQuoteIndex).trim();
-                     if(newTerm){
-                        addQuickFilterTerm(newTerm);
-                     }
-
-                     //place iterator after closing quote
-                     i = closeQuoteIndex;
-                   }
-                 }
-                 else{
-                    //not a space or quote,then add character to temp string
-                     temp += searchText.charAt(i);
-                 }
-              }
-
+            $scope.addFilterTerm = function(quickfilterObject){
+              var nextId = quickfilterObject.terms.sort(function(a,b){
+                return a.id < b.id ? 1 : a.id > b.id ? -1 : 0;
+              })[0].id + 1;
+              quickfilterObject.terms.push({id:nextId,term:''});
             };
 
             /**
@@ -1204,7 +1213,7 @@
              * @returns {boolean}
              */
             var quickFilter = function(video){
-                if($scope.quickFilterTerms.length === 0){
+                if(!hasQuickFilter()){
                     return true;
                 }
                 else{
@@ -1213,41 +1222,42 @@
                   var videoTitle = video.title.toLowerCase();
                   var channelTitle = video.channelTitle.toLowerCase();
 
-                  //exact mode
-                  if($scope.quickFilterType == 0){
-                    for(var i = 0; i < $scope.quickFilterTerms.length; i++){
-                      if(!isTextInVideo(videoTitle, channelTitle, $scope.quickFilterTerms[i])){
+                  //must have
+                  if($scope.quickFilterObjects[0].terms.filter(function(d){return d.term;}).length > 0){
+                    for(var i = 0; i < $scope.quickFilterObjects[0].terms.length; i++){
+                      if(!isTextInVideo(videoTitle, channelTitle, $scope.quickFilterObjects[0].terms[i].term)){
                         return false;
                       }
                     }
-                    return true;
                   }
-                  else {
-                    for(var i = 0; i < $scope.quickFilterTerms.length; i++){
-                      if(isTextInVideo(videoTitle, channelTitle, $scope.quickFilterTerms[i])){
+
+                  //cannot have
+                  if($scope.quickFilterObjects[2].terms.filter(function(d){return d.term;}).length > 0){
+                    for(var i = 0; i < $scope.quickFilterObjects[2].terms.length; i++){
+                      if(isTextInVideo(videoTitle, channelTitle, $scope.quickFilterObjects[2].terms[i].term)){
+                        return false;
+                      }
+                    }
+                  }
+
+                  //atleast one
+                  if($scope.quickFilterObjects[1].terms.filter(function(d){return d.term;}).length > 0){
+                    for(var i = 0; i < $scope.quickFilterObjects[1].terms.length; i++){
+                      if(isTextInVideo(videoTitle, channelTitle, $scope.quickFilterObjects[1].terms[i].term)){
                         return true;
                       }
                     }
-                    return false
                   }
+
+                  return $scope.quickFilterObjects[1].terms.filter(function(d){return d.term;}).length === 0;
                 }
             };
 
             var isTextInVideo = function(videoTitle, videoChannelTitle, searchText){
-              if(searchText.negate){
-                  return !((videoTitle.indexOf(searchText.value) > -1) || (videoChannelTitle.indexOf(searchText.value) > -1));
-              }
-              return (videoTitle.indexOf(searchText.value) > -1) || (videoChannelTitle.indexOf(searchText.value) > -1);
+              return (videoTitle.toLowerCase().indexOf(searchText.toLowerCase().trim()) > -1) || (videoChannelTitle.toLowerCase().indexOf(searchText.toLowerCase().trim()) > -1);
             };
 
-            $scope.removeQuickFilterTerm = function(term){
-              for(var i = $scope.quickFilterTerms.length -1; i >= 0; i--){
-                if($scope.quickFilterTerms[i] === term){
-                  $scope.quickFilterTerms.splice(i,1);
-                }
-              }
-              $scope.filter();
-            }
+            //------------ end quick filter -------------------
 
             var performChannelFilter = function(video){
               if(!$scope.enableChannelFilter || !$scope.channelFilter || $scope.channelFilter.length === 0){
@@ -1350,11 +1360,12 @@
                 'minRating': $scope.minRating,
                 'shorterThanFilter': $scope.shorterThanFilter,
                 'longerThanFilter': $scope.longerThanFilter,
-                'quickFilterTerms': $scope.quickFilterTerms,
+                // 'quickFilterTerms': $scope.quickFilterTerms,
                 'searchParam': $scope.searchParam,
-                'quickFilterType': $scope.quickFilterType,
+                // 'quickFilterType': $scope.quickFilterType,
                 'searchMode' : $scope.searchMode,
-                'hashedResults' : $scope.hashedResults
+                'hashedResults' : $scope.hashedResults,
+                'quickFilterObjects' : $scope.quickFilterObjects
               }
             };
 
@@ -1388,11 +1399,15 @@
               $scope.minRating = json.minRating;
               $scope.shorterThanFilter = json.shorterThanFilter;
               $scope.longerThanFilter = json.longerThanFilter;
-              $scope.quickFilterTerms = json.quickFilterTerms;
-              $scope.quickFilterType = json.quickFilterType;
+              // $scope.quickFilterTerms = json.quickFilterTerms;
+              // $scope.quickFilterType = json.quickFilterType;
               $scope.searchParam = json.searchParam;
               $scope.searchMode = json.searchMode || $scope.TEXT_SEARCH;
               $scope.hashedResults = json.hashedResults;
+
+              if(json.quickFilterObjects){
+                $scope.quickFilterObjects = json.quickFilterObjects;
+              }
 
               //convert date properties (they come back as strings) on search results back to date objects
               $scope.searchResults.forEach(function(video){
@@ -1400,7 +1415,7 @@
               });
 
               $scope.quickFilterReadonly = true;
-              $scope.updateQuickFilter();
+              // $scope.updateQuickFilter();
 
               //backwards compatible hashed results
               if(!$scope.hashedResults){
@@ -1418,7 +1433,7 @@
             }
 
             $scope.filter = function(){
-                if((!$scope.enableChannelFilter || !$scope.channelFilter || $scope.channelFilter.length === 0) && (!$scope.filterText || $scope.filterText.trim().length === 0) && !$scope.minViews && (!$scope.minDislikes && $scope.minDislikes !== 0) && !$scope.minDate && !$scope.shorterThanFilter && !$scope.longerThanFilter && !$scope.minRating){
+                if((!$scope.enableChannelFilter || !$scope.channelFilter || $scope.channelFilter.length === 0) && !hasQuickFilter() && !$scope.minViews && (!$scope.minDislikes && $scope.minDislikes !== 0) && !$scope.minDate && !$scope.shorterThanFilter && !$scope.longerThanFilter && !$scope.minRating){
                     $scope.filteredResults = $scope.searchResults;
                 }
                 else{
