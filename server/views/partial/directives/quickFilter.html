@@ -40,7 +40,7 @@
           <div id="quick-filter-input-container">
 
             <div class="quick-filter-mode-container" ng-repeat="filter in quickFilterObjects track by $index">
-              <div class="remove-one-of-category" ng-show="filter.type===quickFilterType.ONE_OF && hasMultipleOneOfFilters()" ng-click="removeCategory(filter)">
+              <div class="remove-one-of-category" ng-show="filter.type===quickFilterType.ONE_OF && hasMultipleFiltersByType(quickFilterType.ONE_OF)" ng-click="removeCategory(filter)">
                 <span class="glyphicon glyphicon-minus-sign"></span>
               </div>
               <div class="quick-filter-mode-label">{{filter.quickfilterType}}

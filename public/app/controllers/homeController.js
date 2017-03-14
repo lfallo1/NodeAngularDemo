@@ -64,11 +64,6 @@
                 'BIANNUAL' : 0.5
             };
 
-            $scope.quickFilterModes = {
-              'ALL' : 0,
-              'ANY' : 1
-            };
-
             var millisConstants = {
               YEAR : 1000*60*60*24*365,
               WEEK : 1000*60*60*24*7,
@@ -199,7 +194,6 @@
             $scope.MOST_VIEWED_SEARCH = 4;
             $scope.WATCHLIST_MODAL_CTRL = 'WatchlistModalCtrl';
             $scope.BULK_PLAYLIST_MODAL_CTRL = 'BulkPlaylistModalCtrl';
-            $scope.quickFilterTerms = [];
             var ALL_CATEGORIES = {'id' : '-1', 'snippet' : {'title' : 'Search All Categories'}};
             var relatedPending = false;
 
@@ -650,6 +644,8 @@
 
                     //otherwise there are items
                     var nonDuplicates = getNonDuplicates(res);
+                    console.log("Search results update: " + nonDuplicates.length + " NEW records found - " + new Date().toString());
+                    console.log(nonDuplicates);
 
                     //send requests / store promises
                     var promises = createBatchVideoRequest(nonDuplicates);
@@ -1110,80 +1106,9 @@
                 });
             };
 
-            var addQuickFilterTerm = function(term){
-              if(!term || !term.trim()){
-                return;
-              }
-
-              $scope.quickFilterTerms.push({
-                'value' : term.trim().replace("!",""),
-                'negate': term.startsWith('!')
-              });
-            };
-
-            // $scope.updateQuickFilter = function(){
-            //
-            //   if(!$scope.filterText || $scope.filterText.trim().length === 0){
-            //       $scope.quickFilterTerms = [];
-            //       return;
-            //   }
-            //
-            //   var searchText = $scope.filterText.toLowerCase().trim();
-            //   $scope.quickFilterTerms = [];
-            //
-            //   var terms = [];
-            //   var temp = '';
-            //   for(var i = 0; i < searchText.length; i++){
-            //      if(searchText.charAt(i) === ' ' || i === (searchText.length - 1)){
-            //        if(temp.length > 0){
-            //          temp += searchText.charAt(i) === '"' ? '' : searchText.charAt(i);
-            //          addQuickFilterTerm(temp);
-            //          temp = '';
-            //        }
-            //      }
-            //      else if(searchText.charAt(i) === '"'){
-            //        //if temp is not empty, then the quote occurred after a non-space, so add current temp string to term list
-            //        if(temp.length > 0){
-            //          addQuickFilterTerm(temp);
-            //          temp = '';
-            //        }
-            //
-            //       //if quote occurs as last character and is not a closing quote, then break
-            //        if(i === (searchText.length - 1)){
-            //          break;
-            //        }
-            //
-            //       //find the closing quote
-            //        var closeQuoteIndex = searchText.substring(i+1).indexOf('"');
-            //
-            //        //if no closing quote, then split on spaces and bail
-            //        if(closeQuoteIndex < 0){
-            //          searchText.substring(i+1).replace('"','').split(" ").forEach(function(str){
-            //            addQuickFilterTerm(str);
-            //          });
-            //          break;
-            //        } else{
-            //          closeQuoteIndex = i + searchText.substring(i+1).indexOf('"') + 1;
-            //          //otherwise push the quote wrapped string to end of array
-            //          var newTerm = searchText.substring(i+1, closeQuoteIndex).trim();
-            //          if(newTerm){
-            //             addQuickFilterTerm(newTerm);
-            //          }
-            //
-            //          //place iterator after closing quote
-            //          i = closeQuoteIndex;
-            //        }
-            //      }
-            //      else{
-            //         //not a space or quote,then add character to temp string
-            //          temp += searchText.charAt(i);
-            //      }
-            //   }
-            //
-            // };
-
             //------------ start quick filter -----------------
 
+            //add a "ONE_OF" category quickfilter
             $scope.addQuickFilterCategory = function(){
               var nextId = $scope.quickFilterObjects.sort(function(a,b){
                 return a.id < b.id ? 1 : a.id > b.id ? -1 : 0;
@@ -1194,8 +1119,9 @@
               })
             };
 
+            //remove a "ONE_OF" category quick filter
             $scope.removeCategory = function(filter){
-              if($scope.hasMultipleOneOfFilters()){
+              if($scope.hasMultipleFiltersByType($scope.quickFilterType.ONE_OF)){
                 for(var i = 0; i < $scope.quickFilterObjects.length; i++){
                   if($scope.quickFilterObjects[i].id === filter.id && $scope.quickFilterObjects[i].type===$scope.quickFilterType.ONE_OF){
                       $scope.quickFilterObjects.splice(i,1);
@@ -1204,12 +1130,14 @@
               }
             };
 
-            $scope.hasMultipleOneOfFilters = function(){
+            //given a type, return if the there is atleast one term defined for that quickfilter
+            $scope.hasMultipleFiltersByType = function(type){
               return $scope.quickFilterObjects.filter(function(d){
-                return d.type === $scope.quickFilterType.ONE_OF;
+                return d.type === type;
               }).length > 1;
             };
 
+            //determine if atleast one term is defined in one of the quickfilter objects
             var hasQuickFilter = function(){
               for(var i =0; i < $scope.quickFilterObjects.length; i++){
                 for(var j = 0; j < $scope.quickFilterObjects[i].terms.length; j++){
@@ -1221,17 +1149,31 @@
               return false;
             };
 
+            //remove an item from an array
             $scope.removeFilterTerm = function(terms, index){
               if(terms.length > 1){
                 terms.splice(index, 1);
               }
             };
 
+            //add a new term to the passed in quickfilter object
             $scope.addFilterTerm = function(quickfilterObject){
               var nextId = quickfilterObject.terms.sort(function(a,b){
                 return a.id < b.id ? 1 : a.id > b.id ? -1 : 0;
               })[0].id + 1;
               quickfilterObject.terms.push({id:nextId,term:''});
+            };
+
+            //return if the quickfilter object has atleast one term
+            var hasQuickFilterTerm = function(quickFilter){
+              return quickFilter.terms.filter(function(d){return d.term;}).length > 0
+            };
+
+            //return quick filter objects by type
+            var getQuickFilterByType = function(type){
+              return $scope.quickFilterObjects.filter(function(d){
+                return d.type === type;
+              });
             };
 
             /**
@@ -1249,20 +1191,12 @@
                   var videoTitle = video.title.toLowerCase();
                   var channelTitle = video.channelTitle.toLowerCase();
 
-                  var mustHave = $scope.quickFilterObjects.filter(function(d){
-                    return d.type === $scope.quickFilterType.MUST_HAVE;
-                  })[0];
-
-                  var exclude = $scope.quickFilterObjects.filter(function(d){
-                    return d.type === $scope.quickFilterType.EXCLUDE;
-                  })[0];
-
-                  var oneOf = $scope.quickFilterObjects.filter(function(d){
-                    return d.type === $scope.quickFilterType.ONE_OF;
-                  });
+                  var mustHave = getQuickFilterByType($scope.quickFilterType.MUST_HAVE)[0];
+                  var exclude = getQuickFilterByType($scope.quickFilterType.EXCLUDE)[0];
+                  var oneOf = getQuickFilterByType($scope.quickFilterType.ONE_OF);
 
                   //must have
-                  if(mustHave.terms.filter(function(d){return d.term;}).length > 0){
+                  if(hasQuickFilterTerm(mustHave)){
                     for(var i = 0; i < mustHave.terms.length; i++){
                       if(!isTextInVideo(videoTitle, channelTitle, mustHave.terms[i].term)){
                         return false;
@@ -1271,7 +1205,7 @@
                   }
 
                   //cannot have
-                  if(exclude.terms.filter(function(d){return d.term;}).length > 0){
+                  if(hasQuickFilterTerm(exclude)){
                     for(var i = 0; i < exclude.terms.length; i++){
                       if(isTextInVideo(videoTitle, channelTitle, exclude.terms[i].term)){
                         return false;
@@ -1280,31 +1214,25 @@
                   }
 
                   //atleast one
-                  var count = 0;
                   for(var i = 0; i < oneOf.length; i++){
-                    count += oneOf[i].terms.filter(function(d){return d.term;}).length;
-                  }
-                  if(count > 0){
-                    for(var i = 0; i < oneOf.length; i++){
-                      if(oneOf[i].terms.filter(function(d){return d.term;}).length > 0){
-                        var found = false;
-                        for(var j = 0; j < oneOf[i].terms.length; j++){
-                          if(isTextInVideo(videoTitle, channelTitle, oneOf[i].terms[j].term)){
-                            found = true;
-                          }
-                        }
-                        if(!found){
-                          return false;
+                    if(hasQuickFilterTerm(oneOf[i])){
+                      var found = false;
+                      for(var j = 0; j < oneOf[i].terms.length; j++){
+                        if(isTextInVideo(videoTitle, channelTitle, oneOf[i].terms[j].term)){
+                          found = true;
+                          break;
                         }
                       }
+                      if(!found){
+                        return false;
+                      }
                     }
-                    return true;
-                  } else{
-                    return true;
                   }
+                  return true;
                 }
             };
 
+            //given a video / channel title, determine if it contains the corresponding searchText
             var isTextInVideo = function(videoTitle, videoChannelTitle, searchText){
               return (videoTitle.toLowerCase().indexOf(searchText.toLowerCase().trim()) > -1) || (videoChannelTitle.toLowerCase().indexOf(searchText.toLowerCase().trim()) > -1);
             };
@@ -1412,9 +1340,7 @@
                 'minRating': $scope.minRating,
                 'shorterThanFilter': $scope.shorterThanFilter,
                 'longerThanFilter': $scope.longerThanFilter,
-                // 'quickFilterTerms': $scope.quickFilterTerms,
                 'searchParam': $scope.searchParam,
-                // 'quickFilterType': $scope.quickFilterType,
                 'searchMode' : $scope.searchMode,
                 'hashedResults' : $scope.hashedResults,
                 'quickFilterObjects' : $scope.quickFilterObjects
@@ -1463,9 +1389,6 @@
               $scope.searchResults.forEach(function(video){
                 video.created = new Date(video.created);
               });
-
-              $scope.quickFilterReadonly = true;
-              // $scope.updateQuickFilter();
 
               //backwards compatible hashed results
               if(!$scope.hashedResults){
