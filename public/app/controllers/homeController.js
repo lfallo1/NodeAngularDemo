@@ -279,10 +279,33 @@
                 this.displayName = displayName;
             };
 
+            //------------ start quick filter -----------------
+
+            $scope.removeFilterTerm = function(terms, index){
+              if(terms.length > 1){
+                terms.splice(1,index);
+              }
+            };
+
+            $scope.addFilterTerm = function(quickfilterObject){
+              var nextId = quickfilterObject.terms.sort(function(a,b){
+                return a.id < b.id ? 1 : a.id > b.id ? -1 : 0;
+              })[0].id + 1;
+              quickfilterObject.terms.push({id:nextId,term:''});
+            };
+
+            //------------ end quick filter -------------------
+
             /**
              * setup view
              */
             var init = function(){
+
+                $scope.quickFilterObjects = [
+                  {id:1, quickfilterType:'Must have', terms : [{id:1,term:""}]},
+                  {id:2, quickfilterType:'Atleast One', terms : [{id:1,term:""}]},
+                  {id:3, quickfilterType:'Exclude', terms : [{id:1,term:""}]}
+                ];
 
                 $scope.autoplay = true;
 
@@ -1112,7 +1135,7 @@
                 'value' : term.trim().replace("!",""),
                 'negate': term.startsWith('!')
               });
-            }
+            };
 
             $scope.updateQuickFilter = function(){
 

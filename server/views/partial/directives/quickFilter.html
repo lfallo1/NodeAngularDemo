@@ -19,7 +19,7 @@
         <button ng-disabled="savingToPlaylist" class="btn btn-success" ng-click="openListManagerModal(selectedVideos, BULK_PLAYLIST_MODAL_CTRL, 'bulkPlaylistModal.html')"><span class="glyphicon glyphicon-floppy-disk"></span>Selected videos ({{selectedVideos.length}} videos)</button>
     </div>
 
-    <div class="col-md-12" ng-show="searchResults.length > 0">
+    <div class="col-md-12">
         <div id="quick-filter-title" ng-click="toggleQuickFilter()" title="Wrap multi-word terms in quotes, and negate terms by preceding with bang operator (!)">
             <span class="glyphicon glyphicon-filter"></span>Advanced filter / tools
             <span ng-if="quickFilterVisible" class="glyphicon glyphicon-minus"></span>
@@ -38,7 +38,16 @@
           </div>
 
           <div>
-            <input ng-show="!quickFilterReadonly" type="text" ng-blur="updateQuickFilter(); filter(); quickFilterReadonly = true; scrollToElement('results', true);" class="form-control" ng-model="filterText" placeholder="Filter artist and title."/>
+
+            <div ng-repeat="filter in quickFilterObjects track by $index">
+              <div>{{filter.quickfilterType}} <button class="btn btn-sm btn-success" ng-click="addFilterTerm(filter)"><span class="glyphicon glyphicon-plus"></span></button></div>
+              <div ng-repeat="termObject in filter.terms">
+                <input ng-model="termObject.term" type="text" />
+                <button ng-click="removeFilterTerm(filter.terms, $index)">Remove</button>
+              </div>
+            </div>
+            <button class="btn btn-primary" ng-click="updateQuickFilterTerms(); filter()"></button>
+              <!-- <input ng-show="!quickFilterReadonly" type="text" ng-blur="updateQuickFilter(); filter(); quickFilterReadonly = true; scrollToElement('results', true);" class="form-control" ng-model="filterText" placeholder="Filter artist and title."/>
             <div ng-show="quickFilterReadonly" class="readonly-quickfilter" ng-click="quickFilterReadonly = false">
               <span ng-show="quickFilterTerms.length > 0" ng-repeat="term in quickFilterTerms" ng-class="term.negate ? 'quickfilter-negate-term' : 'quickfilter-include-term'">{{term.value}}</span>
               <div id="quick-filter-no-terms-specified" ng-show="quickFilterTerms.length === 0" class="text-center text-danger">
@@ -50,7 +59,7 @@
                     <label id="quick-filter-all-terms-label" class="filter-type-button btn btn-warning" ng-model="quickFilterType" uib-btn-radio="'0'" ng-click="filter()">All terms</label>
                     <label id="quick-filter-any-term-label" class="filter-type-button btn btn-warning" ng-model="quickFilterType" uib-btn-radio="'1'" ng-click="filter()">Any term</label>
                 </div>
-            </div>
+            </div> -->
           </div>
         </div>
 
