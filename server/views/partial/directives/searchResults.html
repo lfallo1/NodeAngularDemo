@@ -16,6 +16,12 @@
         </li>
     </ul>
 
+    <div class="restore-removed-videos" ng-show="removedVideos.length > 0">
+      <button class="btn btn-sm btn-default" ng-click="restoreRemovedItems()">
+        <span class="glyphicon glyphicon-share-alt"></span> Restore Removed Videos
+      </button>
+    </div>
+
     <!-- <div ng-class="autoplay ? 'toggle-autoplay text-success' : 'toggle-autoplay text-danger'" ng-click="toggleAutoplay()"><span class="glyphicon glyphicon-play-circle"></span>{{autoplay ? 'Autoplay enabled' : 'Autoplay disabled'}}</div> -->
 
     <table class="table">
@@ -31,6 +37,7 @@
                 <div ng-if="isVideoInList(video, watchlist)" class="add-to-watchlist text-danger" ng-click="toggleVideoInList(video, watchlist)"><span class="glyphicon glyphicon-remove"></span>Remove from watchlist</div>
                 <div ng-if="!isVideoInList(video, selectedVideos) && AuthService.isLoggedIn()" class="add-to-multivid-playlist text-success" ng-click="toggleVideoInList(video, selectedVideos)"><span class="glyphicon glyphicon-plus"></span>Add to playlist queue</div>
                 <div ng-if="isVideoInList(video, selectedVideos) && AuthService.isLoggedIn()" class="add-to-multivid-playlist text-danger" ng-click="toggleVideoInList(video, selectedVideos)"><span class="glyphicon glyphicon-remove"></span>Remove from queue</div>
+                <div class="remove-from-results text-danger" ng-click="removeVideoFromList(video)"><span class="glyphicon glyphicon-remove"></span> Remove from results</div>
             </td>
             <td>
                 <div class="video-details-container">

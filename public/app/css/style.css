@@ -1222,3 +1222,22 @@ div.report-modal .modal-content {
 .remove-one-of-category:hover{
     opacity: 0.7;
 }
+
+.remove-from-results{
+    margin-top: 5px;
+}
+
+.remove-from-results:hover{
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.restore-removed-videos{
+    text-align: center;
+    margin-top: 15px;
+}
+
+.restore-removed-videos .btn{
+    font-weight: bolder;
+    font-size: 24px;
+}

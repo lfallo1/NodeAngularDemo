@@ -289,6 +289,8 @@
                   {id:3, type:$scope.quickFilterType.EXCLUDE, quickfilterType:'Exclude', terms : [{id:1,term:""}]}
                 ];
 
+                $scope.removedVideos = [];
+
                 $scope.autoplay = true;
 
                 resetPagination();
@@ -464,6 +466,7 @@
 
             var resetAll = function(){
 
+              $scope.removedVideos = [];
               mostViewedSearchInterval = 0;
               $scope.saveUrl = undefined;
 
@@ -841,8 +844,6 @@
 
                             addVideosToList(data);
 
-                            $scope.sort();
-
                             $scope.fetchPopularByCountryAndCategory(countryAlphaCode, category, nextPageToken);
                         }, function (err) {
                             stopSearch('Service unavailable', 'error');
@@ -852,6 +853,25 @@
                         stopSearch('Finished search', 'info');
                     }
                 });
+            };
+
+            $scope.removeVideoFromList = function(video){
+              for(var i = 0; i < $scope.searchResults.length; i++){
+                if($scope.searchResults[i].videoId === video.videoId){
+                  $scope.removedVideos.push($scope.searchResults.splice(i,1)[0]);
+                  $scope.filter();
+                  return;
+                }
+              }
+            };
+
+            $scope.restoreRemovedItems = function(){
+              for(var i = 0; i < $scope.removedVideos.length; i++){
+                $scope.searchResults.push($scope.removedVideos[i]);
+              }
+              $scope.removedVideos = [];
+              $scope.sort();
+              $scope.filter();
             };
 
             /**
