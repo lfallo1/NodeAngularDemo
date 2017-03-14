@@ -509,6 +509,8 @@ body{
     width: 30%;
     z-index: 1000;
     font-weight: bolder;
+    overflow: scroll !important;
+    max-height: 500px;
 }
 
 #quick-filter-title{
@@ -1203,4 +1205,20 @@ div.report-modal .modal-content {
 #quick-filter-container{
     background: #222;
     border-radius: 8px;
+}
+
+.remove-one-of-filter{
+    font-size: 14px;
+    float: right;
+    margin-top: 10px;
+}
+
+.remove-one-of-category{
+    margin-bottom: -30px;
+    color: #a94442;
+    font-size: 18px;
+}
+
+.remove-one-of-category:hover{
+    opacity: 0.7;
 }

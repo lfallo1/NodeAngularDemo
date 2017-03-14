@@ -40,7 +40,15 @@
           <div id="quick-filter-input-container">
 
             <div class="quick-filter-mode-container" ng-repeat="filter in quickFilterObjects track by $index">
-              <div class="quick-filter-mode-label">{{filter.quickfilterType}} <button class="btn btn-sm btn-success" ng-click="addFilterTerm(filter)"><span class="glyphicon glyphicon-plus"></span>Add row</button></div>
+              <div class="remove-one-of-category" ng-show="filter.type===quickFilterType.ONE_OF && hasMultipleOneOfFilters()" ng-click="removeCategory(filter)">
+                <span class="glyphicon glyphicon-minus-sign"></span>
+              </div>
+              <div class="quick-filter-mode-label">{{filter.quickfilterType}}
+                <button class="btn btn-sm btn-success" ng-click="addFilterTerm(filter)">
+                  <span class="glyphicon glyphicon-plus"></span>Add row
+                </button>
+                <button ng-show="filter.type===quickFilterType.ONE_OF" class="btn btn-default btn-sm" ng-click="addQuickFilterCategory()">Add category</button>
+              </div>
               <div class="quick-filter-item" ng-repeat="termObject in filter.terms">
                 <input ng-model="termObject.term" type="text" />
                 <div class="remove-quick-filter-item" ng-click="removeFilterTerm(filter.terms, $index)"><span class="glyphicon glyphicon-minus-sign"></span></div>

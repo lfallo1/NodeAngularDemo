@@ -199,7 +199,6 @@
             $scope.MOST_VIEWED_SEARCH = 4;
             $scope.WATCHLIST_MODAL_CTRL = 'WatchlistModalCtrl';
             $scope.BULK_PLAYLIST_MODAL_CTRL = 'BulkPlaylistModalCtrl';
-            $scope.quickFilterType = "0";
             $scope.quickFilterTerms = [];
             var ALL_CATEGORIES = {'id' : '-1', 'snippet' : {'title' : 'Search All Categories'}};
             var relatedPending = false;
@@ -279,15 +278,21 @@
                 this.displayName = displayName;
             };
 
+            $scope.quickFilterType = {
+              MUST_HAVE : 1,
+              ONE_OF : 2,
+              EXCLUDE : 3
+            };
+
             /**
              * setup view
              */
             var init = function(){
 
                 $scope.quickFilterObjects = [
-                  {id:1, quickfilterType:'Must have', terms : [{id:1,term:""}]},
-                  {id:2, quickfilterType:'Atleast One', terms : [{id:1,term:""}]},
-                  {id:3, quickfilterType:'Exclude', terms : [{id:1,term:""}]}
+                  {id:1, type:$scope.quickFilterType.MUST_HAVE, quickfilterType:'Must have', terms : [{id:1,term:""}]},
+                  {id:2, type:$scope.quickFilterType.ONE_OF, quickfilterType:'Atleast One', terms : [{id:1,term:""}]},
+                  {id:3, type:$scope.quickFilterType.EXCLUDE, quickfilterType:'Exclude', terms : [{id:1,term:""}]}
                 ];
 
                 $scope.autoplay = true;
@@ -295,10 +300,6 @@
                 resetPagination();
 
                 $scope.datepicker = {};
-
-                //reset quick filter
-                $scope.quickFilterType = "0";
-                $scope.quickFilterTerms = [];
 
                 $scope.selectedIntervalType = $scope.dateIntervalTypes.BIENNIAL;
                 $scope.intervalSearch = false;
@@ -1183,6 +1184,32 @@
 
             //------------ start quick filter -----------------
 
+            $scope.addQuickFilterCategory = function(){
+              var nextId = $scope.quickFilterObjects.sort(function(a,b){
+                return a.id < b.id ? 1 : a.id > b.id ? -1 : 0;
+              })[0].id + 1;
+              $scope.quickFilterObjects.push({id:nextId, type:$scope.quickFilterType.ONE_OF, quickfilterType:'Atleast one', terms : [{id:1,term:""}]});
+              $scope.quickFilterObjects = $scope.quickFilterObjects.sort(function(a,b){
+                return a.type > b.type ? 1 : a.type < b.type ? -1 : 0;
+              })
+            };
+
+            $scope.removeCategory = function(filter){
+              if($scope.hasMultipleOneOfFilters()){
+                for(var i = 0; i < $scope.quickFilterObjects.length; i++){
+                  if($scope.quickFilterObjects[i].id === filter.id && $scope.quickFilterObjects[i].type===$scope.quickFilterType.ONE_OF){
+                      $scope.quickFilterObjects.splice(i,1);
+                  }
+                }
+              }
+            };
+
+            $scope.hasMultipleOneOfFilters = function(){
+              return $scope.quickFilterObjects.filter(function(d){
+                return d.type === $scope.quickFilterType.ONE_OF;
+              }).length > 1;
+            };
+
             var hasQuickFilter = function(){
               for(var i =0; i < $scope.quickFilterObjects.length; i++){
                 for(var j = 0; j < $scope.quickFilterObjects[i].terms.length; j++){
@@ -1222,34 +1249,59 @@
                   var videoTitle = video.title.toLowerCase();
                   var channelTitle = video.channelTitle.toLowerCase();
 
+                  var mustHave = $scope.quickFilterObjects.filter(function(d){
+                    return d.type === $scope.quickFilterType.MUST_HAVE;
+                  })[0];
+
+                  var exclude = $scope.quickFilterObjects.filter(function(d){
+                    return d.type === $scope.quickFilterType.EXCLUDE;
+                  })[0];
+
+                  var oneOf = $scope.quickFilterObjects.filter(function(d){
+                    return d.type === $scope.quickFilterType.ONE_OF;
+                  });
+
                   //must have
-                  if($scope.quickFilterObjects[0].terms.filter(function(d){return d.term;}).length > 0){
-                    for(var i = 0; i < $scope.quickFilterObjects[0].terms.length; i++){
-                      if(!isTextInVideo(videoTitle, channelTitle, $scope.quickFilterObjects[0].terms[i].term)){
+                  if(mustHave.terms.filter(function(d){return d.term;}).length > 0){
+                    for(var i = 0; i < mustHave.terms.length; i++){
+                      if(!isTextInVideo(videoTitle, channelTitle, mustHave.terms[i].term)){
                         return false;
                       }
                     }
                   }
 
                   //cannot have
-                  if($scope.quickFilterObjects[2].terms.filter(function(d){return d.term;}).length > 0){
-                    for(var i = 0; i < $scope.quickFilterObjects[2].terms.length; i++){
-                      if(isTextInVideo(videoTitle, channelTitle, $scope.quickFilterObjects[2].terms[i].term)){
+                  if(exclude.terms.filter(function(d){return d.term;}).length > 0){
+                    for(var i = 0; i < exclude.terms.length; i++){
+                      if(isTextInVideo(videoTitle, channelTitle, exclude.terms[i].term)){
                         return false;
                       }
                     }
                   }
 
                   //atleast one
-                  if($scope.quickFilterObjects[1].terms.filter(function(d){return d.term;}).length > 0){
-                    for(var i = 0; i < $scope.quickFilterObjects[1].terms.length; i++){
-                      if(isTextInVideo(videoTitle, channelTitle, $scope.quickFilterObjects[1].terms[i].term)){
-                        return true;
+                  var count = 0;
+                  for(var i = 0; i < oneOf.length; i++){
+                    count += oneOf[i].terms.filter(function(d){return d.term;}).length;
+                  }
+                  if(count > 0){
+                    for(var i = 0; i < oneOf.length; i++){
+                      if(oneOf[i].terms.filter(function(d){return d.term;}).length > 0){
+                        var found = false;
+                        for(var j = 0; j < oneOf[i].terms.length; j++){
+                          if(isTextInVideo(videoTitle, channelTitle, oneOf[i].terms[j].term)){
+                            found = true;
+                          }
+                        }
+                        if(!found){
+                          return false;
+                        }
                       }
                     }
+                    return true;
+                  } else{
+                    return true;
                   }
-
-                  return $scope.quickFilterObjects[1].terms.filter(function(d){return d.term;}).length === 0;
                 }
             };
 
@@ -1399,8 +1451,6 @@
               $scope.minRating = json.minRating;
               $scope.shorterThanFilter = json.shorterThanFilter;
               $scope.longerThanFilter = json.longerThanFilter;
-              // $scope.quickFilterTerms = json.quickFilterTerms;
-              // $scope.quickFilterType = json.quickFilterType;
               $scope.searchParam = json.searchParam;
               $scope.searchMode = json.searchMode || $scope.TEXT_SEARCH;
               $scope.hashedResults = json.hashedResults;
