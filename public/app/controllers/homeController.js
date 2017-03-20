@@ -272,6 +272,10 @@
                 this.displayName = displayName;
             };
 
+            var SortModeTypes = {
+              RANDOM : 'Random'
+            };
+
             $scope.quickFilterType = {
               MUST_HAVE : 1,
               ONE_OF : 2,
@@ -338,7 +342,8 @@
                     new SortOption(4, 'pctLikes', -1, 'star', 'Rating'),
                     new SortOption(5, 'created', 1, 'calendar', 'Date Asc'),
                     new SortOption(6, 'created', -1, 'calendar', 'Date Desc'),
-                    new SortOption(7, 'durationMinutes', -1, 'time', 'Length')
+                    new SortOption(7, 'durationMinutes', -1, 'time', 'Length'),
+                    new SortOption(8, 'index', 1, 'random', SortModeTypes.RANDOM)
                 ];
                 // $scope.sortField = $scope.sortOptions[0];
 
@@ -383,7 +388,16 @@
                 // $location.path('/', true).search({q:null, m:null});
             };
 
+            var resetRandomIndexes = function(){
+              for(var i = 0; i < $scope.searchResults.length; i++){
+                $scope.searchResults[i].index = Math.ceil(Math.random()*1000000);
+              }
+            };
+
             $scope.sortOptionChanged = function(option){
+                if(option.displayName === SortModeTypes.RANDOM){
+                  resetRandomIndexes();
+                }
                 $scope.sortField.id = option.id;
                 $scope.sort();
             };
@@ -924,7 +938,8 @@
                             "dislikes": Number(dislikes) || 0,
                             "thumbnail": datastats.snippet.thumbnails.medium,
                             "duration": duration.formatted || null,
-                            "durationMinutes": duration.approxMinutes || null
+                            "durationMinutes": duration.approxMinutes || null,
+                            "index" : Math.ceil(Math.random()*1000000)
                         };
 
                         //add object to search results
@@ -1277,6 +1292,7 @@
             };
 
             $scope.sort = function(){
+
                 //backwards compatible
                 var sortObject = $scope.sortOptions[0];
                 if(isNaN($scope.sortField.id)){
@@ -1288,6 +1304,7 @@
                   sortObject = $scope.sortOptions[0];
                   $scope.sortField = {id : 1};
                 }
+
                 $scope.searchResults = $scope.searchResults.sort(function(a,b){
                     if(a[sortObject.value] > b[sortObject.value]){
                         return sortObject.direction;
@@ -1296,6 +1313,7 @@
                     }
                     return 0;
                 });
+
                 $scope.filter();
             };
 
