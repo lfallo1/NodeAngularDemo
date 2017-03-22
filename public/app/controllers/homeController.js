@@ -1587,7 +1587,7 @@
                 //get the file, and validate
                 var file = files[0];
 
-                if(file.size > 26214400 || file.type !== 'application/json'){
+                if(file.size > 26214400){
                   //max file size 25mb and must be json
                   toaster.pop('error','','Please upload a json file less than 15mb')
                   return;
