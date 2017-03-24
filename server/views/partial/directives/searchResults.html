@@ -1,5 +1,11 @@
 <!-- SEARCH RESULTS -->
 <div id="results" class="col-md-7 text-center" ng-show="searchResults.length > 0">
+
+    <!-- List the suggested tags -->
+    <div ng-show="!fetching && searchResults.length > 0 && tagsArray.length > 0" id="suggested-tags">
+        <span class="badge" ng-repeat="tagItem in tagsArray track by $index">{{tagItem.tag}}</span>
+    </div>
+
     <ul class="pagination">
         <li ng-click="previousPage()">
             <a href="" aria-label="Previous">

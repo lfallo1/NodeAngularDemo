@@ -64,6 +64,12 @@
                 'BIANNUAL' : 0.5
             };
 
+            var RelatedThreshold = {
+              WEAK : 5,
+              MEDIUM : 10,
+              STRICT: 15
+            }
+
             var millisConstants = {
               YEAR : 1000*60*60*24*365,
               WEEK : 1000*60*60*24*7,
@@ -287,6 +293,9 @@
              */
             var init = function(){
 
+                $scope.tags = {};
+                $scope.tagsArray = [];
+
                 $scope.quickFilterObjects = [
                   {id:1, type:$scope.quickFilterType.MUST_HAVE, quickfilterType:'Must have', terms : [{id:1,term:""}]},
                   {id:2, type:$scope.quickFilterType.ONE_OF, quickfilterType:'Atleast One', terms : [{id:1,term:""}]},
@@ -376,6 +385,8 @@
             }
 
             $scope.reset = function(){
+                $scope.tags = {};
+                $scope.tagsArray = [];
                 $scope.searchResults = [];
                 $scope.filteredResults = [];
                 $scope.hashedResults = {};
@@ -479,6 +490,9 @@
             };
 
             var resetAll = function(){
+
+              $scope.tags = {};
+              $scope.tagsArray = [];
 
               $scope.removedVideos = [];
               mostViewedSearchInterval = 0;
@@ -680,8 +694,11 @@
                             data = data.concat(res[i].data.items);
                         }
 
+                        //update the related tags array and hash obj
+                        updateTags(data);
+
                         //populated related video id's (for now, only populating during first pass)
-                        if(relatedPending && $scope.nextRelated.length === 0){
+                        if($scope.extendedSearch && relatedPending && $scope.nextRelated.length < 500){
                             getRelatedVideos(data);
                         }
 
@@ -702,6 +719,37 @@
 
                 return deferred.promise;
             };
+
+            //update the tags hash with new count of tags
+            var updateTags = function(data){
+              $scope.tagsArray = [];
+              for(var i = 0; i < data.length; i++){
+                var video = data[i];
+                if(video.snippet.tags && video.snippet.tags.length){
+                  for(var j = 0; j < video.snippet.tags.length; j++){
+                    var currentValue = $scope.tags[video.snippet.tags[j]];
+                    $scope.tags[video.snippet.tags[j]] = currentValue ? currentValue + 1 : 1;
+                  }
+                }
+              }
+
+              //get top 30 tags
+              Object.keys($scope.tags).forEach(function(v){
+                if($scope.tagsArray.length < 30){
+                  $scope.tagsArray.push({'tag' : v, 'count' : $scope.tags[v]});
+                  shouldSort = true;
+                }
+                else if($scope.tagsArray[29].count < $scope.tags[v]){
+                  $scope.tagsArray[29] = {'tag' : v, 'count' : $scope.tags[v]};
+                  shouldSort = true;
+                }
+                if(shouldSort){
+                  $scope.tagsArray = $scope.tagsArray.sort(function(a,b){
+                    return a.count < b.count ? 1 : a.count > b.count ? -1 : 0;
+                  });
+                }
+              });
+            }
 
             /**
              * upddate categories.
@@ -963,7 +1011,8 @@
              */
             var getRelatedVideos = function(data){
                 //split search term(s) into array
-                var parts = $scope.searchParam.toLowerCase().split(' ' );
+                // var parts = $scope.searchParam.toLowerCase().split(' ' );
+                var parts = $scope.tagsArray;
 
                 //loop over each returned video
                 for(var count = data.length - 1; count >= 0; count--){
@@ -972,34 +1021,36 @@
                     if(data[count].snippet.tags){
 
                         //get the tags
-                        var terms = data[count].snippet.tags.toString().toLowerCase();
+                        var terms = data[count].snippet.tags;
 
                         var isRelevant = true;
+
+                        var totalMatches = 0;
 
                         //check if tags match what we searched for
                         for(var i = 0; i < parts.length; i++){
 
                             //if for any term in our search, it does NOT exist in the videos's tags, then we consider it not a relevant match
-                            if(terms.toLowerCase().indexOf(parts[i]) < 0){
-                                isRelevant = false;
-                                break;
+                            for(var j = 0; j < terms.length; j++){
+                              if(terms[j].toLowerCase() === parts[i].tag.toLowerCase()){
+                                  totalMatches++;
+                              }
                             }
                         }
 
-                        if(!isRelevant){
-                            terms = data[count].snippet.title.toString().toLowerCase();
-                            for(var i = 0; i < parts.length; i++){
-
-                                //if for any term in our search, it does NOT exist in the videos's tags, then we consider it not a relevant match
-                                if(terms.toLowerCase().indexOf(parts[i]) < 0){
-                                    isRelevant = false;
-                                    break;
-                                }
-                            }
-                        }
+                        // if(!isRelevant){
+                        //     terms = data[count].snippet.title.toString().toLowerCase();
+                        //     for(var i = 0; i < parts.length; i++){
+                        //
+                        //         //if for any term in our search, it does NOT exist in the videos's tags, then we consider it not a relevant match
+                        //         if(terms.toLowerCase().indexOf(parts[i].toLowerCase()) > -1){
+                        //             count++
+                        //         }
+                        //     }
+                        // }
 
                         //if relevant (terms are similar), then add to related list
-                        if(isRelevant){
+                        if(totalMatches > RelatedThreshold.WEAK){
                             $scope.nextRelated.push(data[count].id);
                         }
                     }
