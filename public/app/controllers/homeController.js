@@ -924,7 +924,9 @@
                             "dislikes": Number(dislikes) || 0,
                             "thumbnail": datastats.snippet.thumbnails.medium,
                             "duration": duration.formatted || null,
-                            "durationMinutes": duration.approxMinutes || null
+                            "durationMinutes": duration.approxMinutes || null,
+                            "description" : datastats.snippet.description,
+                            "tags" : datastats.snippet.tags
                         };
 
                         //add object to search results
@@ -1210,6 +1212,8 @@
                   //get video & channel title
                   var videoTitle = video.title.toLowerCase();
                   var channelTitle = video.channelTitle.toLowerCase();
+                  var videoDescription = video.description ? video.description.toLowerCase() : "";
+                  var tags = (video.tags && video.tags.length > 0) ? video.tags.toString().toLowerCase().replace(/,/g,' ') : "";
 
                   var mustHave = getQuickFilterByType($scope.quickFilterType.MUST_HAVE)[0];
                   var exclude = getQuickFilterByType($scope.quickFilterType.EXCLUDE)[0];
@@ -1218,7 +1222,7 @@
                   //must have
                   if(hasQuickFilterTerm(mustHave)){
                     for(var i = 0; i < mustHave.terms.length; i++){
-                      if(!isTextInVideo(videoTitle, channelTitle, mustHave.terms[i].term)){
+                      if(!isTextInVideo(videoTitle, channelTitle, videoDescription, tags, mustHave.terms[i].term)){
                         return false;
                       }
                     }
@@ -1227,7 +1231,7 @@
                   //cannot have
                   if(hasQuickFilterTerm(exclude)){
                     for(var i = 0; i < exclude.terms.length; i++){
-                      if(isTextInVideo(videoTitle, channelTitle, exclude.terms[i].term)){
+                      if(isTextInVideo(videoTitle, channelTitle, videoDescription, tags, exclude.terms[i].term)){
                         return false;
                       }
                     }
@@ -1238,7 +1242,7 @@
                     if(hasQuickFilterTerm(oneOf[i])){
                       var found = false;
                       for(var j = 0; j < oneOf[i].terms.length; j++){
-                        if(isTextInVideo(videoTitle, channelTitle, oneOf[i].terms[j].term)){
+                        if(isTextInVideo(videoTitle, channelTitle, videoDescription, tags, oneOf[i].terms[j].term)){
                           found = true;
                           break;
                         }
@@ -1253,8 +1257,11 @@
             };
 
             //given a video / channel title, determine if it contains the corresponding searchText
-            var isTextInVideo = function(videoTitle, videoChannelTitle, searchText){
-              return (videoTitle.toLowerCase().indexOf(searchText.toLowerCase().trim()) > -1) || (videoChannelTitle.toLowerCase().indexOf(searchText.toLowerCase().trim()) > -1);
+            var isTextInVideo = function(videoTitle, videoChannelTitle, videoDescription, tags, searchText){
+              return (videoTitle.toLowerCase().indexOf(searchText.toLowerCase().trim()) > -1) ||
+              (videoChannelTitle.toLowerCase().indexOf(searchText.toLowerCase().trim()) > -1) ||
+              (videoDescription.toLowerCase().indexOf(searchText.toLowerCase().trim()) > -1) ||
+              (tags && tags.toLowerCase().indexOf(searchText.toLowerCase().trim()) > -1);
             };
 
             //------------ end quick filter -------------------
