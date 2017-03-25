@@ -3,8 +3,8 @@
  */
 (function(){
     angular.module('youtubeSearchApp').controller('HomeCtrl', [
-        '$rootScope', '$scope', '$http', '$q', '$routeParams', '$log', '$timeout', '$location', 'TimeService', 'toaster', '$window', '$uibModal', 'AuthService', 'PlaylistService', '$sce', 'CountriesService', '$anchorScroll', '$cookies', 'DirectionsService',
-        function($rootScope, $scope, $http, $q, $routeParams, $log, $timeout, $location, TimeService, toaster, $window, $uibModal, AuthService, PlaylistService, $sce, CountriesService, $anchorScroll, $cookies, DirectionsService){
+        '$rootScope', '$scope', '$http', '$q', '$routeParams', '$log', '$timeout', '$location', 'TimeService', 'toaster', '$window', '$uibModal', 'AuthService', 'PlaylistService', '$sce', 'CountriesService', '$anchorScroll', '$cookies', 'DirectionsService', 'FileSaver', 'Blob',
+        function($rootScope, $scope, $http, $q, $routeParams, $log, $timeout, $location, TimeService, toaster, $window, $uibModal, AuthService, PlaylistService, $sce, CountriesService, $anchorScroll, $cookies, DirectionsService, FileSaver, Blob){
 
             $scope.userPlaylist = {};
 
@@ -65,10 +65,10 @@
             };
 
             var RelatedThreshold = {
-              WEAK : 5,
-              MEDIUM : 10,
-              STRICT: 15
-            }
+              WEAK : 25,
+              MEDIUM : 40,
+              STRICT: 65
+            };
 
             var millisConstants = {
               YEAR : 1000*60*60*24*365,
@@ -496,7 +496,8 @@
 
               $scope.removedVideos = [];
               mostViewedSearchInterval = 0;
-              $scope.saveUrl = undefined;
+              $scope.blob = undefined;
+              $scope.saveName = '';
 
               $scope.alerts = [];
 
@@ -694,17 +695,16 @@
                             data = data.concat(res[i].data.items);
                         }
 
-                        //update the related tags array and hash obj
-                        updateTags(data);
-
-                        //populated related video id's (for now, only populating during first pass)
-                        if($scope.extendedSearch && relatedPending && $scope.nextRelated.length < 500){
-                            getRelatedVideos(data);
-                        }
-
                         addVideosToList(data);
 
                         $scope.sort();
+
+                        //update the related tags array and hash obj
+                        updateTags();
+                        //populated related video id's (for now, only populating during first pass)
+                        if($scope.extendedSearch && relatedPending){
+                            getRelatedVideos(data);
+                        }
 
                         fetchResults(dateSmall, dateLarge, deferred);
                     }, function (err) {
@@ -721,34 +721,42 @@
             };
 
             //update the tags hash with new count of tags
-            var updateTags = function(data){
+            var updateTags = function(){
               $scope.tagsArray = [];
-              for(var i = 0; i < data.length; i++){
-                var video = data[i];
-                if(video.snippet.tags && video.snippet.tags.length){
-                  for(var j = 0; j < video.snippet.tags.length; j++){
-                    var currentValue = $scope.tags[video.snippet.tags[j]];
-                    $scope.tags[video.snippet.tags[j]] = currentValue ? currentValue + 1 : 1;
+              $scope.tags = {};
+
+              //first generate the tags object. each object contains the name of the tag, and the number of videos in which is occured
+              for(var i = 0; i < $scope.filteredResults.length; i++){
+                var video = $scope.filteredResults[i];
+                if(video.tags && video.tags.length){
+                  for(var j = 0; j < video.tags.length; j++){
+                    var currentValue = $scope.tags[video.tags[j].toLowerCase()];
+                    $scope.tags[video.tags[j].toLowerCase()] = currentValue ? currentValue + 1 : 1;
                   }
                 }
               }
 
-              //get top 30 tags
+              //get top 30 tags (tags which appear in the most videos), and save into an array.
+              //array is ordered by most frequent tags
               Object.keys($scope.tags).forEach(function(v){
+
+                //if the tags array is less than 30, then always add it
                 if($scope.tagsArray.length < 30){
                   $scope.tagsArray.push({'tag' : v, 'count' : $scope.tags[v]});
-                  shouldSort = true;
-                }
-                else if($scope.tagsArray[29].count < $scope.tags[v]){
-                  $scope.tagsArray[29] = {'tag' : v, 'count' : $scope.tags[v]};
-                  shouldSort = true;
-                }
-                if(shouldSort){
                   $scope.tagsArray = $scope.tagsArray.sort(function(a,b){
                     return a.count < b.count ? 1 : a.count > b.count ? -1 : 0;
                   });
                 }
+                //if not less than thirty, then see if the tag has a higher count than the most infrequent tag
+                else if($scope.tagsArray[29].count < $scope.tags[v]){
+                  $scope.tagsArray[29] = {'tag' : v, 'count' : $scope.tags[v]};
+                  $scope.tagsArray = $scope.tagsArray.sort(function(a,b){
+                    return a.count < b.count ? 1 : a.count > b.count ? -1 : 0;
+                  });
+                }
+
               });
+              console.log($scope.tagsArray);
             }
 
             /**
@@ -780,7 +788,8 @@
                 resetSortOrders();
                 $scope.searchResults = [];
                 $scope.wasInterrupted = undefined;
-                $scope.saveUrl = undefined;
+                $scope.blob = undefined;
+                $scope.saveName = '';
                 $scope.fetching = true;
                 if($scope.selectedCategory && $scope.selectedCategory.id && $scope.selectedCategory.id > 0){
                     $scope.fetchPopularByCountryAndCategory($scope.selectedCountry['alpha-2'], $scope.selectedCategory.id);
@@ -1014,6 +1023,20 @@
                 // var parts = $scope.searchParam.toLowerCase().split(' ' );
                 var parts = $scope.tagsArray;
 
+                //the count of tags (this is not just the count of tag objects, but the sum of the count value of each tag)
+                var totalTagCount = $scope.tagsArray
+                  .map(function(a){
+                    return a.count;
+                  })
+                  .reduce(function(a,b){
+                    return a + b;
+                  });
+
+                //if no tags, just return
+                if(!totalTagCount){
+                  return;
+                }
+
                 //loop over each returned video
                 for(var count = data.length - 1; count >= 0; count--){
 
@@ -1027,31 +1050,36 @@
 
                         var totalMatches = 0;
 
-                        //check if tags match what we searched for
+                        //loop over each tag in the saved tagsArray object
                         for(var i = 0; i < parts.length; i++){
 
-                            //if for any term in our search, it does NOT exist in the videos's tags, then we consider it not a relevant match
+                            //loop over each tag for the current video
                             for(var j = 0; j < terms.length; j++){
                               if(terms[j].toLowerCase() === parts[i].tag.toLowerCase()){
-                                  totalMatches++;
+                                  totalMatches += parts[i].count;
                               }
                             }
                         }
 
-                        // if(!isRelevant){
-                        //     terms = data[count].snippet.title.toString().toLowerCase();
-                        //     for(var i = 0; i < parts.length; i++){
-                        //
-                        //         //if for any term in our search, it does NOT exist in the videos's tags, then we consider it not a relevant match
-                        //         if(terms.toLowerCase().indexOf(parts[i].toLowerCase()) > -1){
-                        //             count++
-                        //         }
-                        //     }
-                        // }
+                        //get the match percentage value.
+                        //this is a weighted average, based on the video's tag matches, and how the tag ranks in terms of overall popularity.
+                        var matchPercentage = (totalMatches / totalTagCount) * 100;
 
-                        //if relevant (terms are similar), then add to related list
-                        if(totalMatches > RelatedThreshold.WEAK){
-                            $scope.nextRelated.push(data[count].id);
+                        //if less than 100 are in the nextRelated list, then only check that the matchPercentage is greater than the min threshold
+                        if($scope.nextRelated.length < 100){
+                          //if meets minimum requirement needed to be considered a related video
+                          if(matchPercentage >= RelatedThreshold.WEAK){
+                            $scope.nextRelated.push({id:data[count].id, matchPercentage:matchPercentage});
+                            $scope.nextRelated = $scope.nextRelated.sort(function(a,b){
+                              return a.matchPercentage < b.matchPercentage ? 1 : a.matchPercentage > b.matchPercentage ? -1 : 0;
+                            });
+                          }
+                        //otherwise, compare its match percentage to that of the lowest match percentage in the list
+                        } else if(matchPercentage > $scope.nextRelated[99].matchPercentage){
+                          $scope.nextRelated[99] = {id:data[count].id, matchPercentage:matchPercentage};
+                          $scope.nextRelated = $scope.nextRelated.sort(function(a,b){
+                            return a.matchPercentage < b.matchPercentage ? 1 : a.matchPercentage > b.matchPercentage ? -1 : 0;
+                          });
                         }
                     }
                 }
@@ -1153,7 +1181,8 @@
                 }
                 resetSortOrders();
                 relatedPending = false;
-                $scope.related = $scope.nextRelated[0];
+                $scope.searchParam = $scope.tagsArray.slice(0,6).map(function(d){return d.tag;}).toString().replace(/,/g,' ').trim();
+                $scope.related = $scope.nextRelated[0].id;
                 $scope.nextRelated.splice(0,1);
                 $scope.checkRelated = true;
                 fetchResultsWrapper(false);
@@ -1439,7 +1468,8 @@
                 'searchParam': $scope.searchParam,
                 'searchMode' : $scope.searchMode,
                 'hashedResults' : $scope.hashedResults,
-                'quickFilterObjects' : $scope.quickFilterObjects
+                'quickFilterObjects' : $scope.quickFilterObjects,
+                'tagsArray' : $scope.tagsArray
               }
             };
 
@@ -1628,9 +1658,12 @@
             $scope.setSaveUrl = function(){
               var data = createJsonObjectForFile();
               var json = JSON.stringify(data);
-              var blob = new Blob([json], {type: "application/json"});
-              $scope.saveUrl  = URL.createObjectURL(blob);
+              $scope.blob = new Blob([json], {type: "application/json"});
               $scope.saveName = $scope.searchParam.replace(" ","_") + new Date().getTime().toString() + ".json";
+            };
+
+            $scope.saveJson = function(){
+              FileSaver.saveAs($scope.blob, $scope.saveName);
             };
 
             $scope.uploadFile = function(files) {
@@ -1656,6 +1689,14 @@
                   $http.get(res).then(function(json){
                     setupJsonObjectsFromFile(json.data);
                     $scope.sort();
+
+                    //check tags after sorting / filtering
+                    if(json.data.tagsArray){
+                      $scope.tagsArray = json.data.tagsArray
+                    } else{
+                      updateTags();
+                    }
+
                   }, function(err){
                     toaster.pop('error', '', 'Unable to read file');
                     console.log(err);
