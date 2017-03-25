@@ -1252,7 +1252,7 @@ div.report-modal .modal-content {
     margin-top: 3px;
     padding: 4px;
     border-radius: 5px;
-    font-size: 30px;
+    font-size: 26px;
     color: white;
     font-weight: bolder;
     text-align: center;
@@ -1270,7 +1270,7 @@ div.report-modal .modal-content {
 #select-terms-modal-head{
     font-weight: bold;
     text-align: center;
-    font-size: 34px;
+    font-size: 24px;
     color: #337ab7;
 }
 
@@ -1284,6 +1284,10 @@ div.report-modal .modal-content {
 .select-terms-footer .btn-link{
     color: white !important;
     font-weight: bold;
+}
+
+.select-terms-footer .btn-link:hover{
+  text-decoration: none;
 }
 
 .select-terms-footer:hover{
