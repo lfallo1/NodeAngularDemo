@@ -1192,11 +1192,13 @@
             };
 
             var setNewSearchParams = function(){
+
+              //save into new array to avoid modifying initial array
               var selectableTags = []
               for(var i = 0; i < $scope.tagsArray.length; i++){
                 selectableTags.push({tag:$scope.tagsArray[i].tag});
               }
-              selectableTags.unshift({tag:$scope.searchParam});
+              selectableTags.unshift({tag:$scope.searchParam}); //add original search as first element
               var deferred = $q.defer();
               //if hitting the extended search for the first time, prompt user to select search terms
               if(relatedPending){
