@@ -1192,6 +1192,11 @@
             };
 
             var setNewSearchParams = function(){
+              var selectableTags = []
+              for(var i = 0; i < $scope.tagsArray.length; i++){
+                selectableTags.push({tag:$scope.tagsArray[i].tag});
+              }
+              selectableTags.unshift({tag:$scope.searchParam});
               var deferred = $q.defer();
               //if hitting the extended search for the first time, prompt user to select search terms
               if(relatedPending){
@@ -1204,20 +1209,17 @@
                     resolve: {
                         content: function () {
                             return {
-                                'tagsArray' : $scope.tagsArray
+                                'tagsArray' : selectableTags
                             }
                         }
                     }
                 }).result.then(function (terms) {
-                    if(!terms || terms.length === 0){
-                      $scope.searchParam = $scope.tagsArray.slice(0,6).map(function(d){return d.tag;}).toString().replace(/,/g,' ').trim();
-                    } else{
+                    if(terms && terms.length > 0){
                       $scope.searchParam = terms;
                     }
                     deferred.resolve();
                 }, function () {
                   $scope.enableChannelFilter = $scope.channelFilter && $scope.channelFilter.length > 0;
-                    $scope.searchParam = $scope.tagsArray.slice(0,6).map(function(d){return d.tag;}).toString().replace(/,/g,' ').trim();
                     deferred.resolve();
                 });
               } else{
