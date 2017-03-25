@@ -1194,7 +1194,7 @@
             var setNewSearchParams = function(){
 
               //save into new array to avoid modifying initial array
-              var selectableTags = []
+              var selectableTags = [];
               for(var i = 0; i < $scope.tagsArray.length; i++){
                 selectableTags.push({tag:$scope.tagsArray[i].tag});
               }
