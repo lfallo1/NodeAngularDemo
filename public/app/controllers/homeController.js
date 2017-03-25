@@ -1179,14 +1179,52 @@
                     stopSearch('Finished search', 'info');
                     return;
                 }
-                resetSortOrders();
-                relatedPending = false;
-                $scope.searchParam = $scope.tagsArray.slice(0,6).map(function(d){return d.tag;}).toString().replace(/,/g,' ').trim();
-                $scope.related = $scope.nextRelated[0].id;
-                $scope.nextRelated.splice(0,1);
-                $scope.checkRelated = true;
-                fetchResultsWrapper(false);
+
+                setNewSearchParams().then(function(){
+                  resetSortOrders();
+                  relatedPending = false;
+                  $scope.related = $scope.nextRelated[0].id;
+                  $scope.nextRelated.splice(0,1);
+                  $scope.checkRelated = true;
+                  fetchResultsWrapper(false);
+                })
+
             };
+
+            var setNewSearchParams = function(){
+              var deferred = $q.defer();
+              //if hitting the extended search for the first time, prompt user to select search terms
+              if(relatedPending){
+                $uibModal.open({
+                    templateUrl: 'partials/selectExtendedSearchTerms.html',
+                    controller: 'SelectExtendedSearchTermsCtrl',
+                    size: 'md',
+                    windowClass : 'select-terms-modal',
+                    backdrop: 'static',
+                    resolve: {
+                        content: function () {
+                            return {
+                                'tagsArray' : $scope.tagsArray
+                            }
+                        }
+                    }
+                }).result.then(function (terms) {
+                    if(!terms || terms.length === 0){
+                      $scope.searchParam = $scope.tagsArray.slice(0,6).map(function(d){return d.tag;}).toString().replace(/,/g,' ').trim();
+                    } else{
+                      $scope.searchParam = terms;
+                    }
+                    deferred.resolve();
+                }, function () {
+                  $scope.enableChannelFilter = $scope.channelFilter && $scope.channelFilter.length > 0;
+                    $scope.searchParam = $scope.tagsArray.slice(0,6).map(function(d){return d.tag;}).toString().replace(/,/g,' ').trim();
+                    deferred.resolve();
+                });
+              } else{
+                  deferred.resolve();
+              }
+              return deferred.promise;
+            }
 
             /**
              * ---------------------------------------------------

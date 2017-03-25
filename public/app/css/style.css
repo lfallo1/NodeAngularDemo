@@ -1246,3 +1246,47 @@ div.report-modal .modal-content {
   margin-left: 3px;
   background: #337ab7;
 }
+
+#select-terms-modal-body div{
+    background: black;
+    margin-top: 3px;
+    padding: 4px;
+    border-radius: 5px;
+    font-size: 30px;
+    color: white;
+    font-weight: bolder;
+    text-align: center;
+}
+
+#select-terms-modal-body div:hover{
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+#select-terms-modal-body div.tag-selected{
+    background: #337ab7 !important;
+}
+
+#select-terms-modal-head{
+    font-weight: bold;
+    text-align: center;
+    font-size: 34px;
+    color: #337ab7;
+}
+
+.select-terms-footer{
+    text-align: center;
+    font-size: 30px;
+    width: 100%;
+    background: #337ab7;
+}
+
+.select-terms-footer .btn-link{
+    color: white !important;
+    font-weight: bold;
+}
+
+.select-terms-footer:hover{
+    cursor: pointer;
+    opacity: 0.7;
+}

@@ -1,0 +1,11 @@
+<div id="select-terms-modal-head" class="modal-header">
+    <div>Select Extended Search Terms</div>
+</div>
+<div id="select-terms-modal-body" class="modal-body">
+    <div ng-class="{'tag-selected' : tagObject.selected}" ng-repeat="tagObject in tagsArray" ng-click="toggle(tagObject)">
+      {{tagObject.tag}}
+    </div>
+</div>
+<div class="modal-footer select-terms-footer">
+    <button class="btn-link" ng-click="save()">Save</button>
+</div>
