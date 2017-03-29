@@ -1032,7 +1032,7 @@
                 //sum the tags
                 var totalTagCount = (totalTagsCountMap && totalTagsCountMap.size > 0) ? totalTagsCountMap.reduce(function(a,b){
                     return a + b;
-                  }) || 0;
+                  }) : 0;
 
                 //if no tags, just return
                 if(!totalTagCount){
