@@ -1023,14 +1023,16 @@
                 // var parts = $scope.searchParam.toLowerCase().split(' ' );
                 var parts = $scope.tagsArray;
 
-                //the count of tags (this is not just the count of tag objects, but the sum of the count value of each tag)
-                var totalTagCount = $scope.tagsArray
+                //create an array with only the tags count
+                var totalTagsCountMap = $scope.tagsArray
                   .map(function(a){
                     return a.count;
-                  })
-                  .reduce(function(a,b){
-                    return a + b;
                   });
+
+                //sum the tags
+                var totalTagCount = (totalTagsCountMap && totalTagsCountMap.size > 0) ? totalTagsCountMap.reduce(function(a,b){
+                    return a + b;
+                  }) || 0;
 
                 //if no tags, just return
                 if(!totalTagCount){
