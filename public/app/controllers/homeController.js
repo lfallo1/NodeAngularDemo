@@ -1030,7 +1030,7 @@
                   });
 
                 //sum the tags
-                var totalTagCount = (totalTagsCountMap && totalTagsCountMap.size > 0) ? totalTagsCountMap.reduce(function(a,b){
+                var totalTagCount = (totalTagsCountMap && Object.keys(totalTagsCountMap).length > 0) ? totalTagsCountMap.reduce(function(a,b){
                     return a + b;
                   }) : 0;
 
