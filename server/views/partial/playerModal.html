@@ -1,6 +1,6 @@
 <div id="player-modal-head" class="modal-header">
     <div class="left">
-      <div>{{currentVideo.title}} <small>{{currentVideo.created | date:'MM-dd-yyyy'}}</small> - {{currentVideo.duration}} <small>({{getVideoPosition()}})</small></div>
+      <div title="{{(currentVideo.tags && currentVideo.tags.length > 0) ? currentVideo.tags.toString() : ''}}">{{currentVideo.title}} <small>{{currentVideo.created | date:'MM-dd-yyyy'}}</small> - {{currentVideo.duration}} <small>({{getVideoPosition()}})</small></div>
       <div class="rating">
           <span class="rating-value">{{currentVideo.pctLikes | number:2}}%</span>
           <span class="video-rating glyphicon glyphicon-thumbs-up text-success"></span> {{currentVideo.likes}}

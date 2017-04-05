@@ -34,7 +34,7 @@
         <tbody>
         <tr ng-repeat="video in displayList track by $index">
             <td id="{{video.videoId}}">
-                <div class="video-image-container" ng-click="playVideo(video, true, $index)">
+                <div class="video-image-container" ng-click="playVideo(video, true, $index)" title="{{(video.tags && video.tags.length > 0) ? video.tags.toString() : ''}}">
                     <!-- <div id="video-overlay-text"><span class="glyphicon glyphicon-play"></span></div> -->
                     <img ng-class="{'decrease-opacity' : watched}" src="{{video.thumbnail.url}}" width="250px" class="thumbnail" />
                     <div id="watched-video-overlay" ng-if="hasWatched(video.videoId)" class="text-danger">WATCHED ON YOUTUBE</div>
