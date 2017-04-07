@@ -961,20 +961,26 @@
                         var id = datastats.id;
 
                         //format the pct likes
-                        var pctLikes;
-                        if (datastats.statistics.likeCount) {
-                            pctLikes = (Number(datastats.statistics.likeCount) / (Number(datastats.statistics.likeCount) + Number(datastats.statistics.dislikeCount))) * 100
-                        }
-                        else if (datastats.statistics.dislikeCount) {
-                            pctLikes = 0;
-                        }
-                        else {
-                            pctLikes = undefined;
-                        }
+                        var viewCount = 0;
+                        var likes = 0;
+                        var dislikes = 0;
 
-                        var viewCount = datastats.statistics.viewCount;
-                        var likes = datastats.statistics.likeCount;
-                        var dislikes = datastats.statistics.dislikeCount;
+                        if(datastats.statistics){
+                          var pctLikes = 0;
+                          if (datastats.statistics.likeCount) {
+                              pctLikes = (Number(datastats.statistics.likeCount) / (Number(datastats.statistics.likeCount) + Number(datastats.statistics.dislikeCount))) * 100
+                          }
+                          else if (datastats.statistics.dislikeCount) {
+                              pctLikes = 0;
+                          }
+                          else {
+                              pctLikes = undefined;
+                          }
+
+                          viewCount = datastats.statistics.viewCount;
+                          likes = datastats.statistics.likeCount;
+                          dislikes = datastats.statistics.dislikeCount;
+                        }
 
                         //extract duration from ISO 8601 (PT#H#M#S)
                         var duration = {};
