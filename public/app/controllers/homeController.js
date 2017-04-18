@@ -620,7 +620,7 @@
                     videoDuration = $scope.videoDuration ? '&videoDuration=' + $scope.videoDuration : '';
                     safeSearch = $scope.safeSearch ? '&safeSearch=' + $scope.safeSearch : '';
 
-                    relevanceLanguage = ($scope.lang.toLanguage.code && $scope.shouldTranslate) ? '&relevanceLanguage=' + $scope.lang.toLanguage.code : '';
+                    relevanceLanguage = ($scope.lang.toLanguage.code && $scope.searchLanguage) ? '&relevanceLanguage=' + $scope.lang.toLanguage.code : '';
 
                     regionCode = $scope.selectedCountry ? '&regionCode=' + $scope.selectedCountry['alpha-2'] : '';
                     videoCategoryId = ($scope.selectedCategory && $scope.selectedCategory.id && $scope.selectedCategory.id > 0) ? '&videoCategoryId=' + $scope.selectedCategory.id : '';
@@ -880,7 +880,7 @@
 
                 token = token ? '&pageToken=' + token : '';
 
-                relevanceLanguage = ($scope.lang.toLanguage.code && $scope.shouldTranslate) ? '&relevanceLanguage=' + $scope.lang.toLanguage.code : '';
+                relevanceLanguage = ($scope.lang.toLanguage.code && $scope.searchLanguage) ? '&relevanceLanguage=' + $scope.lang.toLanguage.code : '';
 
                 var promises = [];
                 var payload = {url : popularByCountryBase + countryAlphaCode + token};
@@ -959,7 +959,7 @@
 
                 token = token ? '&pageToken=' + token : '';
                 category = category || '';
-                relevanceLanguage = ($scope.lang.toLanguage.code && $scope.shouldTranslate) ? '&relevanceLanguage=' + $scope.lang.toLanguage.code : '';
+                relevanceLanguage = ($scope.lang.toLanguage.code && $scope.searchLanguage) ? '&relevanceLanguage=' + $scope.lang.toLanguage.code : '';
 
                 var payload = {'url' : popularByCountryBase + countryAlphaCode + '&videoCategoryId=' + category + token};
                 $http.post('api/youtube/get', payload).then(function(res){
