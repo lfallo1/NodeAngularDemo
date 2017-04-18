@@ -87,8 +87,18 @@
       </div>
 
       <div class="translate-text">
-        <input type="text" ng-model="lang.fromLanguage" placeholder="from language" />
-        <input type="text" ng-model="lang.toLanguage" placeholder="to language"/>
+        <div class="language-dropdown">
+            <select id="categories-list-text-search" name="languages"
+                    ng-model="lang.fromLanguage"
+                    ng-options="lang as lang.displayName for lang in languages">
+            </select>
+        </div>
+        <div class="language-dropdown">
+            <select id="categories-list-text-search" name="languages"
+                    ng-model="lang.toLanguage"
+                    ng-options="lang as lang.displayName for lang in languages">
+            </select>
+        </div>
         <label for="translate">
           <input class="translate-checkbox" type="checkbox" ng-model="shouldTranslate" />
           Translate on keystroke

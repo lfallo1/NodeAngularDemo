@@ -13,6 +13,25 @@
               toLanguage: ''
             };
 
+            $scope.languages = [];
+            $scope.loadLanguages = function(){
+              var id = 0;
+              $http.get('https://translate.yandex.net/api/v1.5/tr.json/getLangs?ui=en&key=trnsl.1.1.20170418T030821Z.28ba4f71e181dba1.d3d8e55926a99a319cbb8ee04202463a1aa9f263').then(function(res){
+                for(key in res.data.langs){
+                  var item = {id: id++, code: key, displayName: res.data.langs[key]};
+                  $scope.languages.push(item);
+                  if(key === 'en'){
+                    $scope.lang.fromLanguage = item;
+                  } else if (key === 'es'){
+                    $scope.lang.toLanguage = item;
+                  }
+                }
+                $scope.languages.sort(function(a,b){
+                  return a.displayName > b.displayName ? 1 : a.displayName < b.displayName ? -1 : 0;
+                });
+              });
+            };
+
             var TRANSLATE_URL_BASE = 'https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20170418T030821Z.28ba4f71e181dba1.d3d8e55926a99a319cbb8ee04202463a1aa9f263&format=text&';
 
             $scope.translate = function(obj, isSearchParam, searchParam){
@@ -20,7 +39,7 @@
               var term = obj ? obj.term : searchParam;
               if($scope.shouldTranslate && $scope.lang.fromLanguage && $scope.lang.toLanguage && term){
 
-                var translateUrl = TRANSLATE_URL_BASE + '&lang=' + $scope.lang.fromLanguage + '-' + $scope.lang.toLanguage + '&text=' + term;
+                var translateUrl = TRANSLATE_URL_BASE + '&lang=' + $scope.lang.fromLanguage.code + '-' + $scope.lang.toLanguage.code + '&text=' + term;
                 $http.post(translateUrl).then(function(res){
                   if(isSearchParam){
                     $scope.searchParam = res.data.text[0];
@@ -373,6 +392,8 @@
                         $scope.selectedCategory = $scope.videoCategories && $scope.videoCategories.length > 0 ? $scope.videoCategories[$scope.videoCategories.length - 1] : ALL_CATEGORIES;
                     });
                 });
+
+                $scope.loadLanguages();
 
                 $scope.searchMode = $scope.TEXT_SEARCH;
                 $scope.totalResults = 0;

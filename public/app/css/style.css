@@ -1302,8 +1302,13 @@ div.report-modal .modal-content {
     text-align: center;
 }
 
-.translate-text input[type=text]{
+.translate-text select{
+    padding: 5px;
     font-size: 18px;
+}
+
+.language-dropdown{
+    display: inline;
 }
 
 .translate-text input[type=checkbox] {
