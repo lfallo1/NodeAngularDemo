@@ -96,16 +96,17 @@
         <div class="language-dropdown">
             <select id="categories-list-text-search" name="languages"
                     ng-model="lang.toLanguage"
-                    ng-options="lang as lang.displayName for lang in languages">
+                    ng-options="lang as lang.snippet.name for lang in languages">
             </select>
         </div>
-        <label for="translate">
+        <label for="translate" title="translate text to specified language as you type">
           <input class="translate-checkbox" type="checkbox" ng-model="shouldTranslate" />
-          Translate
+          Live Text Translate
         </label>
-        <label for="language-search" title="Add a filter to search within the selected region">
+        &nbsp;
+        <label for="language-search" title="Add a filter to search only results most relevant to specified language">
           <input class="language-checkbox" type="checkbox" ng-model="searchLanguage" />
-          Language
+          Search Language Relevance
         </label>
       </div>
 

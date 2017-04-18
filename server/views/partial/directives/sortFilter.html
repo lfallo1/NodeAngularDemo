@@ -40,7 +40,7 @@
                           <div id="countries-dropdown-textmode-wrapper" class="form-group">
                               <select id="countries-list-textmode" name="countries" class="form-control"
                                       ng-model="selectedCountry"
-                                      ng-options="country.name for country in countries"
+                                      ng-options="country.snippet.name for country in countries"
                                       ng-change="updateCategories()"
                                       placeholder="Select a country">
                                   <option value="">{{searchMode === TEXT_SEARCH ? 'Any country' : 'Select a country'}}</option>

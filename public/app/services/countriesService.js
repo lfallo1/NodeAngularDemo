@@ -11,8 +11,8 @@
                 deferred.resolve(countries);
                 return;
             }
-          $http.get('api/countries').then(function(res){
-              countries = res.data;
+          $http.post('api/youtube/get', {url: 'https://www.googleapis.com/youtube/v3/i18nRegions?part=snippet'}).then(function(res){
+              countries = res.data.items;
               deferred.resolve(countries);
           }, function(err){
               $log.error(err);
@@ -23,7 +23,7 @@
 
         service.getCountryByCode = function(alpha){
           return countries.filter(function(d) {
-              if (d['alpha-2'] === alpha) {
+              if (d.id === alpha) {
                   return d;
               }
           })[0];

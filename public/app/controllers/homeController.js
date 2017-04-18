@@ -16,31 +16,26 @@
             $scope.languages = [];
             $scope.loadLanguages = function(){
               var id = 0;
-              $http.get('https://translate.yandex.net/api/v1.5/tr.json/getLangs?ui=en&key=trnsl.1.1.20170418T030821Z.28ba4f71e181dba1.d3d8e55926a99a319cbb8ee04202463a1aa9f263').then(function(res){
-                for(key in res.data.langs){
-                  var item = {id: id++, code: key, displayName: res.data.langs[key]};
-                  $scope.languages.push(item);
-                  if(key === 'en'){
-                    $scope.lang.fromLanguage = item;
-                  } else if (key === 'es'){
-                    $scope.lang.toLanguage = item;
-                  }
-                }
+              // $http.get('https://translate.yandex.net/api/v1.5/tr.json/getLangs?ui=en&key=trnsl.1.1.20170418T030821Z.28ba4f71e181dba1.d3d8e55926a99a319cbb8ee04202463a1aa9f263').then(function(res){
+              $http.post('api/youtube/get', {url: 'https://www.googleapis.com/youtube/v3/i18nLanguages?part=snippet'}).then(function(res){
+                $scope.languages = res.data.items;
                 $scope.languages.sort(function(a,b){
-                  return a.displayName > b.displayName ? 1 : a.displayName < b.displayName ? -1 : 0;
+                  return a.snippet.name > b.snippet.name ? 1 : a.snippet.name < b.snippet.name ? -1 : 0;
                 });
+                $scope.lang.toLanguage = $scope.languages.filter(function(d){
+                  return d.id === 'de';
+                })[0];
               });
             };
 
             var TRANSLATE_URL_BASE = 'https://translation.googleapis.com/language/translate/v2?format=text&q=';
-
             $scope.translate = function(obj, isSearchParam, searchParam){
               var deferred = $q.defer();
               var term = obj ? obj.term : searchParam;
               if($scope.shouldTranslate && $scope.lang.toLanguage && term){
 
-                // var translateUrl = TRANSLATE_URL_BASE + '&lang=' + $scope.lang.fromLanguage.code + '-' + $scope.lang.toLanguage.code + '&text=' + term;
-                var translateUrl = TRANSLATE_URL_BASE + encodeURI(term) + '&target=' + $scope.lang.toLanguage.code;
+                // var translateUrl = TRANSLATE_URL_BASE + '&lang=' + $scope.lang.fromLanguage.code + '-' + $scope.lang.toLanguage.id + '&text=' + term;
+                var translateUrl = TRANSLATE_URL_BASE + encodeURI(term) + '&target=' + $scope.lang.toLanguage.id;
                 $http.post('api/translation/translate', {url: translateUrl}).then(function(res){
                   var translation = res.data.data.translations.length > 0 ? res.data.data.translations[0].translatedText : '';
                   if(translation){
@@ -388,12 +383,12 @@
 
                 CountriesService.getCountries().then(function(countries){
                     $scope.countries = countries;
-                    $scope.selectedCountry = $scope.countries.filter(function(d){
-                        if(d['alpha-2'] === 'US'){
+                    var defaultCountry = $scope.countries.filter(function(d){
+                        if(d.id === 'US'){
                             return d;
                         }
                     })[0];
-                    $scope.updateCategories().then(function(){
+                    $scope.updateCategories(defaultCountry).then(function(){
                         $scope.selectedCategory = $scope.videoCategories && $scope.videoCategories.length > 0 ? $scope.videoCategories[$scope.videoCategories.length - 1] : ALL_CATEGORIES;
                     });
                 });
@@ -620,9 +615,9 @@
                     videoDuration = $scope.videoDuration ? '&videoDuration=' + $scope.videoDuration : '';
                     safeSearch = $scope.safeSearch ? '&safeSearch=' + $scope.safeSearch : '';
 
-                    relevanceLanguage = ($scope.lang.toLanguage.code && $scope.searchLanguage) ? '&relevanceLanguage=' + $scope.lang.toLanguage.code : '';
+                    relevanceLanguage = ($scope.lang.toLanguage.id && $scope.searchLanguage) ? '&relevanceLanguage=' + $scope.lang.toLanguage.id : '';
 
-                    regionCode = $scope.selectedCountry ? '&regionCode=' + $scope.selectedCountry['alpha-2'] : '';
+                    regionCode = $scope.selectedCountry ? '&regionCode=' + $scope.selectedCountry.id : '';
                     videoCategoryId = ($scope.selectedCategory && $scope.selectedCategory.id && $scope.selectedCategory.id > 0) ? '&videoCategoryId=' + $scope.selectedCategory.id : '';
                     // if(!regionCode || !videoCategoryId){
                     //     regionCode = videoCategoryId = '';
@@ -833,19 +828,25 @@
              * called to refresh the categories list
              * @returns {*}
              */
-            $scope.updateCategories = function(){
+            $scope.updateCategories = function(country){
                 var deferred = $q.defer();
-                var payload = {url : youtubeVideoCategoriesBase + $scope.selectedCountry['alpha-2']};
-                $http.post('api/youtube/get', payload).then(function(res){
-                    $scope.videoCategories = res.data.items.filter(function(d){
-                        if(d.snippet.assignable){
-                            return d;
-                        }
-                    });
-                    $scope.videoCategories.push(ALL_CATEGORIES);
-                    $scope.selectedCategory = $scope.videoCategories[0];
-                    deferred.resolve();
-                });
+                var countryId = $scope.selectedCountry ? $scope.selectedCountry.id : country ? country.id : '';
+                if(countryId){
+                  var payload = {url : youtubeVideoCategoriesBase + countryId};
+                  $http.post('api/youtube/get', payload).then(function(res){
+                      $scope.videoCategories = res.data.items.filter(function(d){
+                          if(d.snippet.assignable){
+                              return d;
+                          }
+                      });
+                      $scope.videoCategories.push(ALL_CATEGORIES);
+                      $scope.selectedCategory = $scope.videoCategories[$scope.videoCategories.length - 1];
+                      deferred.resolve();
+                  });
+                }
+                else{
+                  deferred.resolve();
+                }
                 return deferred.promise;
             };
 
@@ -880,7 +881,7 @@
 
                 token = token ? '&pageToken=' + token : '';
 
-                relevanceLanguage = ($scope.lang.toLanguage.code && $scope.searchLanguage) ? '&relevanceLanguage=' + $scope.lang.toLanguage.code : '';
+                relevanceLanguage = ($scope.lang.toLanguage.id && $scope.searchLanguage) ? '&relevanceLanguage=' + $scope.lang.toLanguage.id : '';
 
                 var promises = [];
                 var payload = {url : popularByCountryBase + countryAlphaCode + token};
@@ -959,7 +960,7 @@
 
                 token = token ? '&pageToken=' + token : '';
                 category = category || '';
-                relevanceLanguage = ($scope.lang.toLanguage.code && $scope.searchLanguage) ? '&relevanceLanguage=' + $scope.lang.toLanguage.code : '';
+                relevanceLanguage = ($scope.lang.toLanguage.id && $scope.searchLanguage) ? '&relevanceLanguage=' + $scope.lang.toLanguage.id : '';
 
                 var payload = {'url' : popularByCountryBase + countryAlphaCode + '&videoCategoryId=' + category + token};
                 $http.post('api/youtube/get', payload).then(function(res){
