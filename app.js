@@ -4,6 +4,7 @@ var express = require('express'),
 var countriesAPI = require('./server/services/countriesAPI.js');
 var youtubeAPI = require('./server/services/youtubeAPI.js');
 var videoApi = require('./server/services/videoApi.js');
+var translateAPI = require('./server/services/translateApi.js');
 
 var app = express();
 
@@ -40,6 +41,7 @@ app.get('/partials/directives/:name', function(req, res){
 });
 
 //Endpoints
+app.use('/api/translation', translateAPI);
 app.use('/api/countries', countriesAPI.getAll);
 app.use('/api/youtube', youtubeAPI);
 app.use('/api/config', function(req,res,next){
