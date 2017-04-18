@@ -8,6 +8,43 @@
 
             $scope.userPlaylist = {};
 
+            $scope.lang = {
+              fromLanguage: 'en',
+              toLanguage: ''
+            };
+
+            var TRANSLATE_URL_BASE = 'https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20170418T030821Z.28ba4f71e181dba1.d3d8e55926a99a319cbb8ee04202463a1aa9f263&format=text&';
+
+            $scope.translate = function(obj, isSearchParam, searchParam){
+              var deferred = $q.defer();
+              var term = obj ? obj.term : searchParam;
+              if($scope.shouldTranslate && $scope.lang.fromLanguage && $scope.lang.toLanguage && term){
+
+                var translateUrl = TRANSLATE_URL_BASE + '&lang=' + $scope.lang.fromLanguage + '-' + $scope.lang.toLanguage + '&text=' + term;
+                $http.post(translateUrl).then(function(res){
+                  if(isSearchParam){
+                    $scope.searchParam = res.data.text[0];
+                  } else{
+                    obj.term = res.data.text[0];
+                  }
+                  deferred.resolve();
+                });
+              } else{
+                deferred.resolve();
+              }
+
+              return deferred.promise;
+            };
+
+            $scope.checkTranslation = function(){
+              var deferred = $q.defer();
+              if($scope.shouldTranslate){
+                return $scope.translate(null, true, $scope.searchParam)
+              }
+              deferred.resolve();
+              return deferred.promise;
+            }
+
             //Datepicker
             $scope.openDatepicker = function (prop) {
                 $scope.datepicker[prop] = true;
@@ -572,8 +609,11 @@
                       $scope.extendedSearch = false;
                     }
 
-                    //call the wrapper
-                    fetchResultsWrapper();
+                    //check for translation, and then call the wrapper
+                    $scope.checkTranslation().then(function(){
+                      fetchResultsWrapper();
+                    });
+
                 }
                 else if($scope.searchMode === $scope.PLAYLIST_SEARCH){
                   getVideosInPlaylist().then(function(res){

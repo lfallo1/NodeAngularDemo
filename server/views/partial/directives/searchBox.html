@@ -11,7 +11,7 @@
   <div id="textbox-container" class="form-group col-md-6 col-md-offset-3">
       <form ng-show="searchMode !== POPULAR_SEARCH" ng-submit="doSearch()">
           <div class="input-group">
-              <input class="form-control" type="text" ng-model="searchParam" ng-attr-placeholder="{{getSearchBoxPlaceholder()}}" autofocus />
+              <input class="form-control" type="text" ng-model="searchParam" ng-attr-placeholder="{{getSearchBoxPlaceholder()}}" autofocus ng-blur="translate(null,true,searchParam)" />
               <div id="searchButton" ng-if="!fetching" class="notta-button input-group-addon" ng-click="doSearch()"><span class="glyphicon glyphicon-search"></span>Search</div>
               <div id="stopButton" ng-if="fetching" class="notta-button input-group-addon" ng-click="interrupt()"><span class="glyphicon glyphicon-stop"></span>Stop</div>
           </div>
@@ -84,6 +84,15 @@
           <div class="btn-link text-info" ng-click="showCrapInstructions = !showCrapInstructions">{{showCrapInstructions ? 'Hide instructions' : 'If Google is failing to connect the app, please click here'}}</div>
             <div ng-show="showCrapInstructions" id="connect-text-extra">If you are seeing this button after connecting your account, please click the google-signin button (upper-right) and refreshing the page to update your account.  If you continue having issues, there is a bug in google's signin system that occurs when you are logged into multiple google accounts. Please sign out / remove your accounts, and then come back to YoutubeAgent and give the signin / connect another shot.</div>
           </div>
+      </div>
+
+      <div class="translate-text">
+        <input type="text" ng-model="lang.fromLanguage" placeholder="from language" />
+        <input type="text" ng-model="lang.toLanguage" placeholder="to language"/>
+        <label for="translate">
+          <input class="translate-checkbox" type="checkbox" ng-model="shouldTranslate" />
+          Translate on keystroke
+        </label>
       </div>
 
   </div>

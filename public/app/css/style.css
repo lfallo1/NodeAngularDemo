@@ -1294,3 +1294,26 @@ div.report-modal .modal-content {
     cursor: pointer;
     opacity: 0.7;
 }
+
+.translate-text{
+    margin-top: 15px;
+    width: 100%;
+    display: inline-block !important;
+    text-align: center;
+}
+
+.translate-text input[type=text]{
+    font-size: 18px;
+}
+
+.translate-text input[type=checkbox] {
+  transform: scale(2);
+  margin-left: 15px;
+  margin-right: 4px;
+}
+
+.translate-text label{
+    color: white;
+    font-weight: bold;
+    font-size: 22px;
+}

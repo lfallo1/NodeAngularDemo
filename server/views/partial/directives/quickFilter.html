@@ -50,7 +50,7 @@
                 <button ng-show="filter.type===quickFilterType.ONE_OF" class="btn btn-default btn-sm" ng-click="addQuickFilterCategory()">Add category</button>
               </div>
               <div class="quick-filter-item" ng-repeat="termObject in filter.terms">
-                <input ng-model="termObject.term" type="text" />
+                <input ng-model="termObject.term" type="text" ng-blur="translate(termObject)" />
                 <div class="remove-quick-filter-item" ng-click="removeFilterTerm(filter.terms, $index)"><span class="glyphicon glyphicon-minus-sign"></span></div>
               </div>
             </div>
