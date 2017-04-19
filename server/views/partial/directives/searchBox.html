@@ -104,11 +104,23 @@
           Live Text Translate
         </label>
         &nbsp;
-        <label for="language-search" title="Add a filter to search only results most relevant to specified language">
-          <input class="language-checkbox" type="checkbox" ng-model="searchLanguage" />
-          Search Language Relevance
+        <label for="location-search" title="Add a filter to search videos in specified region">
+          <input class="location-checkbox" type="checkbox" ng-model="searchLocation" />
+          Search By Location
         </label>
       </div>
+
+      <div id="map-selector">
+        <div ng-if="searchLocation" map-lazy-load="https://maps.google.com/maps/api/js"
+          map-lazy-load-params="{{googleMapsUrl.url}}">
+          <ng-map center="41,-87" max-zoom="3" min-zoom="3" zoom="3" on-click="mapClick(evt)">
+            <marker class="custom-marker" ng-show="pos.lat" position="{{pos.lat}}, {{pos.lng}}"
+            icon="{{iconOptions}}"></marker>
+          </ng-map>
+        </div>
+        <div ng-show="searchLocation">
+            <rzslider rz-slider-model="locationRadius" rz-slider-options="{floor: 250, ceil: 1200, onChange: updateScale()}"></rzslider>
+        </div>
 
   </div>
 </div>

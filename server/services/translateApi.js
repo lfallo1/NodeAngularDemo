@@ -8,7 +8,7 @@ var apiKey = process.env.YOUTUBE_API_KEY || 'AIzaSyA7mIz_md82p22_U9TDhCsz8PoMRrn
 var _options = {};
 
 router.post('/translate', function (req, res, next) {
-    console.log(req.body.url + '&key=' + apiKey);
+    
     var options = {
         uri: req.body.url + '&key=' + apiKey,
         json: true

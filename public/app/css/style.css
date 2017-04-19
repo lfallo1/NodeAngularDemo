@@ -1322,3 +1322,13 @@ div.report-modal .modal-content {
     font-weight: bold;
     font-size: 22px;
 }
+
+.rz-bubble{
+    font-weight: bold;
+    color: white !important;
+}
+
+#map-selector{
+    width: 85%;;
+    margin: 0px auto;
+}

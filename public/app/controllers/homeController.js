@@ -3,8 +3,39 @@
  */
 (function(){
     angular.module('youtubeSearchApp').controller('HomeCtrl', [
-        '$rootScope', '$scope', '$http', '$q', '$routeParams', '$log', '$timeout', '$location', 'TimeService', 'toaster', '$window', '$uibModal', 'AuthService', 'PlaylistService', '$sce', 'CountriesService', '$anchorScroll', '$cookies', 'DirectionsService', 'FileSaver', 'Blob',
-        function($rootScope, $scope, $http, $q, $routeParams, $log, $timeout, $location, TimeService, toaster, $window, $uibModal, AuthService, PlaylistService, $sce, CountriesService, $anchorScroll, $cookies, DirectionsService, FileSaver, Blob){
+        '$rootScope', '$scope', '$http', '$q', '$routeParams', '$log', '$timeout', '$location', 'TimeService', 'toaster', '$window', '$uibModal', 'AuthService', 'PlaylistService', '$sce', 'CountriesService', '$anchorScroll', '$cookies', 'DirectionsService', 'FileSaver', 'Blob', 'NgMap',
+        function($rootScope, $scope, $http, $q, $routeParams, $log, $timeout, $location, TimeService, toaster, $window, $uibModal, AuthService, PlaylistService, $sce, CountriesService, $anchorScroll, $cookies, DirectionsService, FileSaver, Blob, NgMap){
+
+            $scope.googleMapsUrl={
+              url: 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAdvomXbhYg3GeBGymbPVBg-aRJeIOfFyQ',
+            };
+
+            var LOCATION_SCALE_DIVIDER = 25;
+            $scope.locationRadius = 600;
+            $scope.pos = {};
+            $scope.iconOptions = {
+              path:'CIRCLE',
+              strokeWeight:80,
+              scale: 40,
+              strokeColor: 'red',
+              strokeOpacity: 0.3,
+              zIndex:10
+            };
+
+            //map stuff
+            NgMap.getMap();
+
+            $scope.mapClick = function(evt){
+              $scope.pos = {
+                lat: evt.latLng.lat(),
+                lng: evt.latLng.lng()
+              };
+            };
+
+            $scope.updateScale = function(){
+              $scope.iconOptions.scale = $scope.locationRadius / LOCATION_SCALE_DIVIDER;
+              $scope.iconOptions.strokeWeight = $scope.iconOptions.scale * 2;
+            };
 
             $scope.userPlaylist = {};
 
@@ -263,7 +294,7 @@
             var videoDuration= '';
             var videoCategoryId= '';
             var safeSearch= '';
-            var relevanceLanguage= '';
+            var latlng= '';
 
             $scope.videoDurationOptions = ['any','long','medium','short'];
             $scope.safeSearchOptions = ['moderate', 'none', 'strict'];
@@ -615,7 +646,7 @@
                     videoDuration = $scope.videoDuration ? '&videoDuration=' + $scope.videoDuration : '';
                     safeSearch = $scope.safeSearch ? '&safeSearch=' + $scope.safeSearch : '';
 
-                    relevanceLanguage = ($scope.lang.toLanguage.id && $scope.searchLanguage) ? '&relevanceLanguage=' + $scope.lang.toLanguage.id : '';
+                    latlng = ($scope.pos.lat && $scope.searchLocation) ? '&location=' + $scope.pos.lat + "," + $scope.pos.lng + '&locationRadius=' + $scope.locationRadius/2 + 'mi': '';
 
                     regionCode = $scope.selectedCountry ? '&regionCode=' + $scope.selectedCountry.id : '';
                     videoCategoryId = ($scope.selectedCategory && $scope.selectedCategory.id && $scope.selectedCategory.id > 0) ? '&videoCategoryId=' + $scope.selectedCategory.id : '';
@@ -711,7 +742,7 @@
                         var token = sortOrders[i].token ? '&pageToken=' + sortOrders[i].token : '';
 
                         promises.push($http.post('api/youtube/get', {'url' : youtubeSearchBase + $scope.searchParam + "&type=video&maxResults=50" +
-                        dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + relevanceLanguage + safeSearch +
+                        dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + latlng + safeSearch +
                         "&order=" + sortOrders[i].order + related  + token}));
                     }
                   }
@@ -722,7 +753,7 @@
                         var token = sortOrders[i].token ? '&pageToken=' + sortOrders[i].token : '';
 
                         promises.push($http.post('api/youtube/get', {'url' : youtubeSearchBase + $scope.searchParam + "&type=video&maxResults=50" +
-                        dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + relevanceLanguage + safeSearch +
+                        dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + latlng + safeSearch +
                         "&order=" + sortOrders[i].order + related  + token}));
                     }
                 }
@@ -881,13 +912,13 @@
 
                 token = token ? '&pageToken=' + token : '';
 
-                relevanceLanguage = ($scope.lang.toLanguage.id && $scope.searchLanguage) ? '&relevanceLanguage=' + $scope.lang.toLanguage.id : '';
+                latlng = ($scope.pos.lat && $scope.searchLocation) ? '&location=' + $scope.pos.lat + "," + $scope.pos.lng + '&locationRadius=' + $scope.locationRadius/2 + 'mi': '';
 
                 var promises = [];
                 var payload = {url : popularByCountryBase + countryAlphaCode + token};
                 promises.push($http.post('api/youtube/get', payload));
                 for(var i = 0; i < $scope.videoCategories.length - 1; i++){
-                    payload = {url : popularByCountryBase + countryAlphaCode + '&videoCategoryId=' + $scope.videoCategories[i].id + relevanceLanguage + token};
+                    payload = {url : popularByCountryBase + countryAlphaCode + '&videoCategoryId=' + $scope.videoCategories[i].id + latlng + token};
                     promises.push($http.post('api/youtube/get',payload));
                 }
 
@@ -960,7 +991,7 @@
 
                 token = token ? '&pageToken=' + token : '';
                 category = category || '';
-                relevanceLanguage = ($scope.lang.toLanguage.id && $scope.searchLanguage) ? '&relevanceLanguage=' + $scope.lang.toLanguage.id : '';
+                latlng = ($scope.pos.lat && $scope.searchLocation) ? '&location=' + $scope.pos.lat + "," + $scope.pos.lng + '&locationRadius=' + $scope.locationRadius/2 + 'mi': '';
 
                 var payload = {'url' : popularByCountryBase + countryAlphaCode + '&videoCategoryId=' + category + token};
                 $http.post('api/youtube/get', payload).then(function(res){
