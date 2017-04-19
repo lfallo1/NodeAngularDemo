@@ -6,6 +6,10 @@
         '$rootScope', '$scope', '$http', '$q', '$routeParams', '$log', '$timeout', '$location', 'TimeService', 'toaster', '$window', '$uibModal', 'AuthService', 'PlaylistService', '$sce', 'CountriesService', '$anchorScroll', '$cookies', 'DirectionsService', 'FileSaver', 'Blob', 'NgMap',
         function($rootScope, $scope, $http, $q, $routeParams, $log, $timeout, $location, TimeService, toaster, $window, $uibModal, AuthService, PlaylistService, $sce, CountriesService, $anchorScroll, $cookies, DirectionsService, FileSaver, Blob, NgMap){
 
+
+            //*********** START LANGUAGE / MAP LOGIC ****************
+
+            //map variables
             $scope.googleMapsUrl={
               url: 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDE3EI_Yy2IKmN7aL0tVug3w-sR1tVnGwY',
             };
@@ -14,21 +18,21 @@
             //   url: 'https://maps.googleapis.com/maps/api/js?key=AIzaSyA7mIz_md82p22_U9TDhCsz8PoMRrnt5RI',
             // };
 
-            var LOCATION_SCALE_DIVIDER = 25;
-            $scope.locationRadius = 625;
-            $scope.pos = {lat:40, lng:-95};
-            $scope.iconOptions = {
-              path:'CIRCLE',
-              strokeWeight:80,
-              scale: 40,
-              strokeColor: 'red',
-              strokeOpacity: 0.3,
-              zIndex:10
+            var MILE = 1609.34;             //set constant for meter to mile conversions
+            $scope.locationDiameter = 625; //set initial diameter
+            $scope.pos = {lat:40, lng:-95}; //default location to ~center of US
+            $scope.circleRadius = $scope.locationDiameter/2 * MILE; //set default radius
+            NgMap.getMap(); //initialize the map
+
+            //language variables
+            $scope.lang = {
+              fromLanguage: 'en',
+              toLanguage: ''
             };
+            $scope.languages = [];
+            var TRANSLATE_URL_BASE = 'https://translation.googleapis.com/language/translate/v2?format=text&q=';
 
-            //map stuff
-            NgMap.getMap();
-
+            //on map clicks, update the lon/lat values
             $scope.mapClick = function(evt){
               $scope.pos = {
                 lat: evt.latLng.lat(),
@@ -36,6 +40,7 @@
               };
             };
 
+            //on map drag events, update lon/lat values
             $scope.mapDrag = function(evt){
               $scope.pos = {
                 lat: evt.latLng.lat(),
@@ -43,22 +48,28 @@
               };
             }
 
+            //handle rzSlider event by updating size of circle (method returns radius in meters)
             $scope.updateScale = function(){
-              $scope.iconOptions.scale = $scope.locationRadius / LOCATION_SCALE_DIVIDER;
-              $scope.iconOptions.strokeWeight = $scope.iconOptions.scale * 2;
+              $scope.circleRadius = ($scope.locationDiameter/2) * MILE;
             };
 
-            $scope.userPlaylist = {};
+            //toggle map visibility. additionally, if showing the map then also refresh the slider
+            $scope.toggleMap = function(){
+              $scope.searchLocation = !$scope.searchLocation;
+              if($scope.searchLocation){
+                $scope.refreshSlider();
+              }
+            }
 
-            $scope.lang = {
-              fromLanguage: 'en',
-              toLanguage: ''
+            //handle refreshing the slider to prevent ui issues
+            $scope.refreshSlider = function () {
+              $timeout(function () {
+                  $scope.$broadcast('rzSliderForceRender');
+              });
             };
 
-            $scope.languages = [];
+            //load all supported languages via youtube api
             $scope.loadLanguages = function(){
-              var id = 0;
-              // $http.get('https://translate.yandex.net/api/v1.5/tr.json/getLangs?ui=en&key=trnsl.1.1.20170418T030821Z.28ba4f71e181dba1.d3d8e55926a99a319cbb8ee04202463a1aa9f263').then(function(res){
               $http.post('api/youtube/get', {url: 'https://www.googleapis.com/youtube/v3/i18nLanguages?part=snippet'}).then(function(res){
                 $scope.languages = res.data.items;
                 $scope.languages.sort(function(a,b){
@@ -70,13 +81,11 @@
               });
             };
 
-            var TRANSLATE_URL_BASE = 'https://translation.googleapis.com/language/translate/v2?format=text&q=';
+            //translate text
             $scope.translate = function(obj, isSearchParam, searchParam){
               var deferred = $q.defer();
               var term = obj ? obj.term : searchParam;
               if($scope.shouldTranslate && $scope.lang.toLanguage && term){
-
-                // var translateUrl = TRANSLATE_URL_BASE + '&lang=' + $scope.lang.fromLanguage.code + '-' + $scope.lang.toLanguage.id + '&text=' + term;
                 var translateUrl = TRANSLATE_URL_BASE + encodeURI(term) + '&target=' + $scope.lang.toLanguage.id;
                 $http.post('api/translation/translate', {url: translateUrl}).then(function(res){
                   var translation = res.data.data.translations.length > 0 ? res.data.data.translations[0].translatedText : '';
@@ -96,6 +105,9 @@
               return deferred.promise;
             };
 
+            //explicitly, check translation for the search parameter
+            //since the translation is asynchronous, this is to handle cases when search is clicked prior
+            //to clicking away from the search box.
             $scope.checkTranslation = function(){
               var deferred = $q.defer();
               if($scope.shouldTranslate){
@@ -104,6 +116,10 @@
               deferred.resolve();
               return deferred.promise;
             }
+
+            //*********** END LANGUAGE / MAP LOGIC ****************
+
+            $scope.userPlaylist = {};
 
             //Datepicker
             $scope.openDatepicker = function (prop) {
@@ -657,7 +673,7 @@
                     videoDuration = $scope.videoDuration ? '&videoDuration=' + $scope.videoDuration : '';
                     safeSearch = $scope.safeSearch ? '&safeSearch=' + $scope.safeSearch : '';
 
-                    latlng = ($scope.pos.lat && $scope.searchLocation) ? '&location=' + $scope.pos.lat + "," + $scope.pos.lng + '&locationRadius=' + $scope.locationRadius/2 + 'mi': '';
+                    latlng = ($scope.pos.lat && $scope.searchLocation) ? '&location=' + $scope.pos.lat + "," + $scope.pos.lng + '&locationRadius=' + $scope.locationDiameter/2 + 'mi': '';
 
                     regionCode = $scope.selectedCountry ? '&regionCode=' + $scope.selectedCountry.id : '';
                     videoCategoryId = ($scope.selectedCategory && $scope.selectedCategory.id && $scope.selectedCategory.id > 0) ? '&videoCategoryId=' + $scope.selectedCategory.id : '';
@@ -923,7 +939,7 @@
 
                 token = token ? '&pageToken=' + token : '';
 
-                latlng = ($scope.pos.lat && $scope.searchLocation) ? '&location=' + $scope.pos.lat + "," + $scope.pos.lng + '&locationRadius=' + $scope.locationRadius/2 + 'mi': '';
+                latlng = ($scope.pos.lat && $scope.searchLocation) ? '&location=' + $scope.pos.lat + "," + $scope.pos.lng + '&locationRadius=' + $scope.locationDiameter/2 + 'mi': '';
 
                 var promises = [];
                 var payload = {url : popularByCountryBase + countryAlphaCode + token};
@@ -1002,7 +1018,7 @@
 
                 token = token ? '&pageToken=' + token : '';
                 category = category || '';
-                latlng = ($scope.pos.lat && $scope.searchLocation) ? '&location=' + $scope.pos.lat + "," + $scope.pos.lng + '&locationRadius=' + $scope.locationRadius/2 + 'mi': '';
+                latlng = ($scope.pos.lat && $scope.searchLocation) ? '&location=' + $scope.pos.lat + "," + $scope.pos.lng + '&locationRadius=' + $scope.locationDiameter/2 + 'mi': '';
 
                 var payload = {'url' : popularByCountryBase + countryAlphaCode + '&videoCategoryId=' + category + token};
                 $http.post('api/youtube/get', payload).then(function(res){

@@ -87,10 +87,10 @@
       </div>
 
 
-      <div id="toggleMap" ng-click="mapVisible = !mapVisible">
-        {{mapVisible ? '[ Hide Controls - ]' : '[ Show Map/Region Controls + ]'}}
+      <div id="toggleMap" ng-click="langMapOptionsVisible = !langMapOptionsVisible">
+        {{langMapOptionsVisible ? '[ Hide Controls - ]' : '[ Show Language/Map Controls + ]'}}
       </div>
-      <div ng-show="mapVisible">
+      <div ng-show="langMapOptionsVisible">
         <div class="translate-text">
           <!-- <div class="language-dropdown">
               <select id="categories-list-text-search" name="languages"
@@ -110,8 +110,8 @@
           </label>
           &nbsp;
           <label for="location-search" title="Add a filter to search videos in specified region">
-            <input class="location-checkbox" type="checkbox" ng-model="searchLocation" />
-            Search By Location {{pos.lat}}, {{pos.lng}}
+            <input class="location-checkbox" type="checkbox" ng-click="toggleMap()" />
+            Search By Location
           </label>
         </div>
 
@@ -119,13 +119,26 @@
           <!-- <div ng-if="searchLocation" map-lazy-load="https://maps.google.com/maps/api/js?key=AIzaSyA7mIz_md82p22_U9TDhCsz8PoMRrnt5RI" -->
           <div ng-if="searchLocation" map-lazy-load="https://maps.google.com/maps/api/js?key=AIzaSyDE3EI_Yy2IKmN7aL0tVug3w-sR1tVnGwY"
             map-lazy-load-params="{{googleMapsUrl.url}}">
-            <ng-map center="41,-87" max-zoom="3" min-zoom="3" zoom="3" on-click="mapClick(evt)">
-              <marker class="custom-marker" ng-show="pos.lat" on-dragend="mapDrag()" draggable="true" position="{{pos.lat}}, {{pos.lng}}"
-              icon="{{iconOptions}}"></marker>
+            <ng-map center="41,-87" max-zoom="5" min-zoom="3" zoom="3" on-click="mapClick(evt)">
+
+              <shape name="circle"
+                    stroke-color="#01579b"
+                    stroke-opacity="0.7"
+                    stroke-weight="2"
+                    fill-color="#01579b"
+                    fill-opacity="0.35"
+                    center="{{ [pos.lat, pos.lng] }}"
+                    radius="{{circleRadius}}"
+                    on-dragend="mapDrag()"
+                    draggable="true">
+                  </shape>
+
+              <!-- <marker class="custom-marker" ng-show="pos.lat" on-dragend="mapDrag()" draggable="true" position="{{pos.lat}}, {{pos.lng}}"
+              icon="{{iconOptions}}"></marker> -->
             </ng-map>
           </div>
           <div ng-show="searchLocation">
-              <rzslider rz-slider-model="locationRadius" rz-slider-options="{floor: 250, ceil: 1240, onChange: updateScale()}"></rzslider>
+              <rzslider rz-slider-model="locationDiameter" rz-slider-options="{floor: 250, ceil: 1240, onChange: updateScale()}"></rzslider>
           </div>
         </div>
       </div>
