@@ -10,9 +10,13 @@
               url: 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDE3EI_Yy2IKmN7aL0tVug3w-sR1tVnGwY',
             };
 
+            // $scope.googleMapsUrl={
+            //   url: 'https://maps.googleapis.com/maps/api/js?key=AIzaSyA7mIz_md82p22_U9TDhCsz8PoMRrnt5RI',
+            // };
+
             var LOCATION_SCALE_DIVIDER = 25;
-            $scope.locationRadius = 600;
-            $scope.pos = {};
+            $scope.locationRadius = 625;
+            $scope.pos = {lat:40, lng:-95};
             $scope.iconOptions = {
               path:'CIRCLE',
               strokeWeight:80,
@@ -31,6 +35,13 @@
                 lng: evt.latLng.lng()
               };
             };
+
+            $scope.mapDrag = function(evt){
+              $scope.pos = {
+                lat: evt.latLng.lat(),
+                lng: evt.latLng.lng()
+              };
+            }
 
             $scope.updateScale = function(){
               $scope.iconOptions.scale = $scope.locationRadius / LOCATION_SCALE_DIVIDER;
