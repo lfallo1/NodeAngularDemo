@@ -7,7 +7,7 @@
         function($rootScope, $scope, $http, $q, $routeParams, $log, $timeout, $location, TimeService, toaster, $window, $uibModal, AuthService, PlaylistService, $sce, CountriesService, $anchorScroll, $cookies, DirectionsService, FileSaver, Blob, NgMap){
 
             $scope.googleMapsUrl={
-              url: 'https://maps.googleapis.com/maps/api/js?key=AIzaSyA7mIz_md82p22_U9TDhCsz8PoMRrnt5RI',
+              url: 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDE3EI_Yy2IKmN7aL0tVug3w-sR1tVnGwY',
             };
 
             var LOCATION_SCALE_DIVIDER = 25;
