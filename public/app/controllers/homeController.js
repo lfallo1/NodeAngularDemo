@@ -919,10 +919,10 @@
                 $scope.saveName = '';
                 $scope.fetching = true;
                 if($scope.selectedCategory && $scope.selectedCategory.id && $scope.selectedCategory.id > 0){
-                    $scope.fetchPopularByCountryAndCategory($scope.selectedCountry['alpha-2'], $scope.selectedCategory.id);
+                    $scope.fetchPopularByCountryAndCategory($scope.selectedCountry.id, $scope.selectedCategory.id);
                 }
                 else{
-                    $scope.fetchPopularByCountryAll($scope.selectedCountry['alpha-2']);
+                    $scope.fetchPopularByCountryAll($scope.selectedCountry.id);
                 }
             };
 
@@ -939,13 +939,13 @@
 
                 token = token ? '&pageToken=' + token : '';
 
-                latlng = ($scope.pos.lat && $scope.searchLocation) ? '&location=' + $scope.pos.lat + "," + $scope.pos.lng + '&locationRadius=' + $scope.locationDiameter/2 + 'mi': '';
+                // latlng = ($scope.pos.lat && $scope.searchLocation) ? '&location=' + $scope.pos.lat + "," + $scope.pos.lng + '&locationRadius=' + $scope.locationDiameter/2 + 'mi': '';
 
                 var promises = [];
                 var payload = {url : popularByCountryBase + countryAlphaCode + token};
                 promises.push($http.post('api/youtube/get', payload));
                 for(var i = 0; i < $scope.videoCategories.length - 1; i++){
-                    payload = {url : popularByCountryBase + countryAlphaCode + '&videoCategoryId=' + $scope.videoCategories[i].id + latlng + token};
+                    payload = {url : popularByCountryBase + countryAlphaCode + '&videoCategoryId=' + $scope.videoCategories[i].id + token};
                     promises.push($http.post('api/youtube/get',payload));
                 }
 

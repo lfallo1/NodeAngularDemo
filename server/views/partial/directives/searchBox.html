@@ -44,7 +44,7 @@
           <div id="countries-dropdown-wrapper" class="col-md-6">
               <select id="countries-list" name="countries" class="form-control"
                       ng-model="selectedCountry"
-                      ng-options="country.name for country in countries"
+                      ng-options="country.snippet.name for country in countries"
                       ng-change="updateCategories()"
                       placeholder="Select a country">
                   <option value="">Select a country</option>

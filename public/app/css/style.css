@@ -356,6 +356,7 @@ body{
 
 #search-popular-wrapper #search-popular-button-wrapper .btn-default{
     background: #4CAF50 ;
+    border: none;
 }
 
 #sort-content{
