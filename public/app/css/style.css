@@ -1376,3 +1376,7 @@ div.report-modal .modal-content {
 .duration, .likes, .rating, .view-count, .dislikes{
     font-weight: bold !important;
 }
+
+.empty-stars{
+    margin-left: -5px;
+}

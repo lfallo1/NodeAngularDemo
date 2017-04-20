@@ -71,7 +71,11 @@
                     </a>
                     <div class="created"><a href="https://www.youtube.com/channel/{{video.channelId}}" target="_blank">{{video.channelTitle}}</a> - {{video.created | date:'MM-dd-yyyy'}}</div>
                     <div class="duration">{{video.duration}}</div>
-                    <div class="rating"><span ng-repeat="i in rating(video.pctLikes) track by $index" class="glyphicon glyphicon-star"></span> <span class="rating-value">{{video.pctLikes | number:2}}%</span></div>
+                    <div class="rating">
+                      <span ng-repeat="i in rating(video.pctLikes) track by $index" class="glyphicon glyphicon-star"></span>
+                      <span class="empty-stars"><span ng-repeat="i in rating(video.pctLikes, true) track by $index" class="glyphicon glyphicon-star-empty"></span></span>
+                      <span class="rating-value">{{video.pctLikes | number:2}}%</span>
+                    </div>
                     <div class="view-count"><span class="glyphicon glyphicon-eye-open"></span> {{video.viewCount | number}}</div>
                     <div class="likes"><span class="video-rating glyphicon glyphicon-thumbs-up text-success"></span> {{video.likes}}</div>
                     <div class="dislikes"><span class="video-rating glyphicon glyphicon-thumbs-down text-danger"></span> {{video.dislikes}}</div>

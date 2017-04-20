@@ -299,8 +299,11 @@
                 $scope.gotoPage($scope.pagination.currentPage);
             };
 
-            $scope.rating = function(pctLikes){
-              var rating = pctLikes > 99 ? 5 : pctLikes > 95 ? 4 : pctLikes > 90 ? 3 : pctLikes > 75 ? 2 : 1;
+            $scope.rating = function(pctLikes, subtract){
+              var rating = pctLikes > 99 ? 5 : pctLikes > 97 ? 4 : pctLikes > 90 ? 3 : pctLikes > 80 ? 2 : 1;
+              if(subtract){
+                rating = 5 - rating;
+              }
               return new Array(rating);
             }
 
