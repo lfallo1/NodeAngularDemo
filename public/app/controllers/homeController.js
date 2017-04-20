@@ -1018,7 +1018,7 @@
 
                 token = token ? '&pageToken=' + token : '';
                 category = category || '';
-                latlng = ($scope.pos.lat && $scope.searchLocation) ? '&location=' + $scope.pos.lat + "," + $scope.pos.lng + '&locationRadius=' + $scope.locationDiameter/2 + 'mi': '';
+                // latlng = ($scope.pos.lat && $scope.searchLocation) ? '&location=' + $scope.pos.lat + "," + $scope.pos.lng + '&locationRadius=' + $scope.locationDiameter/2 + 'mi': '';
 
                 var payload = {'url' : popularByCountryBase + countryAlphaCode + '&videoCategoryId=' + category + token};
                 $http.post('api/youtube/get', payload).then(function(res){
