@@ -1348,11 +1348,9 @@ div.report-modal .modal-content {
 }
 
 .stop-video{
-    font-size: 75px;
+    font-size: 45px;
     color: #c9302c;
-    display: inline;
-    float: left;
-    margin-right: -100px;
+    text-align:center;
 }
 
 .stop-video:hover{
