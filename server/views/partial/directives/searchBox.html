@@ -88,7 +88,8 @@
 
 
       <div id="toggleMap" ng-click="langMapOptionsVisible = !langMapOptionsVisible">
-        {{langMapOptionsVisible ? '[ Hide Controls - ]' : '[ Show Language/Map Controls + ]'}}
+        <span class="glyphicon glyphicon-globe"></span>
+        {{langMapOptionsVisible ? 'Hide Controls -' : 'Show Language/Map Controls +'}}
       </div>
       <div ng-show="langMapOptionsVisible">
         <div class="translate-text">
