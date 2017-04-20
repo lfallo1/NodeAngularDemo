@@ -1346,3 +1346,16 @@ div.report-modal .modal-content {
     opacity: 0.7;
     cursor: pointer;
 }
+
+.stop-video{
+    font-size: 75px;
+    color: #c9302c;
+    display: inline;
+    float: left;
+    margin-right: -100px;
+}
+
+.stop-video:hover{
+    cursor: pointer;
+    opacity: 0.7;
+}

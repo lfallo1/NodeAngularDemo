@@ -286,6 +286,7 @@
                     $scope.pagination.currentPage = page;
                 }
                 $scope.paginate();
+                $scope.scrollToElement('results');
             };
 
             $scope.nextPage = function(){
@@ -529,40 +530,51 @@
                 $scope.sort();
             };
 
-            $scope.playVideo = function(video, val, index){
-              var index = ($scope.pagination.currentPage - 1) * $scope.pagination.resultsPerPage + index;
-              // $location.path('/' + video.videoId, true).search({q:null, m:null});
-              var modalInstance = $uibModal.open({
-                  templateUrl: 'partials/playerModal.html',
-                  controller: 'YoutubePlayerModalCtrl',
-                  backdrop : 'static',
-                  size: 'lg',
-                  resolve: {
-                      content: function () {
-                          return {
-                              'autoplay' : $scope.autoplay,
-                              'pagination' : $scope.pagination,
-                              'filteredResults' : $scope.filteredResults,
-                              'video' : video,
-                              'val' : val,
-                              'index' : index
-                          }
-                      }
-                  }
-              });
 
-              modalInstance.result.then(function(data){
-                $scope.gotoPage(Math.floor(data / $scope.pagination.resultsPerPage) + 1);
-                $scope.scrollToElement($scope.filteredResults[data].videoId, true);
-                // $location.path('/', true).search({q:null, m:null});
-                $rootScope.currentPageTitle = 'Youtube Agent - Sort, Filter, Download, Analyze - Your Ultimate Youtube Search Tool';
-              }, function(data){
-                $scope.gotoPage(Math.floor(data / $scope.pagination.resultsPerPage) + 1);
-                $scope.scrollToElement($scope.filteredResults[data].videoId, true);
-                // $location.path('/', true).search({q:null, m:null});
-                $rootScope.currentPageTitle = 'Youtube Agent - Sort, Filter, Download, Analyze - Your Ultimate Youtube Search Tool';
-              })
+            $scope.autoplay = true;
+            $scope.$on('youtube.player.ended', handleYoutubeEnd);
+            $scope.$on('youtube.player.error', handleYoutubeEnd);
+            $scope.youtubePlayerOptions = {
+              autoplay : 1
             };
+            $scope.getIFrameSrc = function (videoId) {
+                return 'https://www.youtube.com/embed/' + videoId;
+            };
+            function handleYoutubeEnd($event, player) {
+              if($scope.autoplay){
+                //handle youtube player errors and end of video events - end of digest loop
+                $timeout(function(){
+                  if($scope.nextVideo >= 0){
+                    // if($scope.nextVideo === $scope.pagination.resultsPerPage){
+                    //   $scope.nextPage();
+                    // }
+                    $scope.currentVideo.playing = false;
+                    $scope.playVideo($scope.filteredResults[$scope.nextVideo], $scope.nextVideo);
+                  }
+                  $scope.gotoPage(Math.floor($scope.currIndex / $scope.pagination.resultsPerPage) + 1);
+                  $scope.scrollToElement($scope.filteredResults[$scope.currIndex].videoId);
+                },50);
+              }
+            };
+
+            $scope.playVideo = function(video, index){
+              video.playing = true;
+              var index = ($scope.pagination.currentPage - 1) * $scope.pagination.resultsPerPage + index;
+              $scope.currentVideo = video;
+              $scope.currIndex = index || 0;
+
+              if(!isNaN(index)){
+                //set the next video to be played, if $scope.autoplay is on
+                $scope.nextVideo = (index < ($scope.filteredResults.length - 1)) ? (index+1) : $scope.repeat ? 0 : undefined;
+                $scope.previousVideo = index > 0 ? (index-1) : undefined;
+              }
+            };
+
+            $scope.stopAllVideos = function(){
+              $scope.displayList.forEach(function(vid){
+                vid.playing = false;
+              });
+            }
 
             /**
              * Interrupt a search

@@ -6,7 +6,9 @@ angular.module('youtubeSearchApp').controller('YoutubePlayerModalCtrl', [ '$root
 
     $scope.$on('youtube.player.ended', handleYoutubeEnd);
     $scope.$on('youtube.player.error', handleYoutubeEnd);
-
+    $scope.youtubePlayerOptions = {
+      autoplay : 1
+    };
     function handleYoutubeEnd($event, player) {
       if($scope.autoplay){
         //handle youtube player errors and end of video events - end of digest loop

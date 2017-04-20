@@ -28,13 +28,26 @@
       </button>
     </div>
 
+    <div id="toggle-autoplay">
+      <toggle-switch
+        ng-model="autoplay"
+        class="switch-success switch-large"
+        knob-label="Autoplay">
+      </toggle-switch>
+      <!-- <toggle-switch
+        ng-model="repeat"
+        class="switch-primary switch-large"
+        knob-label="Repeat" ng-change="updateNextPrevious()">
+      </toggle-switch> -->
+    </div>
+
     <!-- <div ng-class="autoplay ? 'toggle-autoplay text-success' : 'toggle-autoplay text-danger'" ng-click="toggleAutoplay()"><span class="glyphicon glyphicon-play-circle"></span>{{autoplay ? 'Autoplay enabled' : 'Autoplay disabled'}}</div> -->
 
     <table class="table">
         <tbody>
         <tr ng-repeat="video in displayList track by $index">
-            <td id="{{video.videoId}}">
-                <div class="video-image-container" ng-click="playVideo(video, true, $index)" title="{{(video.tags && video.tags.length > 0) ? video.tags.toString() : ''}}">
+            <td ng-show="!video.playing" id="{{video.videoId}}">
+                <div class="video-image-container" ng-click="stopAllVideos(); playVideo(video, $index)" title="{{(video.tags && video.tags.length > 0) ? video.tags.toString() : ''}}">
                     <!-- <div id="video-overlay-text"><span class="glyphicon glyphicon-play"></span></div> -->
                     <img ng-class="{'decrease-opacity' : watched}" src="{{video.thumbnail.url}}" width="250px" class="thumbnail" />
                     <div id="watched-video-overlay" ng-if="hasWatched(video.videoId)" class="text-danger">WATCHED ON YOUTUBE</div>
@@ -44,6 +57,10 @@
                 <div ng-if="!isVideoInList(video, selectedVideos) && AuthService.isLoggedIn()" class="add-to-multivid-playlist text-success" ng-click="toggleVideoInList(video, selectedVideos)"><span class="glyphicon glyphicon-plus"></span>Add to playlist queue</div>
                 <div ng-if="isVideoInList(video, selectedVideos) && AuthService.isLoggedIn()" class="add-to-multivid-playlist text-danger" ng-click="toggleVideoInList(video, selectedVideos)"><span class="glyphicon glyphicon-remove"></span>Remove from queue</div>
                 <div class="remove-from-results text-danger" ng-click="removeVideoFromList(video)"><span class="glyphicon glyphicon-remove"></span> Remove from results</div>
+            </td>
+            <td ng-if="video.playing">
+              <youtube-video video-url="getIFrameSrc(video.videoId)" player-vars="youtubePlayerOptions"></youtube-video>
+              <div class="stop-video" ng-click="video.playing = false"><span class="glyphicon glyphicon-remove"></span></div>
             </td>
             <td>
                 <div class="video-details-container">
