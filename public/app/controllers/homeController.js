@@ -803,10 +803,10 @@
                     //send requests / store promises
                     var promises = createBatchVideoRequest(nonDuplicates);
 
-                    // if(promises.length === 0){
-                    //     deferred.resolve();
-                    //     return;
-                    // }
+                    if(promises.length === 0){
+                        deferred.resolve();
+                        return;
+                    }
 
                     //wait for request to finish
                     $q.all(promises).then(function (res) {
