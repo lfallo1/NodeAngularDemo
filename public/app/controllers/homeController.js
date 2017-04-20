@@ -299,6 +299,11 @@
                 $scope.gotoPage($scope.pagination.currentPage);
             };
 
+            $scope.rating = function(pctLikes){
+              var rating = pctLikes > 99 ? 5 : pctLikes > 95 ? 4 : pctLikes > 90 ? 3 : pctLikes > 75 ? 2 : 1;
+              return new Array(rating);
+            }
+
             /**
              * set playlistService scope variable so the view can access service methods directly instead of creating redundant
              * intermediary methods

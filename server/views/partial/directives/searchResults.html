@@ -59,7 +59,7 @@
                 <div class="remove-from-results text-danger" ng-click="removeVideoFromList(video)"><span class="glyphicon glyphicon-remove"></span> Remove from results</div>
             </td>
             <td ng-if="video.playing">
-              <youtube-video video-url="getIFrameSrc(video.videoId)" player-vars="youtubePlayerOptions"></youtube-video>
+              <youtube-video video-url="getIFrameSrc(video.videoId)" player-vars="youtubePlayerOptions" title="{{(video.tags && video.tags.length > 0) ? video.tags.toString() : ''}}"></youtube-video>
               <div class="stop-video" ng-click="video.playing = false"><span class="glyphicon glyphicon-stop"></span> Stop Video</div>
             </td>
             <td>
@@ -71,10 +71,10 @@
                     </a>
                     <div class="created"><a href="https://www.youtube.com/channel/{{video.channelId}}" target="_blank">{{video.channelTitle}}</a> - {{video.created | date:'MM-dd-yyyy'}}</div>
                     <div class="duration">{{video.duration}}</div>
-                    <div class="rating"><small>Rating</small> {{video.pctLikes | number:2}}</div>
-                    <div class="view-count"><small>Views</small> {{video.viewCount}}</div>
-                    <div class="likes"><small>Likes</small> {{video.likes}}</div>
-                    <div class="dislikes"><small>Dislikes</small> {{video.dislikes}}</div>
+                    <div class="rating"><span ng-repeat="i in rating(video.pctLikes) track by $index" class="glyphicon glyphicon-star"></span> <span class="rating-value">{{video.pctLikes | number:2}}%</span></div>
+                    <div class="view-count"><span class="glyphicon glyphicon-eye-open"></span> {{video.viewCount | number}}</div>
+                    <div class="likes"><span class="video-rating glyphicon glyphicon-thumbs-up text-success"></span> {{video.likes}}</div>
+                    <div class="dislikes"><span class="video-rating glyphicon glyphicon-thumbs-down text-danger"></span> {{video.dislikes}}</div>
                     <div class="video-buttons row">
                         <div class="col-md-12">
                             <div class="download-mp3"><a class="btn btn-success" ng-show="!video.downloadAudioDisabled" target="_self" href="api/youtube/mp3/{{video.videoId}}/{{video.safeTitle}}" download="{{video.safeTitle + '.mp3'}}" ng-click="disableAudioDownload(video)"><span class="glyphicon glyphicon-music"></span>Download Audio (mp3)</a></div>

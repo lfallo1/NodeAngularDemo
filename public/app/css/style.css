@@ -1357,3 +1357,22 @@ div.report-modal .modal-content {
     cursor: pointer;
     opacity: 0.7;
 }
+
+.likes{
+    color: #3c763d;
+}
+.dislikes{
+    color: #a94442;
+}
+
+.rating{
+    color: #d58512
+}
+
+.view-count{
+    color: rgb(1,87,155)
+}
+
+.duration, .likes, .rating, .view-count, .dislikes{
+    font-weight: bold !important;
+}
