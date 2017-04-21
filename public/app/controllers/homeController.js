@@ -481,7 +481,8 @@
                     new SortOption(6, 'created', -1, 'calendar', 'Date Desc'),
                     new SortOption(7, 'durationMinutes', -1, 'time', 'Length'),
                     new SortOption(8, 'index', 1, 'random', SortModeTypes.RANDOM),
-                    new SortOption(9, 'matchPercentage', -1, 'ok', 'Relevance')
+                    new SortOption(9, 'matchPercentage', -1, 'ok', 'Relevance'),
+                    new SortOption(10, 'returnedIndex', -1, 'sort-by-attributes-alt', 'Date Returned')
                 ];
                 // $scope.sortField = $scope.sortOptions[0];
 
@@ -515,8 +516,8 @@
             }
 
             $scope.reset = function(){
-                $scope.playlistSearchCounter = 0;
-                $scope.playlistLoaded = false;
+                $scope.smartSearchExecuting = false;
+                $scope.smartSearchCounter = 0;
                 $scope.tags = {};
                 $scope.tagsArray = [];
                 $scope.searchResults = [];
@@ -584,6 +585,7 @@
                 $scope.nextVideo = (index < ($scope.filteredResults.length - 1)) ? (index+1) : $scope.repeat ? 0 : undefined;
                 $scope.previousVideo = index > 0 ? (index-1) : undefined;
               }
+              $scope.scrollToElement($scope.filteredResults[$scope.currIndex].videoId, true);
             };
 
             $scope.stopAllVideos = function(){
@@ -597,6 +599,7 @@
              * Interrupt a search
              */
             $scope.interrupt = function(){
+                $scope.smartSearchExecuting = false;
                 $scope.alerts = [];
                 relatedPending = false;
                 $scope.related = undefined;
@@ -619,6 +622,7 @@
                 toaster.pop(toasterType, '', msg);
                 $scope.setSaveUrl();
                 $scope.finalizeMatchPercentage();
+                $scope.smartSearchExecuting = false;
             };
 
             /**
@@ -636,8 +640,8 @@
             };
 
             var resetAll = function(){
-              $scope.playlistSearchCounter = 0;
-              $scope.playlistLoaded = false;
+              $scope.smartSearchExecuting = false;
+              $scope.smartSearchCounter = 0;
               $scope.tags = {};
               $scope.tagsArray = [];
 
@@ -673,7 +677,6 @@
               if($scope.userPlaylist.selectedPlaylist && $scope.userPlaylist.selectedPlaylist.val){
                   resetAll();
                   getVideosInPlaylist($scope.userPlaylist.selectedPlaylist.val).then(function(){
-                    $scope.playlistLoaded = true;
                   }, function(err){
                     toaster.pop({type : 'error', title: '', body : 'Unable to load playlist. Please make sure you have connected your account to YoutubeAgent using the red button below', timeout : 10000});
                   });
@@ -1183,7 +1186,8 @@
                             "description" : datastats.snippet.description,
                             "tags" : datastats.snippet.tags,
                             "index" : Math.ceil(Math.random()*1000000),
-                            "matchPercentage" : $scope.getMatchPercentage(datastats)
+                            "matchPercentage" : $scope.getMatchPercentage(datastats),
+                            "returnedIndex" : window.performance.timing.navigationStart + window.performance.now()
                         };
 
                         //add object to search results
@@ -1424,25 +1428,25 @@
                 })
             };
 
-            var handleFetchIterationCompletePlaylistSearch = function(){
+            var handleFetchIterationCompleteSmartSearch = function(){
 
                 //if the related videos is empty, or search related videos is turned off then finish the search
-                if($scope.playlistSearchCounter >= $scope.playlistResults.length || $scope.wasInterrupted){
+                if($scope.smartSearchCounter >= $scope.smartSearchInputVideos.length || $scope.wasInterrupted){
                     relatedPending = false;
                     stopSearch('Finished search', 'info');
                     return;
                 }
 
-                for(var i = $scope.playlistSearchCounter; i < $scope.playlistResults.length; i++){
-                  if($scope.playlistResults[i].tags && $scope.playlistResults[i].tags.splice(0,3).toString().replace(/,/g , " ").length < 40){
-                    $scope.searchParam = $scope.playlistResults[i].tags.splice(0,3).toString().replace(/,/g , " ");
-                    $scope.related = $scope.playlistResults[i].videoId;
-                    $scope.playlistSearchCounter = ++i;
+                for(var i = $scope.smartSearchCounter; i < $scope.smartSearchInputVideos.length; i++){
+                  if($scope.smartSearchInputVideos[i].tags && $scope.smartSearchInputVideos[i].tags.splice(0,3).toString().replace(/,/g , " ").length < 40){
+                    $scope.searchParam = $scope.smartSearchInputVideos[i].tags.splice(0,3).toString().replace(/,/g , " ");
+                    $scope.related = $scope.smartSearchInputVideos[i].videoId;
+                    $scope.smartSearchCounter = ++i;
                     break;
                   }
                 }
 
-                fetchResultsWrapper(false, handleFetchIterationCompletePlaylistSearch, handleFetchIterationCompletePlaylistSearch);
+                fetchResultsWrapper(false, handleFetchIterationCompleteSmartSearch, handleFetchIterationCompleteSmartSearch);
             };
 
             var setNewSearchParams = function(){
@@ -1804,6 +1808,7 @@
               $scope.searchMode = json.searchMode || $scope.TEXT_SEARCH;
               $scope.hashedResults = json.hashedResults;
               $scope.minRelevance = json.minRelevance;
+              $scope.returnedIndex = json.returnedIndex || new Date().getTime() + "_" + Math.floor(Math.random() * 10000000);
 
               if(json.quickFilterObjects){
                 $scope.quickFilterObjects = json.quickFilterObjects;
@@ -1964,11 +1969,14 @@
               return deferred.promise;
             };
 
-            $scope.playlistSearchCounter = 0;
-            $scope.searchByPlaylist = function(){
+            $scope.smartSearchCounter = 0;
+            $scope.smartSearch = function(){
+
+              if($scope.fetching){
+                return;
+              }
 
               //subset of the primary reset-all
-              $scope.playlistLoaded = false;
               $scope.tags = {};
               $scope.tagsArray = [];
               $scope.removedVideos = [];
@@ -1981,15 +1989,23 @@
               $scope.wasInterrupted = undefined;
               $scope.checkRelated = true;
 
-              $scope.playlistResults = [];
-              for(var i = 0; i < $scope.filteredResults.length; i++){
-                $scope.playlistResults.push({videoId: $scope.filteredResults[i].videoId, tags: $scope.filteredResults[i].tags});
+              $scope.smartSearchInputVideos = [];
+
+              //to avoid resorting the results, create a copy and sort.
+              //sort by relevance to improve relevance of the input for the smart search.
+              var sorted = $scope.filteredResults.slice().sort(function(a,b){
+                return a.matchPercentage < b.matchPercentage ? 1 : a.matchPercentage > b.matchPercentage ? -1 : 0;
+              });
+              var limit = Math.min(100, sorted.length);
+              for(var i = 0; i < limit; i++){
+                $scope.smartSearchInputVideos.push({videoId: sorted[i].videoId, tags: sorted[i].tags});
               }
-              $scope.playlistSearchCounter = 0;
-              $scope.searchParam = $scope.playlistResults[$scope.playlistSearchCounter].tags.splice(0,3).toString().replace(/,/g , " ").substring(0,40);
-              $scope.related = $scope.playlistResults[$scope.playlistSearchCounter++].videoId;
+              $scope.smartSearchCounter = 0;
+              $scope.searchParam = $scope.smartSearchInputVideos[$scope.smartSearchCounter].tags.splice(0,3).toString().replace(/,/g , " ").substring(0,40);
+              $scope.related = $scope.smartSearchInputVideos[$scope.smartSearchCounter++].videoId;
               $scope.fetching = true;
-              fetchResultsWrapper(false,handleFetchIterationCompletePlaylistSearch, handleFetchIterationCompletePlaylistSearch)
+              $scope.smartSearchExecuting = true;
+              fetchResultsWrapper(false,handleFetchIterationCompleteSmartSearch, handleFetchIterationCompleteSmartSearch)
             };
 
             $scope.setSelectedIntervalType = function(value){
