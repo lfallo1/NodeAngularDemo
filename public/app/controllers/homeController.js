@@ -515,6 +515,8 @@
             }
 
             $scope.reset = function(){
+                $scope.playlistSearchCounter = 0;
+                $scope.playlistLoaded = false;
                 $scope.tags = {};
                 $scope.tagsArray = [];
                 $scope.searchResults = [];
@@ -632,7 +634,8 @@
             };
 
             var resetAll = function(){
-
+              $scope.playlistSearchCounter = 0;
+              $scope.playlistLoaded = false;
               $scope.tags = {};
               $scope.tagsArray = [];
 
@@ -668,7 +671,7 @@
               if($scope.userPlaylist.selectedPlaylist && $scope.userPlaylist.selectedPlaylist.val){
                   resetAll();
                   getVideosInPlaylist($scope.userPlaylist.selectedPlaylist.val).then(function(){
-
+                    $scope.playlistLoaded = true;
                   }, function(err){
                     toaster.pop({type : 'error', title: '', body : 'Unable to load playlist. Please make sure you have connected your account to YoutubeAgent using the red button below', timeout : 10000});
                   });
@@ -718,7 +721,7 @@
 
                     //check for translation, and then call the wrapper
                     $scope.checkTranslation().then(function(){
-                      fetchResultsWrapper();
+                      fetchResultsWrapper(false, handleFetchIterationComplete, handleFetchIterationComplete);
                     });
 
                 }
@@ -742,7 +745,7 @@
              * The method calls fetch results, then waits for all requests to finish.
              * @param cancel
              */
-            var fetchResultsWrapper = function(cancel){
+            var fetchResultsWrapper = function(cancel, iterationCompletedHandler, iterationCompletedHandler){
 
                 //if cancel passed in (used if errors occur, and we want to the search to end
                 if(cancel){
@@ -753,7 +756,7 @@
                 var dateSmall = $scope.preSearchMinDate ? "&publishedAfter=" + $scope.preSearchMinDate.toISOString() : '';
 
                 //fetch results, passing the date range (the date ranges can be empty)
-                fetchResults(dateSmall, dateLarge).then(handleFetchIterationComplete, handleFetchIterationComplete);
+                fetchResults(dateSmall, dateLarge).then(iterationCompletedHandler, iterationCompletedHandler);
             };
 
             /**
@@ -1413,9 +1416,29 @@
                   $scope.related = $scope.nextRelated[0].id;
                   $scope.nextRelated.splice(0,1);
                   $scope.checkRelated = true;
-                  fetchResultsWrapper(false);
+                  fetchResultsWrapper(false, handleFetchIterationComplete, handleFetchIterationComplete);
                 })
+            };
 
+            var handleFetchIterationCompletePlaylistSearch = function(){
+
+                //if the related videos is empty, or search related videos is turned off then finish the search
+                if($scope.playlistSearchCounter >= $scope.playlistResults.length || $scope.wasInterrupted){
+                    relatedPending = false;
+                    stopSearch('Finished search', 'info');
+                    return;
+                }
+
+                for(var i = $scope.playlistSearchCounter; i < $scope.playlistResults.length; i++){
+                  if($scope.playlistResults[i].tags && $scope.playlistResults[i].tags.splice(0,3).toString().replace(/,/g , " ").length < 40){
+                    $scope.searchParam = $scope.playlistResults[i].tags.splice(0,3).toString().replace(/,/g , " ");
+                    $scope.related = $scope.playlistResults[i].videoId;
+                    $scope.playlistSearchCounter = ++i;
+                    break;
+                  }
+                }
+
+                fetchResultsWrapper(false, handleFetchIterationCompletePlaylistSearch, handleFetchIterationCompletePlaylistSearch);
             };
 
             var setNewSearchParams = function(){
@@ -1934,7 +1957,34 @@
               });
 
               return deferred.promise;
-            }
+            };
+
+            $scope.playlistSearchCounter = 0;
+            $scope.searchByPlaylist = function(){
+
+              //subset of the primary reset-all
+              $scope.playlistLoaded = false;
+              $scope.tags = {};
+              $scope.tagsArray = [];
+              $scope.removedVideos = [];
+              mostViewedSearchInterval = 0;
+              $scope.blob = undefined;
+              $scope.saveName = '';
+              $scope.alerts = [];
+              relatedPending = true;
+              resetSortOrders();
+              $scope.wasInterrupted = undefined;
+              $scope.checkRelated = true;
+
+              $scope.playlistResults = [];
+              for(var i = 0; i < $scope.filteredResults.length; i++){
+                $scope.playlistResults.push({videoId: $scope.filteredResults[i].videoId, tags: $scope.filteredResults[i].tags});
+              }
+              $scope.playlistSearchCounter = 0;
+              $scope.searchParam = $scope.playlistResults[$scope.playlistSearchCounter].tags.splice(0,3).toString().replace(/,/g , " ").substring(0,40);
+              $scope.related = $scope.playlistResults[$scope.playlistSearchCounter++].videoId;
+              fetchResultsWrapper(false,handleFetchIterationCompletePlaylistSearch, handleFetchIterationCompletePlaylistSearch)
+            };
 
             $scope.setSelectedIntervalType = function(value){
                 $scope.selectedIntervalType = value;

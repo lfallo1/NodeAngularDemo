@@ -28,6 +28,12 @@
       </button>
     </div>
 
+    <div class="restore-removed-videos" ng-show="playlistLoaded">
+      <button class="btn btn-sm btn-primary" ng-click="searchByPlaylist()">
+        <span class="glyphicon glyphicon-search"></span> Search Similar to Playlist
+      </button>
+    </div>
+
     <div id="toggle-autoplay">
       <toggle-switch
         ng-model="autoplay"
