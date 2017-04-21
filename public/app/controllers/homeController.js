@@ -546,6 +546,7 @@
             };
 
 
+            //START YOUTUBE PLAYER
             $scope.autoplay = true;
             $scope.$on('youtube.player.ended', handleYoutubeEnd);
             $scope.$on('youtube.player.error', handleYoutubeEnd);
@@ -590,6 +591,7 @@
                 vid.playing = false;
               });
             }
+            //END YOUTUBE PLAYER
 
             /**
              * Interrupt a search
@@ -863,7 +865,9 @@
                           for(var i = 0; i < $scope.filteredResults.length; i++){
                             $scope.filteredResults[i].matchPercentage = $scope.getMatchPercentage($scope.filteredResults[i]);
                           }
+                          $scope.sort();
                         }
+
 
                         //populated related video id's (for now, only populating during first pass)
                         if($scope.extendedSearch && relatedPending){
@@ -1826,7 +1830,7 @@
             }
 
             $scope.filter = function(relevancePending){
-                if((!$scope.minRelevance || !$scope.enableChannelFilter || !$scope.channelFilter || $scope.channelFilter.length === 0) && !hasQuickFilter() && !$scope.minViews && (!$scope.minDislikes && $scope.minDislikes !== 0) && !$scope.minDate && !$scope.shorterThanFilter && !$scope.longerThanFilter && !$scope.minRating){
+                if((!$scope.enableChannelFilter || !$scope.channelFilter || $scope.channelFilter.length === 0) && !$scope.minRelevance && !hasQuickFilter() && !$scope.minViews && (!$scope.minDislikes && $scope.minDislikes !== 0) && !$scope.minDate && !$scope.shorterThanFilter && !$scope.longerThanFilter && !$scope.minRating){
                     $scope.filteredResults = $scope.searchResults;
                 }
                 else{
@@ -1932,6 +1936,7 @@
                     for(var i = 0; i < $scope.filteredResults.length; i++){
                       $scope.filteredResults[i].matchPercentage = $scope.getMatchPercentage($scope.filteredResults[i]);
                     }
+                    $scope.sort();
                   }
 
                   deferred.resolve();
@@ -1983,6 +1988,7 @@
               $scope.playlistSearchCounter = 0;
               $scope.searchParam = $scope.playlistResults[$scope.playlistSearchCounter].tags.splice(0,3).toString().replace(/,/g , " ").substring(0,40);
               $scope.related = $scope.playlistResults[$scope.playlistSearchCounter++].videoId;
+              $scope.fetching = true;
               fetchResultsWrapper(false,handleFetchIterationCompletePlaylistSearch, handleFetchIterationCompletePlaylistSearch)
             };
 

@@ -28,23 +28,18 @@
       </button>
     </div>
 
-    <div class="restore-removed-videos" ng-show="playlistLoaded">
-      <button class="btn btn-sm btn-primary" ng-click="searchByPlaylist()">
-        <span class="glyphicon glyphicon-search"></span> Search Similar to Playlist
-      </button>
-    </div>
-
     <div id="toggle-autoplay">
       <toggle-switch
         ng-model="autoplay"
         class="switch-success switch-large"
         knob-label="Autoplay">
       </toggle-switch>
-      <!-- <toggle-switch
-        ng-model="repeat"
-        class="switch-primary switch-large"
-        knob-label="Repeat" ng-change="updateNextPrevious()">
-      </toggle-switch> -->
+    </div>
+
+    <div id="search-similar-videos" ng-show="playlistLoaded">
+      <button class="btn btn-sm btn-success" ng-click="searchByPlaylist()">
+        <span class="glyphicon glyphicon-forward"></span> Search Similar to Playlist
+      </button>
     </div>
 
     <!-- <div ng-class="autoplay ? 'toggle-autoplay text-success' : 'toggle-autoplay text-danger'" ng-click="toggleAutoplay()"><span class="glyphicon glyphicon-play-circle"></span>{{autoplay ? 'Autoplay enabled' : 'Autoplay disabled'}}</div> -->

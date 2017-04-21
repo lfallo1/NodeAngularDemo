@@ -1389,3 +1389,15 @@ div.report-modal .modal-content {
 .switch-right, .switch-left, .knob{
     border: 1px solid #ccc !important;
 }
+
+#search-similar-videos .btn{
+    background: white;
+    color: #5cb85c;
+    font-size: 24px;
+    margin-top: 10px;
+}
+
+#search-similar-videos .btn:hover{
+    background: #5cb85c;
+    color: white;
+}
