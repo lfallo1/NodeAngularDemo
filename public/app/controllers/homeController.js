@@ -1186,7 +1186,7 @@
 
               pct = pct.toFixed(1);
               // var relevance = video.matchPercentage.toFixed(1)
-              if(pct > 50){
+              if(pct > 40){
                 return 'text-success relevance-rating';
               } else if(pct > 10){
                 return 'text-info relevance-rating';
