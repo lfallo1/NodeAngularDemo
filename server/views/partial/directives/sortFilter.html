@@ -58,9 +58,9 @@
                       <div id="duration-header">Duration</div>
                       <div id="duration-label-wrapper">
                           <label id="duration-any" class="duration-button btn btn-default" ng-model="videoDuration" uib-btn-radio="'any'">Any</label>
-                          <label id="duration-short" class="duration-button btn btn-default" ng-model="videoDuration" uib-btn-radio="'short'">Short</label>
-                          <label id="duration-medium" class="duration-button btn btn-default" ng-model="videoDuration" uib-btn-radio="'medium'">Medium</label>
-                          <label id="duration-long" class="duration-button btn btn-default" ng-model="videoDuration" uib-btn-radio="'long'">Long</label>
+                          <label id="duration-short" class="duration-button btn btn-default" ng-model="videoDuration" uib-btn-radio="'short'">{{'<4mins'}}</label>
+                          <label id="duration-medium" class="duration-button btn btn-default" ng-model="videoDuration" uib-btn-radio="'medium'">{{'4-20mins'}}</label>
+                          <label id="duration-long" class="duration-button btn btn-default" ng-model="videoDuration" uib-btn-radio="'long'">{{'>20mins'}}</label>
                       </div>
                   </div>
                   <div id="safe-search-wrapper" class="btn-group col-md-12">
