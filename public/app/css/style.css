@@ -1385,3 +1385,7 @@ div.report-modal .modal-content {
     display: inline;
     margin-right: 6px;
 }
+
+.switch-right, .switch-left, .knob{
+    border: 1px solid #ccc !important;
+}
