@@ -217,7 +217,10 @@
                 var time = maxDate - minDate;
                 var mostViewedSearchInterval = -1;
 
-                if(time > 4 * millisConstants.YEAR){
+                if(time > 8 * millisConstants.YEAR){
+                  mostViewedSearchInterval = 35;
+                }
+                else if(time > 4 * millisConstants.YEAR){
                   mostViewedSearchInterval = 25;
                 }
                 else if(time > 2 * millisConstants.YEAR){
@@ -477,7 +480,8 @@
                     new SortOption(5, 'created', 1, 'calendar', 'Date Asc'),
                     new SortOption(6, 'created', -1, 'calendar', 'Date Desc'),
                     new SortOption(7, 'durationMinutes', -1, 'time', 'Length'),
-                    new SortOption(8, 'index', 1, 'random', SortModeTypes.RANDOM)
+                    new SortOption(8, 'index', 1, 'random', SortModeTypes.RANDOM),
+                    new SortOption(9, 'matchPercentage', -1, 'ok', 'Relevance')
                 ];
                 // $scope.sortField = $scope.sortOptions[0];
 
@@ -507,6 +511,7 @@
               $scope.minRating = undefined;
               $scope.shorterThanFilter = undefined;
               $scope.longerThanFilter = undefined;
+              $scope.minRelevance = undefined;
             }
 
             $scope.reset = function(){
@@ -609,6 +614,7 @@
                 $scope.fetching = false;
                 toaster.pop(toasterType, '', msg);
                 $scope.setSaveUrl();
+                $scope.finalizeMatchPercentage();
             };
 
             /**
@@ -773,7 +779,8 @@
                 related = $scope.checkRelated && $scope.related ? '&relatedToVideoId=' + $scope.related : '';
 
                 //check if date interval searching is turned on
-                if($scope.searchMode === $scope.MOST_VIEWED_SEARCH || $scope.intervalSearch){
+                //since relatedTo params ignore the date, once the extended part of a search begins, the interval search is "turned off"
+                if($scope.searchMode === $scope.MOST_VIEWED_SEARCH || ($scope.intervalSearch && !related)){
                   var intervalObj = defineInterval();
                   for(var j = 0; j < intervalObj.intervalFrequency; j++){
 
@@ -1155,7 +1162,8 @@
                             "durationMinutes": duration.approxMinutes || null,
                             "description" : datastats.snippet.description,
                             "tags" : datastats.snippet.tags,
-                            "index" : Math.ceil(Math.random()*1000000)
+                            "index" : Math.ceil(Math.random()*1000000),
+                            "matchPercentage" : $scope.getMatchPercentage(datastats)
                         };
 
                         //add object to search results
@@ -1171,28 +1179,94 @@
                 }
             };
 
+            $scope.relevanceClass = function(pct){
+              if(!pct){
+                return 'text-warning relevance-rating';
+              }
+
+              pct = pct.toFixed(1);
+              // var relevance = video.matchPercentage.toFixed(1)
+              if(pct > 50){
+                return 'text-success relevance-rating';
+              } else if(pct > 10){
+                return 'text-info relevance-rating';
+              } else{
+                return 'text-danger relevance-rating';
+              }
+            };
+
+            $scope.relevanceText = function(pct){
+              if(!pct){
+                return $scope.fetching ? 'Relevance pending' : 'N/A';
+              }
+
+              pct = pct.toFixed(1);
+              // var relevance = video.matchPercentage.toFixed(1)
+              if(pct > 50){
+                return 'Strong match ('+ pct +'%)';
+              } else if(pct > 10){
+                return 'Medium match ('+ pct +'%)';
+              } else{
+                return 'Low match ('+ pct +'%)';
+              }
+            };
+
+            $scope.finalizeMatchPercentage = function(){
+              for(var i = 0; i < $scope.searchResults.length; i++){
+                $scope.searchResults[i].matchPercentage = $scope.getMatchPercentage($scope.searchResults[i]);
+              }
+              $scope.sort();
+            };
+
+            $scope.getMatchPercentage = function(video, tagCount){
+              var totalTagCount = tagCount || getTagsMapCount();
+              var terms = video.snippet ? video.snippet.tags : video.tags;
+              var parts = $scope.tagsArray;
+              var totalMatches = 0;
+              if(!terms){
+                return 0;
+              }
+
+              //loop over each tag in the saved tagsArray object
+              for(var i = 0; i < parts.length; i++){
+
+                  //loop over each tag for the current video
+                  for(var j = 0; j < terms.length; j++){
+                    if(terms[j].toLowerCase() === parts[i].tag.toLowerCase()){
+                        totalMatches += parts[i].count;
+                    }
+                  }
+              }
+
+              //get the match percentage value.
+              //this is a weighted average, based on the video's tag matches, and how the tag ranks in terms of overall popularity.
+              return (totalMatches / totalTagCount) * 100;
+            };
+
+            var getTagsMapCount = function(){
+
+              //create an array with only the tags count
+              var totalTagsCountMap = $scope.tagsArray
+                .map(function(a){
+                  return a.count;
+                });
+
+              //sum the tags
+              var totalTagCount = (totalTagsCountMap && Object.keys(totalTagsCountMap).length > 0) ? totalTagsCountMap.reduce(function(a,b){
+                  return a + b;
+                }) : 0;
+
+              return totalTagCount || 0;
+            };
+
             /**
              * Given a youtube api data response, check each video to see if it is related to the original search
              * @param data
              */
             var getRelatedVideos = function(data){
-                //split search term(s) into array
-                // var parts = $scope.searchParam.toLowerCase().split(' ' );
-                var parts = $scope.tagsArray;
 
-                //create an array with only the tags count
-                var totalTagsCountMap = $scope.tagsArray
-                  .map(function(a){
-                    return a.count;
-                  });
-
-                //sum the tags
-                var totalTagCount = (totalTagsCountMap && Object.keys(totalTagsCountMap).length > 0) ? totalTagsCountMap.reduce(function(a,b){
-                    return a + b;
-                  }) : 0;
-
-                //if no tags, just return
-                if(!totalTagCount){
+                var tagCount = getTagsMapCount();
+                if(!tagCount){
                   return;
                 }
 
@@ -1202,27 +1276,8 @@
                     //if the video has tags
                     if(data[count].snippet.tags){
 
-                        //get the tags
-                        var terms = data[count].snippet.tags;
-
-                        var isRelevant = true;
-
-                        var totalMatches = 0;
-
-                        //loop over each tag in the saved tagsArray object
-                        for(var i = 0; i < parts.length; i++){
-
-                            //loop over each tag for the current video
-                            for(var j = 0; j < terms.length; j++){
-                              if(terms[j].toLowerCase() === parts[i].tag.toLowerCase()){
-                                  totalMatches += parts[i].count;
-                              }
-                            }
-                        }
-
-                        //get the match percentage value.
-                        //this is a weighted average, based on the video's tag matches, and how the tag ranks in terms of overall popularity.
-                        var matchPercentage = (totalMatches / totalTagCount) * 100;
+                        //get match percentage
+                        var matchPercentage = $scope.getMatchPercentage(data[count], tagCount);
 
                         //if less than 100 are in the nextRelated list, then only check that the matchPercentage is greater than the min threshold
                         if($scope.nextRelated.length < 100){
@@ -1670,7 +1725,8 @@
                 'searchMode' : $scope.searchMode,
                 'hashedResults' : $scope.hashedResults,
                 'quickFilterObjects' : $scope.quickFilterObjects,
-                'tagsArray' : $scope.tagsArray
+                'tagsArray' : $scope.tagsArray,
+                'minRelevance': $scope.minRelevance
               }
             };
 
@@ -1707,6 +1763,7 @@
               $scope.searchParam = json.searchParam;
               $scope.searchMode = json.searchMode || $scope.TEXT_SEARCH;
               $scope.hashedResults = json.hashedResults;
+              $scope.minRelevance = json.minRelevance;
 
               if(json.quickFilterObjects){
                 $scope.quickFilterObjects = json.quickFilterObjects;
@@ -1733,7 +1790,7 @@
             }
 
             $scope.filter = function(){
-                if((!$scope.enableChannelFilter || !$scope.channelFilter || $scope.channelFilter.length === 0) && !hasQuickFilter() && !$scope.minViews && (!$scope.minDislikes && $scope.minDislikes !== 0) && !$scope.minDate && !$scope.shorterThanFilter && !$scope.longerThanFilter && !$scope.minRating){
+                if((!$scope.minRelevance || !$scope.enableChannelFilter || !$scope.channelFilter || $scope.channelFilter.length === 0) && !hasQuickFilter() && !$scope.minViews && (!$scope.minDislikes && $scope.minDislikes !== 0) && !$scope.minDate && !$scope.shorterThanFilter && !$scope.longerThanFilter && !$scope.minRating){
                     $scope.filteredResults = $scope.searchResults;
                 }
                 else{
@@ -1742,6 +1799,7 @@
                             (!$scope.minViews || d.viewCount >= $scope.minViews) &&
                             (!$scope.minRating || d.pctLikes >= $scope.minRating) &&
                             (!$scope.maxDate || d.created <= $scope.maxDate) &&
+                            (!$scope.minRelevance || d.matchPercentage >= $scope.minRelevance) &&
                             (!$scope.minDate || d.created >= $scope.minDate) && durationFilter(d) && quickFilter(d) && performChannelFilter(d)){
                             return d;
                         }
@@ -1879,9 +1937,9 @@
                 //get the file, and validate
                 var file = files[0];
 
-                if(file.size > 26214400){
-                  //max file size 25mb and must be json
-                  toaster.pop('error','','Please upload a json file less than 15mb')
+                if(file.size > 47185920){
+                  //max file size 45mb and must be json
+                  toaster.pop('error','','Please upload a json file less than 45mb')
                   return;
                 }
 
@@ -1897,6 +1955,7 @@
                     } else{
                       updateTags();
                     }
+                    $scope.finalizeMatchPercentage();
 
                   }, function(err){
                     toaster.pop('error', '', 'Unable to read file');
