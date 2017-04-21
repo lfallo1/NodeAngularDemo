@@ -845,10 +845,23 @@
 
                         addVideosToList(data);
 
-                        $scope.sort();
+                        //relevancePending indicates whether or not tags exist.  if they do not, then all videos added are pending a relevance value.
+                        //if this is the case, the relevance should be ignored by the initial filter.
+                        //we are doing this because tags rely on the filtered results, the relevance is a filter, and the relevance is calculated based on the tags.  basically, something needs to exist first.
+                        //to get around this, we are ignoring the relevance filter on the initial pass, and then checking below (after tags have been generated) if we should recalc the relevance.
+                        var relevancePending = !($scope.tags && $scope.tags.length && $scope.tags.length > 0);
+                        $scope.sort(relevancePending); //pass relevancePending to ignore the relevance filter if no tags exist yet (otherwise, the tags will not calculate correctly for the first pass)
 
-                        //update the related tags array and hash obj
+                        //update the related tags array and hash obj (only filtered results are included in the tags calculation)
                         updateTags();
+
+                        //if tags were populated for the first time, then explictly call the match percentage for the videos (this will only happen on the initial pass)
+                        if(relevancePending){
+                          for(var i = 0; i < $scope.filteredResults.length; i++){
+                            $scope.filteredResults[i].matchPercentage = $scope.getMatchPercentage($scope.filteredResults[i]);
+                          }
+                        }
+
                         //populated related video id's (for now, only populating during first pass)
                         if($scope.extendedSearch && relatedPending){
                             getRelatedVideos(data);
@@ -1634,7 +1647,7 @@
                 $scope.filter();
             };
 
-            $scope.sort = function(){
+            $scope.sort = function(relevancePending){
 
                 //backwards compatible
                 var sortObject = $scope.sortOptions[0];
@@ -1657,7 +1670,7 @@
                     return 0;
                 });
 
-                $scope.filter();
+                $scope.filter(relevancePending);
             };
 
             var checkDate = function(date){
@@ -1789,7 +1802,7 @@
               }
             }
 
-            $scope.filter = function(){
+            $scope.filter = function(relevancePending){
                 if((!$scope.minRelevance || !$scope.enableChannelFilter || !$scope.channelFilter || $scope.channelFilter.length === 0) && !hasQuickFilter() && !$scope.minViews && (!$scope.minDislikes && $scope.minDislikes !== 0) && !$scope.minDate && !$scope.shorterThanFilter && !$scope.longerThanFilter && !$scope.minRating){
                     $scope.filteredResults = $scope.searchResults;
                 }
@@ -1799,7 +1812,7 @@
                             (!$scope.minViews || d.viewCount >= $scope.minViews) &&
                             (!$scope.minRating || d.pctLikes >= $scope.minRating) &&
                             (!$scope.maxDate || d.created <= $scope.maxDate) &&
-                            (!$scope.minRelevance || d.matchPercentage >= $scope.minRelevance) &&
+                            (!$scope.minRelevance || d.matchPercentage >= $scope.minRelevance || relevancePending) &&
                             (!$scope.minDate || d.created >= $scope.minDate) && durationFilter(d) && quickFilter(d) && performChannelFilter(d)){
                             return d;
                         }
