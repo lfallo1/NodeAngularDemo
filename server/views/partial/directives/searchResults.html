@@ -72,7 +72,7 @@
                     <div class="created"><a href="https://www.youtube.com/channel/{{video.channelId}}" target="_blank">{{video.channelTitle}}</a> - {{video.created | date:'MM-dd-yyyy'}}</div>
                     <div class="duration">{{video.duration}}</div>
                     <div ng-class="relevanceClass(video.matchPercentage)">
-                      <span ng-show="video.matchPercentage > 50" class="glyphicon glyphicon-ok-circle text-success"></span>
+                      <span ng-show="video.matchPercentage > 40" class="glyphicon glyphicon-ok-circle text-success"></span>
                       {{relevanceText(video.matchPercentage)}}
                     </div>
                     <div class="view-count"><span class="glyphicon glyphicon-eye-open"></span> {{video.viewCount | number}}</div>
