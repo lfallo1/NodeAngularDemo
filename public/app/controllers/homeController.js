@@ -1202,7 +1202,7 @@
 
               pct = pct.toFixed(1);
               // var relevance = video.matchPercentage.toFixed(1)
-              if(pct > 50){
+              if(pct > 40){
                 return 'Strong match ('+ pct +'%)';
               } else if(pct > 10){
                 return 'Medium match ('+ pct +'%)';
