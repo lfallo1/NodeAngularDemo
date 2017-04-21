@@ -1893,7 +1893,24 @@
                   }
 
                   addVideosToList(data);
-                  $scope.sort();
+
+                  //relevancePending indicates whether or not tags exist.  if they do not, then all videos added are pending a relevance value.
+                  //if this is the case, the relevance should be ignored by the initial filter.
+                  //we are doing this because tags rely on the filtered results, the relevance is a filter, and the relevance is calculated based on the tags.  basically, something needs to exist first.
+                  //to get around this, we are ignoring the relevance filter on the initial pass, and then checking below (after tags have been generated) if we should recalc the relevance.
+                  var relevancePending = !($scope.tags && $scope.tags.length && $scope.tags.length > 0);
+                  $scope.sort(relevancePending); //pass relevancePending to ignore the relevance filter if no tags exist yet (otherwise, the tags will not calculate correctly for the first pass)
+
+                  //update the related tags array and hash obj (only filtered results are included in the tags calculation)
+                  updateTags();
+
+                  //if tags were populated for the first time, then explictly call the match percentage for the videos (this will only happen on the initial pass)
+                  if(relevancePending){
+                    for(var i = 0; i < $scope.filteredResults.length; i++){
+                      $scope.filteredResults[i].matchPercentage = $scope.getMatchPercentage($scope.filteredResults[i]);
+                    }
+                  }
+
                   deferred.resolve();
               }, function(err){
                 deferred.reject();
