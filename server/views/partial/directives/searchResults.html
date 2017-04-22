@@ -67,7 +67,7 @@
                 <div class="video-details-container">
                     <a ng-href="{{'https://www.youtube.com/watch?v=' + video.videoId}}" target="_blank" title="{{(video.tags && video.tags.length > 0) ? video.tags.toString() : ''}}">
                         <div class="videoTitle">
-                            {{video.title}} - {{video.returnedIndex}}
+                            {{video.title}}
                         </div>
                     </a>
                     <div class="created"><a href="https://www.youtube.com/channel/{{video.channelId}}" target="_blank">{{video.channelTitle}}</a> - {{video.created | date:'MM-dd-yyyy'}}</div>
