@@ -574,16 +574,15 @@
               }
             };
 
-            $scope.playVideo = function(video, index){
+            $scope.playVideo = function(video, index, isFirst){
               video.playing = true;
-              var index = ($scope.pagination.currentPage - 1) * $scope.pagination.resultsPerPage + index;
+              var index = isFirst ? ($scope.pagination.currentPage - 1) * $scope.pagination.resultsPerPage + index : index;
               $scope.currentVideo = video;
               $scope.currIndex = index || 0;
 
               if(!isNaN(index)){
                 //set the next video to be played, if $scope.autoplay is on
                 $scope.nextVideo = (index < ($scope.filteredResults.length - 1)) ? (index+1) : $scope.repeat ? 0 : undefined;
-                $scope.previousVideo = index > 0 ? (index-1) : undefined;
               }
               $scope.scrollToElement($scope.filteredResults[$scope.currIndex].videoId, true);
             };
@@ -1135,6 +1134,7 @@
                 for (var i = 0; i < data.length; i++) {
                     var datastats = data[i];
                     if (datastats) {
+
                         var title = datastats.snippet.title;
                         var channelTitle = datastats.snippet.channelTitle;
                         var channelId = datastats.snippet.channelId;
@@ -1841,6 +1841,7 @@
             }
 
             $scope.filter = function(relevancePending){
+
                 if((!$scope.enableChannelFilter || !$scope.channelFilter || $scope.channelFilter.length === 0) && !$scope.minRelevance && !hasQuickFilter() && !$scope.minViews && (!$scope.minDislikes && $scope.minDislikes !== 0) && !$scope.minDate && !$scope.shorterThanFilter && !$scope.longerThanFilter && !$scope.minRating){
                     $scope.filteredResults = $scope.searchResults;
                 }
@@ -2148,6 +2149,53 @@
               } else if($scope.searchMode === $scope.MOST_VIEWED_SEARCH){
                 return 'Search term (optional)';
               }
+            };
+
+            var lyricalTitle = function(title){
+              var lyricsMatchers = [, 'lyrics video', 'with lyrics', 'lyrics in description', 'lyrics'];
+              for(var k = 0; k < lyricsMatchers.length; k++){
+                title = title.replace(lyricsMatchers[k],"").trim();
+              }
+              return title.toLowerCase().trim();
+            }
+
+            var checkLyricalDuplicate = function(video, index){
+              if($scope.fetching){ return false; }
+              var title = lyricalTitle(video.safeTitle.replace(/_/g , " ").replace(/ +(?= )/g).trim().toLowerCase());
+              var subFilter = $scope.searchResults.filter(function(d){
+                var safeTitle = d.safeTitle.replace(/_/g , " ").replace(/ +(?= )/g).trim().toLowerCase();
+                return title.substring(0,10) == safeTitle.substring(0,10);
+              });
+              for(var j = 0; j < subFilter.length; j++){
+                if(subFilter[j].videoId != video.videoId){
+                  var otherTitle = lyricalTitle(subFilter[j].safeTitle.replace(/_/g , " ").replace(/ +(?= )/g).trim().toLowerCase());
+                  if( (title.length > otherTitle.length && title.startsWith(otherTitle)) ||
+                    (title.length < otherTitle.length && otherTitle.startsWith(title)) ){
+                      return true;
+                  }
+                }
+              }
+              return false;
+            };
+
+            $scope.removeLyricalDuplicates = function(){
+              $scope.searchResults.sort(function(a,b){
+                aTitle = a.safeTitle.toLowerCase().replace(/_/g , " ").replace(/[^\w\s]/gi, '');
+                bTitle = b.safeTitle.toLowerCase().replace(/_/g , " ").replace(/[^\w\s]/gi, '');
+                return aTitle > bTitle ? 1 : aTitle < bTitle ? -1 : 0;
+              });
+              $rootScope.appLoading = true;
+              $timeout(function(){
+                for(var i = $scope.searchResults.length-1; i>= 0; i--){
+                  console.log('removeLyricalDuplicates: ' + i);
+                  if(checkLyricalDuplicate($scope.searchResults[i])){
+                    $scope.searchResults.splice(i,1);
+                  }
+                }
+                $rootScope.appLoading = false;
+                $scope.sort();                
+              });
+
             };
 
             init();
