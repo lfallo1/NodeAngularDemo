@@ -1438,11 +1438,17 @@
                 }
 
                 for(var i = $scope.smartSearchCounter; i < $scope.smartSearchInputVideos.length; i++){
-                  if($scope.smartSearchInputVideos[i].tags && $scope.smartSearchInputVideos[i].tags.splice(0,3).toString().replace(/,/g , " ").length < 40){
-                    $scope.searchParam = $scope.smartSearchInputVideos[i].tags.splice(0,3).toString().replace(/,/g , " ");
-                    $scope.related = $scope.smartSearchInputVideos[i].videoId;
-                    $scope.smartSearchCounter = ++i;
-                    break;
+                  //if has tags
+                  if($scope.smartSearchInputVideos[i].tags){
+                    //get the text
+                    var text = $scope.smartSearchInputVideos[i].tags.splice(0,3).toString().replace(/,/g , " ").toString();
+                    //if text does not contain invalid characters and text length < 40
+                    if(!( /[\u3400-\u9FBF]/.test(text) ) && text.length < 40){
+                      $scope.searchParam = $scope.smartSearchInputVideos[i].tags.splice(0,3).toString().replace(/,/g , " ");
+                      $scope.related = $scope.smartSearchInputVideos[i].videoId;
+                      $scope.smartSearchCounter = ++i;
+                      break;
+                    }
                   }
                 }
 
