@@ -3,7 +3,7 @@
 
     <!-- List the suggested tags -->
     <div ng-show="tagsArray.length > 0" id="suggested-tags">
-        <span class="badge" ng-repeat="tagItem in tagsArray track by $index">{{tagItem.tag}}</span>
+        <span class="badge" ng-repeat="tagItem in tagsArray track by $index">{{tagItem.tag}} ({{tagItem.count}})</span>
     </div>
 
     <ul class="pagination">
