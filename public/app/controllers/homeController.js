@@ -1262,8 +1262,6 @@
             $scope.getMatchPercentage = function(video, tagCount){
               var totalTagCount = tagCount || getTagsMapCount();
               var terms = video.snippet ? video.snippet.tags : video.tags;
-              var videoTitleParts = video.snippet ? video.snippet.title.replace(/  +/g, ' ').replace(/[^\w\s]/gi, '').split(' ') : video.title.replace(/  +/g, ' ').replace(/[^\w\s]/gi, '').split(' ');
-              terms = terms && terms.length ? terms.concat(videoTitleParts).unique() : videoTitleParts;
               var parts = $scope.tagsArray;
               var totalMatches = 0;
               if(!terms){
@@ -1460,10 +1458,10 @@
                   //if has tags
                   if($scope.smartSearchInputVideos[i].tags){
                     //get the text
-                    var text = $scope.smartSearchInputVideos[i].tags.splice(0,3).toString().replace(/,/g , " ").toString();
+                    var text = $scope.smartSearchInputVideos[i].tags.slice(0,3).toString().replace(/,/g , " ").toString();
                     //if text does not contain invalid characters and text length < 40
                     if(!( /[\u3400-\u9FBF]/.test(text) ) && text.length < 40){
-                      $scope.searchParam = $scope.smartSearchInputVideos[i].tags.splice(0,3).toString().replace(/,/g , " ");
+                      $scope.searchParam = $scope.smartSearchInputVideos[i].tags.slice(0,3).toString().replace(/,/g , " ");
                       $scope.related = $scope.smartSearchInputVideos[i].videoId;
                       $scope.smartSearchCounter = ++i;
                       break;
@@ -2027,7 +2025,7 @@
                 $scope.smartSearchInputVideos.push({videoId: sorted[i].videoId, tags: sorted[i].tags});
               }
               $scope.smartSearchCounter = 0;
-              $scope.searchParam = $scope.smartSearchInputVideos[$scope.smartSearchCounter].tags.splice(0,3).toString().replace(/,/g , " ").substring(0,40);
+              $scope.searchParam = $scope.smartSearchInputVideos[$scope.smartSearchCounter].tags.slice(0,3).toString().replace(/,/g , " ").substring(0,40);
               $scope.related = $scope.smartSearchInputVideos[$scope.smartSearchCounter++].videoId;
               $scope.fetching = true;
               $scope.smartSearchExecuting = true;
