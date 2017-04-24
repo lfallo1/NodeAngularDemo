@@ -20,12 +20,10 @@ router.get('', function (req, res, next) {
     http(options).then(function (data) {
         var response = {results: []};
         if(data && data.length > 0){
-          for(var i = 0; i < data[1].length; i++){
-            response.results.push({'title': data[1][i]});
-          }
-          // data.data = response;
+          res.json(data[1]);
+        } else{
+          res.json([]);
         }
-        res.json(response);
     })
     .catch(function (err) {
         console.log(err);

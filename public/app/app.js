@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('youtubeSearchApp', ['ui.router', 'youtube-embed', 'ngCookies', 'ngRoute', 'ngAnimate', 'toaster', 'ui.bootstrap', 'toggle-switch', 'ngFileSaver', 'ngMap', 'rzModule']).
+angular.module('youtubeSearchApp', ['ui.router', 'youtube-embed', 'ngCookies', 'ngRoute', 'ngAnimate', 'toaster', 'ui.bootstrap', 'toggle-switch', 'ngFileSaver', 'ngMap', 'rzModule', 'autocomplete']).
     config(['$stateProvider', '$locationProvider', '$urlRouterProvider', '$routeProvider', '$httpProvider', '$compileProvider', function($stateProvider, $locationProvider, $urlRouterProvider, $routeProvider, $httpProvider, $compileProvider) {
 
         //enable json file downloading through href tag

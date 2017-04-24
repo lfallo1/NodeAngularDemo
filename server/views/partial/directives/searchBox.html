@@ -11,7 +11,12 @@
   <div id="textbox-container" class="form-group col-md-6 col-md-offset-3">
       <form ng-show="searchMode !== POPULAR_SEARCH" ng-submit="doSearch()">
           <div class="input-group">
-              <input class="form-control" type="text" ng-model="searchParam" ng-attr-placeholder="{{getSearchBoxPlaceholder()}}" autofocus ng-blur="translate(null,true,searchParam)" />
+            <autocomplete attr-input-class="form-control" attr-placeholder="{{getSearchBoxPlaceholder()}}" ng-model="searchParam" data="autocompleteOptions"
+              on-type="getAutocompleteOptions"
+              on-blur="onSearchBoxBlur">
+            </autocomplete>
+            <!-- <input class="form-control" type="text" ng-model="searchParam" ng-attr-placeholder="{{getSearchBoxPlaceholder()}}" autofocus ng-blur="translate(null,true,searchParam)" /> -->
+              <!-- <input class="form-control" type="text" ng-model="searchParam" ng-attr-placeholder="{{getSearchBoxPlaceholder()}}" autofocus ng-blur="translate(null,true,searchParam)" /> -->
               <div id="searchButton" ng-if="!fetching" class="notta-button input-group-addon" ng-click="doSearch()"><span class="glyphicon glyphicon-search"></span>Search</div>
               <div id="stopButton" ng-if="fetching" class="notta-button input-group-addon" ng-click="interrupt()"><span class="glyphicon glyphicon-stop"></span>Stop</div>
           </div>

@@ -81,6 +81,10 @@
               });
             };
 
+            $scope.onSearchBoxBlur = function(){
+              $scope.translate(null,true,$scope.searchParam);
+            }
+
             //translate text
             $scope.translate = function(obj, isSearchParam, searchParam){
               var deferred = $q.defer();
@@ -1227,7 +1231,7 @@
               pct = pct.toFixed(1);
               // var relevance = video.matchPercentage.toFixed(1)
               if(pct > 40){
-                return 'Strong match ('+ pct +'%)';
+                return 'Strong match ('+ (pct > 100 ? 100.00 : pct) +'%)';
               } else if(pct > 10){
                 return 'Medium match ('+ pct +'%)';
               } else{
@@ -2193,8 +2197,20 @@
                   }
                 }
                 $rootScope.appLoading = false;
-                $scope.sort();                
+                $scope.sort();
               });
+
+            };
+
+            $scope.getAutocompleteOptions = function(){
+              if($scope.searchParam){
+                $http.get('api/autocomplete?q=' + $scope.searchParam).then(function(res){
+                  $scope.autocompleteOptions = res.data;
+                }, function(err){
+                  console.log(err);
+                  $scope.autocompleteOptions = [];
+                })
+              }
 
             };
 
