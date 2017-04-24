@@ -2203,7 +2203,7 @@
             };
 
             $scope.getAutocompleteOptions = function(){
-              if($scope.searchParam){
+              if($scope.searchParam && !$scope.smartSearchExecuting){
                 $http.get('api/autocomplete?q=' + $scope.searchParam).then(function(res){
                   $scope.autocompleteOptions = res.data;
                 }, function(err){
