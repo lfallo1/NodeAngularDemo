@@ -5,7 +5,7 @@ var countriesAPI = require('./server/services/countriesAPI.js');
 var youtubeAPI = require('./server/services/youtubeAPI.js');
 var videoApi = require('./server/services/videoApi.js');
 var translateAPI = require('./server/services/translateApi.js');
-var autocompleteAPI = require('./server/services/autocompleteApi.js');
+var autocompleteAPI = require('./server/services/autocompleteAPI.js');
 
 var app = express();
 
