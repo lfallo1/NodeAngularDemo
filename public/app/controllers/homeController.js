@@ -904,8 +904,10 @@
                 var video = $scope.filteredResults[i];
                 if(video.tags && video.tags.length){
                   for(var j = 0; j < video.tags.length; j++){
-                    var currentValue = $scope.tags[video.tags[j].toLowerCase()];
-                    $scope.tags[video.tags[j].toLowerCase()] = currentValue ? currentValue + 1 : 1;
+                    if(video.tags[j]){
+                      var currentValue = $scope.tags[video.tags[j].toLowerCase()];
+                      $scope.tags[video.tags[j].toLowerCase()] = currentValue ? currentValue + 1 : 1;
+                    }
                   }
                 }
               }
@@ -1246,9 +1248,22 @@
               $scope.sort();
             };
 
+            Array.prototype.unique = function() {
+                var a = this.concat();
+                for(var i=0; i<a.length; ++i) {
+                    for(var j=i+1; j<a.length; ++j) {
+                        if(a[i] === a[j])
+                            a.splice(j--, 1);
+                    }
+                }
+                return a;
+            };
+
             $scope.getMatchPercentage = function(video, tagCount){
               var totalTagCount = tagCount || getTagsMapCount();
               var terms = video.snippet ? video.snippet.tags : video.tags;
+              var videoTitleParts = video.snippet ? video.snippet.title.replace(/  +/g, ' ').replace(/[^\w\s]/gi, '').split(' ') : video.title.replace(/  +/g, ' ').replace(/[^\w\s]/gi, '').split(' ');
+              terms = terms && terms.length ? terms.concat(videoTitleParts).unique() : videoTitleParts;
               var parts = $scope.tagsArray;
               var totalMatches = 0;
               if(!terms){
@@ -1260,7 +1275,7 @@
 
                   //loop over each tag for the current video
                   for(var j = 0; j < terms.length; j++){
-                    if(terms[j].toLowerCase() === parts[i].tag.toLowerCase()){
+                    if(terms[j] && terms[j].toLowerCase() === parts[i].tag.toLowerCase()){
                         totalMatches += parts[i].count;
                     }
                   }
