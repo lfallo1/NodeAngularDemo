@@ -60,6 +60,10 @@
                 <div ng-if="!isVideoInList(video, selectedVideos) && AuthService.isLoggedIn()" class="add-to-multivid-playlist text-success" ng-click="toggleVideoInList(video, selectedVideos)"><span class="glyphicon glyphicon-plus"></span>Add to playlist queue</div>
                 <div ng-if="isVideoInList(video, selectedVideos) && AuthService.isLoggedIn()" class="add-to-multivid-playlist text-danger" ng-click="toggleVideoInList(video, selectedVideos)"><span class="glyphicon glyphicon-remove"></span>Remove from queue</div>
                 <div class="remove-from-results text-danger" ng-click="removeVideoFromList(video)"><span class="glyphicon glyphicon-remove"></span> Remove from results</div>
+                <div id="video-id-select" class="input-group">
+                  <input type="text" class="form-control" ng-model="video.videoId" readonly="readonly" select-on-click/>
+                  <span class="input-group-addon glyphicon glyphicon-copy" id="copy-addon"></span>
+                </div>
             </td>
             <td ng-if="video.playing">
               <youtube-video video-url="getIFrameSrc(video.videoId)" player-vars="youtubePlayerOptions"></youtube-video>
@@ -72,7 +76,10 @@
                             {{video.title}}
                         </div>
                     </a>
-                    <div class="created"><a href="https://www.youtube.com/channel/{{video.channelId}}" target="_blank">{{video.channelTitle}}</a> - {{video.created | date:'MM-dd-yyyy'}}</div>
+                    <div class="created"><a href="https://www.youtube.com/channel/{{video.channelId}}" target="_blank">
+                        {{video.channelTitle}}</a> - {{video.created | date:'MM-dd-yyyy'}}
+                        <!-- <input type="text" class="form-control" ng-model="video.videoId" readonly="readonly" select-on-click/> -->
+                    </div>
                     <div class="duration">{{video.duration}}</div>
                     <div ng-class="relevanceClass(video.matchPercentage)">
                       <span ng-show="video.matchPercentage > 40" class="glyphicon glyphicon-ok-circle text-success"></span>

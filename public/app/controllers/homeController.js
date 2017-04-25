@@ -1924,7 +1924,13 @@
               $http.post('api/youtube/get', {url : encodeURI(youtubeVideoBase + id)}).then(function(res){
                 if(res.data.items.length > 0){
                     addVideosToList(res.data.items);
+                    $scope.sort(true);
+                    updateTags();
+                    for(var i = 0; i < $scope.filteredResults.length; i++){
+                      $scope.filteredResults[i].matchPercentage = $scope.getMatchPercentage($scope.filteredResults[i]);
+                    }
                     $scope.sort();
+
                     $scope.fetching = false;
                     deferred.resolve();
                     return;

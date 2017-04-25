@@ -1438,3 +1438,19 @@ div.report-modal .modal-content {
     font-size: 20px;
     font-weight: bold;
 }
+
+div#video-id-select{
+    margin: 0px auto;
+}
+
+div#video-id-select.input-group{
+    width: 150px;
+}
+
+div#video-id-select.input-group input{
+    margin-top: 1px;
+}
+
+div#video-id-select.input-group .input-group-addon{
+    background: white !important;
+}
