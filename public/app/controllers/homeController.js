@@ -806,9 +806,9 @@
                     for (var i = 0; i < sortOrders.length; i++) {
                         var token = sortOrders[i].token ? '&pageToken=' + sortOrders[i].token : '';
 
-                        promises.push($http.post('api/youtube/get', {'url' : youtubeSearchBase + $scope.searchParam + "&type=video&maxResults=50" +
+                        promises.push($http.post('api/youtube/get', {'url' : encodeURI(youtubeSearchBase + $scope.searchParam + "&type=video&maxResults=50" +
                         dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + latlng + safeSearch +
-                        "&order=" + sortOrders[i].order + related  + token}));
+                        "&order=" + sortOrders[i].order + related  + token)}));
                     }
                   }
                 }
@@ -817,9 +817,9 @@
                     for (var i = 0; i < sortOrders.length; i++) {
                         var token = sortOrders[i].token ? '&pageToken=' + sortOrders[i].token : '';
 
-                        promises.push($http.post('api/youtube/get', {'url' : youtubeSearchBase + $scope.searchParam + "&type=video&maxResults=50" +
+                        promises.push($http.post('api/youtube/get', {'url' : encodeURI(youtubeSearchBase + $scope.searchParam + "&type=video&maxResults=50" +
                         dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + latlng + safeSearch +
-                        "&order=" + sortOrders[i].order + related  + token}));
+                        "&order=" + sortOrders[i].order + related  + token)}));
                     }
                 }
 
@@ -1921,7 +1921,7 @@
             var getVideoById = function(id){
               var deferred = $q.defer();
               var id = id || $scope.searchParam;
-              $http.post('api/youtube/get', {url : youtubeVideoBase + id}).then(function(res){
+              $http.post('api/youtube/get', {url : encodeURI(youtubeVideoBase + id)}).then(function(res){
                 if(res.data.items.length > 0){
                     addVideosToList(res.data.items);
                     $scope.sort();
@@ -2216,8 +2216,9 @@
             };
 
             $scope.getAutocompleteOptions = function(){
-              if($scope.searchParam && !$scope.smartSearchExecuting){
-                $http.get('api/autocomplete?q=' + $scope.searchParam).then(function(res){
+              var searchParam = $scope.searchParam ? $scope.searchParam.replace(/#/g,'') : '';
+              if(searchParam && !$scope.smartSearchExecuting){
+                $http.get('api/autocomplete?q=' + searchParam).then(function(res){
                   $scope.autocompleteOptions = res.data;
                 }, function(err){
                   console.log(err);

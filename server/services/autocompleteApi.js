@@ -10,7 +10,7 @@ var _options = {};
 router.get('', function (req, res, next) {
 
     var options = {
-        uri: AUTOCOMPLETE_BASE + req.query.q,
+        uri: AUTOCOMPLETE_BASE + req.query.q.replace(/#/g,''),
         json: true,
         headers: {
           'Content-Type': 'application/json'

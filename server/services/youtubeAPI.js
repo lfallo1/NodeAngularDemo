@@ -77,10 +77,11 @@ router.get('/mp4/:id/:title', function(req, res, next){
 router.post('/get',function (req, res, next) {
 
     var options = {
-        uri: req.body.url + '&key=' + apiKey,
+        uri: req.body.url.replace(/#/g,'') + '&key=' + apiKey,
         json: true
     };
-_options = options;
+
+    _options = options;
     http(options).then(function (data) {
         res.json(data)
     })
