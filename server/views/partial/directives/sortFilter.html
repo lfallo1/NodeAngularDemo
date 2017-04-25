@@ -73,13 +73,24 @@
                   </div>
                   <div id="search-optimizer-wrappers">
                       <div class="extended-search-wrapper">
-                          <button ng-disabled="searchMode !== TEXT_SEARCH" type="button" class="btn btn-success" ng-model="extendedSearch" uib-btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
+                          <button ng-disabled="searchMode !== TEXT_SEARCH"
+                              type="button" class="btn btn-success"
+                              ng-model="extendedSearch"
+                              uib-btn-checkbox btn-checkbox-true="true"
+                              btn-checkbox-false="false"
+                              title="Perform additional searches for videos related to the most relevant results">
                               <span class="glyphicon glyphicon-forward"></span>Extended Search
                           </button>
                       <span class="question-mark" popover-placement="right" uib-popover="Please note that duration and location parameters will be ignored when the extended search executes." popover-title="Extended Search Note" type="button"><span class="glyphicon glyphicon-info-sign" ng-click=""></span></span>
                       </div>
                       <div class="extended-search-wrapper">
-                          <button ng-disabled="searchMode !== TEXT_SEARCH" type="button" class="btn btn-info" ng-model="intervalSearch" uib-btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
+                          <button ng-disabled="searchMode !== TEXT_SEARCH"
+                              type="button"
+                              class="btn btn-info"
+                              ng-model="intervalSearch"
+                              uib-btn-checkbox btn-checkbox-true="true"
+                              btn-checkbox-false="false"
+                              title="Search in time intervals. Returns more results, but takes longer to perform">
                               <span class="glyphicon glyphicon-forward"></span>Interval Search
                           </button>
                       </div>
