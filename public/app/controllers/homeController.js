@@ -1260,12 +1260,17 @@
             };
 
             $scope.getMatchPercentage = function(video, tagCount){
+
+              if(video.title == 'Will B & Steve Allen - Alchera (JPL Remix)'){
+                console.log('stop');
+              }
+
               var totalTagCount = tagCount || getTagsMapCount();
               var videoTitle = video.snippet ? video.snippet.title : video.title;
               var terms = video.snippet ? video.snippet.tags : video.tags;
               var parts = $scope.tagsArray;
               var totalMatches = 0;
-              if(!terms){
+              if(!terms || !totalTagCount){
                 return 0;
               }
 
@@ -1281,12 +1286,33 @@
               }
 
               //edge case --- check if the title matches the search
-              //may ultimately remove this, but for now going to forcibly add relevance title matches
+              //may ultimately remove this, but for now going to forcibly add relevance on title matches
               if($scope.searchParam){
-                var searchParamSafe = $scope.searchParam.replace(/[^\w\s]/gi, '').replace(/\W+/g, " ").trim().toLowerCase();
-                var videoTitleSafe = videoTitle.replace(/[^\w\s]/gi, '').replace(/\W+/g, " ").trim().toLowerCase();
-                if(videoTitleSafe.startsWith(searchParamSafe)){
-                  totalMatches += Math.ceil(totalTagCount*0.12);
+                var searchParamSafe = $scope.searchParam.replace(/[^\w\s]/gi, '').replace(/\W+/g, " ").trim().toLowerCase().split(' ');
+                var videoTitleSafe = videoTitle.replace(/[^\w\s]/gi, '').replace(/\W+/g, " ").trim().toLowerCase().split(' ');
+
+                //default to true, and set false on first term that does not occur in the video title
+                var isTitleMatch = true;
+                for(var i = 0; i < searchParamSafe.length; i++){
+                  var found = false;
+                  for(var j = 0; j < videoTitleSafe.length; j++){
+                    //loop over each word in the video title, until a match is found on the search param
+                    if(searchParamSafe[i] == videoTitleSafe[j]){
+                      found = true;
+                      break;
+                    }
+                  }
+
+                  //if no match was found, then set isTitleMatch to false and break immediately
+                  if(!found){
+                    isTitleMatch = false;
+                    break;
+                  }
+                }
+
+                //if there was a title match, give extra relevance of 2x the most occuring term
+                if(isTitleMatch){
+                  totalMatches += parts[0].count*2;
                 }
               }
 
