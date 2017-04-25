@@ -860,19 +860,18 @@
                         //if this is the case, the relevance should be ignored by the initial filter.
                         //we are doing this because tags rely on the filtered results, the relevance is a filter, and the relevance is calculated based on the tags.  basically, something needs to exist first.
                         //to get around this, we are ignoring the relevance filter on the initial pass, and then checking below (after tags have been generated) if we should recalc the relevance.
-                        var relevancePending = !($scope.tags && $scope.tags.length && $scope.tags.length > 0);
+                        var relevancePending = !($scope.tags && Object.keys($scope.tags).length && Object.keys($scope.tags).length > 0);
                         $scope.sort(relevancePending); //pass relevancePending to ignore the relevance filter if no tags exist yet (otherwise, the tags will not calculate correctly for the first pass)
 
                         //update the related tags array and hash obj (only filtered results are included in the tags calculation)
                         updateTags();
 
-                        //if tags were populated for the first time, then explictly call the match percentage for the videos (this will only happen on the initial pass)
-                        if(relevancePending){
-                          for(var i = 0; i < $scope.filteredResults.length; i++){
-                            $scope.filteredResults[i].matchPercentage = $scope.getMatchPercentage($scope.filteredResults[i]);
-                          }
-                          $scope.sort();
-                        }
+                        //after the tags have been updated, and the results filtered:
+                        //1. finalize the match percentage of the videos
+                        //2. perform another sort. (this ensures that the relevance has been properly updated)
+                        //again this is repetitive BS since the tags are calculated on results (not the search query), and the results.matchPercentage is obviously based on the tags.
+                        $scope.finalizeMatchPercentage();
+                        $scope.sort();
 
 
                         //populated related video id's (for now, only populating during first pass)
@@ -1968,9 +1967,7 @@
                     addVideosToList(res.data.items);
                     $scope.sort(true);
                     updateTags();
-                    for(var i = 0; i < $scope.filteredResults.length; i++){
-                      $scope.filteredResults[i].matchPercentage = $scope.getMatchPercentage($scope.filteredResults[i]);
-                    }
+                    $scope.finalizeMatchPercentage();
                     $scope.sort();
 
                     $scope.fetching = false;
@@ -2002,19 +1999,21 @@
                   //if this is the case, the relevance should be ignored by the initial filter.
                   //we are doing this because tags rely on the filtered results, the relevance is a filter, and the relevance is calculated based on the tags.  basically, something needs to exist first.
                   //to get around this, we are ignoring the relevance filter on the initial pass, and then checking below (after tags have been generated) if we should recalc the relevance.
-                  var relevancePending = !($scope.tags && $scope.tags.length && $scope.tags.length > 0);
+                  var relevancePending = !($scope.tags && Object.keys($scope.tags).length && Object.keys($scope.tags).length > 0);
                   $scope.sort(relevancePending); //pass relevancePending to ignore the relevance filter if no tags exist yet (otherwise, the tags will not calculate correctly for the first pass)
 
                   //update the related tags array and hash obj (only filtered results are included in the tags calculation)
                   updateTags();
 
+                  //after the tags have been updated, and the results filtered finalize the match percentage of the videos and perform another sort.
+                  $scope.finalizeMatchPercentage();
+                  $scope.sort();
+
                   //if tags were populated for the first time, then explictly call the match percentage for the videos (this will only happen on the initial pass)
-                  if(relevancePending){
-                    for(var i = 0; i < $scope.filteredResults.length; i++){
-                      $scope.filteredResults[i].matchPercentage = $scope.getMatchPercentage($scope.filteredResults[i]);
-                    }
-                    $scope.sort();
-                  }
+                  // if(relevancePending){
+                  //   $scope.finalizeMatchPercentage();
+                  //   $scope.sort();
+                  // }
 
                   deferred.resolve();
               }, function(err){
@@ -2122,7 +2121,7 @@
                 readAsDataURL(files[0], $scope).then(function(res){
                   $http.get(res).then(function(json){
                     setupJsonObjectsFromFile(json.data);
-                    $scope.sort();
+                    $scope.sort(true);
 
                     //check tags after sorting / filtering
                     if(json.data.tagsArray){
@@ -2131,6 +2130,7 @@
                       updateTags();
                     }
                     $scope.finalizeMatchPercentage();
+                    $scope.sort();
 
                   }, function(err){
                     toaster.pop('error', '', 'Unable to read file');
