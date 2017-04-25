@@ -1454,20 +1454,25 @@
                     return;
                 }
 
-                for(var i = $scope.smartSearchCounter; i < $scope.smartSearchInputVideos.length; i++){
-                  //if has tags
-                  if($scope.smartSearchInputVideos[i].tags){
-                    //get the text
-                    var text = $scope.smartSearchInputVideos[i].tags.slice(0,3).toString().replace(/,/g , " ").toString();
-                    //if text does not contain invalid characters and text length < 40
-                    if(!( /[\u3400-\u9FBF]/.test(text) ) && text.length < 40){
-                      $scope.searchParam = $scope.smartSearchInputVideos[i].tags.slice(0,3).toString().replace(/,/g , " ");
-                      $scope.related = $scope.smartSearchInputVideos[i].videoId;
-                      $scope.smartSearchCounter = ++i;
-                      break;
-                    }
-                  }
-                }
+                //set search param to nothing to search only on the relation
+                $scope.searchParam = '';
+                $scope.related = $scope.smartSearchInputVideos[$scope.smartSearchCounter++].videoId;
+
+                //****** DISABLED: This dynamically sets the search param  to the top 3 tags of the next video used in the smart search *****
+                // for(var i = $scope.smartSearchCounter; i < $scope.smartSearchInputVideos.length; i++){
+                //   //if has tags
+                //   if($scope.smartSearchInputVideos[i].tags){
+                //     //get the text
+                //     var text = $scope.smartSearchInputVideos[i].tags.slice(0,3).toString().replace(/,/g , " ").toString();
+                //     //if text does not contain invalid characters and text length < 40
+                //     if(!( /[\u3400-\u9FBF]/.test(text) ) && text.length < 40){
+                //       // $scope.searchParam = $scope.smartSearchInputVideos[i].tags.slice(0,3).toString().replace(/,/g , " ");
+                //       $scope.related = $scope.smartSearchInputVideos[i].videoId;
+                //       $scope.smartSearchCounter = ++i;
+                //       break;
+                //     }
+                //   }
+                // }
 
                 fetchResultsWrapper(false, handleFetchIterationCompleteSmartSearch, handleFetchIterationCompleteSmartSearch);
             };
@@ -2031,7 +2036,8 @@
                 $scope.smartSearchInputVideos.push({videoId: sorted[i].videoId, tags: sorted[i].tags});
               }
               $scope.smartSearchCounter = 0;
-              $scope.searchParam = $scope.smartSearchInputVideos[$scope.smartSearchCounter].tags.slice(0,3).toString().replace(/,/g , " ").substring(0,40);
+              // $scope.searchParam = $scope.smartSearchInputVideos[$scope.smartSearchCounter].tags.slice(0,3).toString().replace(/,/g , " ").substring(0,40);
+              $scope.searchParam = '';
               $scope.related = $scope.smartSearchInputVideos[$scope.smartSearchCounter++].videoId;
               $scope.fetching = true;
               $scope.smartSearchExecuting = true;
