@@ -1261,6 +1261,7 @@
 
             $scope.getMatchPercentage = function(video, tagCount){
               var totalTagCount = tagCount || getTagsMapCount();
+              var videoTitle = video.snippet ? video.snippet.title : video.title;
               var terms = video.snippet ? video.snippet.tags : video.tags;
               var parts = $scope.tagsArray;
               var totalMatches = 0;
@@ -1277,6 +1278,16 @@
                         totalMatches += parts[i].count;
                     }
                   }
+              }
+
+              //edge case --- check if the title matches the search
+              //may ultimately remove this, but for now going to forcibly add relevance title matches
+              if($scope.searchParam){
+                var searchParamSafe = $scope.searchParam.replace(/[^\w\s]/gi, '').replace(/\W+/g, " ").trim().toLowerCase();
+                var videoTitleSafe = videoTitle.replace(/[^\w\s]/gi, '').replace(/\W+/g, " ").trim().toLowerCase();
+                if(videoTitleSafe.startsWith(searchParamSafe)){
+                  totalMatches += Math.ceil(totalTagCount*0.12);
+                }
               }
 
               //get the match percentage value.
