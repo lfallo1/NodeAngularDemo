@@ -1470,8 +1470,8 @@ div#video-id-select.input-group .input-group-addon{
 }
 
 #search-similar-videos{
-    border: 1px solid rgba(92, 184, 92, 0.3);
-    border-radius: 20px;
+    /*border: 1px solid rgba(92, 184, 92, 0.3);
+    border-radius: 20px;*/
     width: 75%;
     margin: 0px auto;
     padding-bottom: 10px;
