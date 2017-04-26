@@ -1236,6 +1236,7 @@ div.report-modal .modal-content {
 .restore-removed-videos{
     text-align: center;
     margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 .restore-removed-videos .btn{
@@ -1334,7 +1335,7 @@ div.report-modal .modal-content {
     margin: 0px auto;
 }
 
-#toggleMap{
+#toggleMap, #show-hide-addl-options{
     color: #f0ad4e;
     width: 100%;
     display: inline-block !important;
@@ -1342,7 +1343,14 @@ div.report-modal .modal-content {
     font-size: 20px;
 }
 
-#toggleMap:hover{
+#show-hide-addl-options{
+    color: #5cb85c;
+    font-weight: bold;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+#toggleMap:hover, #show-hide-addl-options:hover{
     opacity: 0.7;
     cursor: pointer;
 }
