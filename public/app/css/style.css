@@ -1503,10 +1503,11 @@ div#video-id-select.input-group .input-group-addon{
 
 #search-similar-videos .rzslider{
     width: 50%;
+    margin-top: 15px;
 }
 
 #search-similar-videos .rz-bubble{
-    color: #0db9f0 !important;
+    /* color: #0db9f0 !important; */
     font-weight: bold !important;
 }
 
@@ -1515,4 +1516,52 @@ div#video-id-select.input-group .input-group-addon{
     font-weight: bold;
     font-style: italic;
     margin-top: -4px;
+}
+
+#smart-search-label-speed, #smart-search-label-results{
+    width: 50%;
+    margin: 0px auto;
+}
+
+#smart-search-label-speed div, #smart-search-label-results div{
+    display: inline !important;
+}
+
+#smart-search-label-results {
+    margin-top: 0px;;
+    margin-bottom: 25px;
+}
+
+#smart-search-label-results, #smart-search-label-speed{
+    color: #5cb85c;
+    font-weight: bold;
+}
+
+.rzslider .rz-pointer{
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    background: white;
+    border: 4px solid #5cb85c;
+    margin-top: -5px;
+}
+
+
+.rzslider .rz-pointer.rz-active:after {
+  background-color: white;
+}
+
+#smart-search-label-faster, #smart-search-label-less-results {
+    float: left;
+}
+
+#smart-search-label-slower, #smart-search-label-more-results {
+    float: right;
+}
+
+.rzslider .rz-bar{
+    height: 20px;
+    margin-top: -7px;
+    border-radius: 10px;
+    background: #5cb85c;
 }

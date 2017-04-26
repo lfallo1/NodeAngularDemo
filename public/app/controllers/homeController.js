@@ -2067,6 +2067,12 @@
               return $scope.filteredResults.filter(function(d){return d.smartSearch});
             };
 
+            $scope.smartSearchSliderOptions = {
+              floor: 1,
+              ceil: 100,
+              hideLimitLabels: true,
+              hidePointerLabels: true
+            };
 
             $scope.smartSearchCounter = 0;
             $scope.smartSearch = function(){

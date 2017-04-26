@@ -59,8 +59,15 @@
           </div>
         </div>
         <div ng-show="!smartSearchIncludeSelected || smartSearchSelections().length === 0">
-            <rzslider rz-slider-model="smartSearchInclusion" rz-slider-options="{floor: 1, ceil: 100}"></rzslider>
-            <div id="smart-search-inclusion-label">Drag slider to select % of videos to use as seeds in SmartSearch</div>
+            <div id="smart-search-label-speed">
+              <div id="smart-search-label-faster">Faster</div>
+              <div id="smart-search-label-slower">Slower</div>
+            </div>
+            <rzslider rz-slider-model="smartSearchInclusion" rz-slider-options="smartSearchSliderOptions"></rzslider>
+            <div id="smart-search-label-results">
+              <div id="smart-search-label-more-results">More results</div>
+              <div id="smart-search-label-less-results">Less results</div>
+            </div>
         </div>
         <div id="clear-smart-search-selections" ng-show="smartSearchSelections().length > 0">
           <button class="btn btn-danger" ng-click="clearSmartSearchSelections()">Clear</button>
