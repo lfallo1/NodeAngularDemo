@@ -870,8 +870,11 @@
                         //1. finalize the match percentage of the videos
                         //2. perform another sort. (this ensures that the relevance has been properly updated)
                         //again this is repetitive BS since the tags are calculated on results (not the search query), and the results.matchPercentage is obviously based on the tags.
-                        $scope.finalizeMatchPercentage();
-                        $scope.sort();
+                        //conditionally performing to improve a little performance
+                        if(relevancePending || new Date().getTime() % 10 === 0){
+                          $scope.finalizeMatchPercentage();
+                          $scope.sort();
+                        }
 
 
                         //populated related video id's (for now, only populating during first pass)
