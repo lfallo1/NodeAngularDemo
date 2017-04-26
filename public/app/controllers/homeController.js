@@ -426,6 +426,7 @@
                 $scope.tags = {};
                 $scope.tagsArray = [];
                 $scope.smartSearchKeepOriginalList = true;
+                $scope.smartSearchInclusion = 100;
 
                 $scope.quickFilterObjects = [
                   {id:1, type:$scope.quickFilterType.MUST_HAVE, quickfilterType:'Must have', terms : [{id:1,term:""}]},
@@ -627,6 +628,9 @@
                 $scope.setSaveUrl();
                 $scope.finalizeMatchPercentage();
                 $scope.smartSearchExecuting = false;
+                $timeout(function(){
+                    $scope.refreshSlider();
+                });
             };
 
             /**
@@ -2046,6 +2050,10 @@
               return deferred.promise;
             };
 
+            $scope.getSmartSearchCeiling = function(){
+              return Math.min($scope.filteredResults ? $scope.filteredResults.length : 1, 100);
+            }
+
             //Clear the smart search flag on videos
             $scope.clearSmartSearchSelections = function(){
               var selections = $scope.smartSearchSelections();
@@ -2102,7 +2110,8 @@
                 var sorted = $scope.filteredResults.sort(function(a,b){
                   return a.matchPercentage < b.matchPercentage ? 1 : a.matchPercentage > b.matchPercentage ? -1 : 0;
                 });
-                var limit = Math.min(100, sorted.length);
+                // var limit = Math.min(100, sorted.length);
+                var limit = Math.min(Math.ceil(($scope.smartSearchInclusion * $scope.filteredResults.length)/100), 125);
                 for(var i = 0; i < limit; i++){
                   $scope.smartSearchInputVideos.push({videoId: sorted[i].videoId, tags: sorted[i].tags});
                 }
@@ -2168,7 +2177,9 @@
                     }
                     $scope.finalizeMatchPercentage();
                     $scope.sort();
-
+                    $timeout(function(){
+                        $scope.refreshSlider();
+                    });
                   }, function(err){
                     toaster.pop('error', '', 'Unable to read file');
                     console.log(err);

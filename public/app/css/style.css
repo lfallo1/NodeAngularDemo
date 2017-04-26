@@ -1492,3 +1492,19 @@ div#video-id-select.input-group .input-group-addon{
 #clear-smart-search-selections button{
     width: 125px;
 }
+
+#search-similar-videos .rzslider{
+    width: 50%;
+}
+
+#search-similar-videos .rz-bubble{
+    color: #0db9f0 !important;
+    font-weight: bold !important;
+}
+
+#smart-search-inclusion-label{
+    color: #0db9f0;
+    font-weight: bold;
+    font-style: italic;
+    margin-top: -4px;
+}
