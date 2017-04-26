@@ -40,7 +40,7 @@
       <button id="smart-search-button" class="btn btn-sm btn-success" ng-click="smartSearch()" title="Search for videos similar to your filtered results">
         <span class="glyphicon glyphicon-flash"></span> SmartSearch
       </button>
-      <label for="smartSearchIncludeSelectedCheckbox">
+      <label for="smartSearchIncludeSelectedCheckbox" ng-show="smartSearchSelections().length > 0">
         <input ng-disabled="smartSearchSelections().length < 1" name="smartSearchIncludeSelectedCheckbox" type="checkbox" ng-model="smartSearchIncludeSelected" />
         Only match on selected videos
       </label>
