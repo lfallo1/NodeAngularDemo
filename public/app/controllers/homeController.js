@@ -425,6 +425,7 @@
 
                 $scope.tags = {};
                 $scope.tagsArray = [];
+                $scope.smartSearchKeepOriginalList = true;
 
                 $scope.quickFilterObjects = [
                   {id:1, type:$scope.quickFilterType.MUST_HAVE, quickfilterType:'Must have', terms : [{id:1,term:""}]},
@@ -2081,21 +2082,30 @@
 
               $scope.smartSearchInputVideos = [];
 
-              //if only including the selected videos, set the entire list to the selected videos
+              //if smart search include selected is checked
               if($scope.smartSearchIncludeSelected && $scope.smartSearchSelections().length > 0){
-                $scope.searchResults = $scope.smartSearchSelections();
-                updateTags();
-                $scope.finalizeMatchPercentage();
+                //if not keeping original list, then re populate the list
+                if(!$scope.smartSearchKeepOriginalList){
+                  $scope.searchResults = $scope.smartSearchSelections();
+                  updateTags();
+                  $scope.finalizeMatchPercentage();
+                }
+                var smartSearchSelections = $scope.smartSearchSelections();
+                var limit = Math.min(100, smartSearchSelections.length);
+                for(var i = 0; i < limit; i++){
+                  $scope.smartSearchInputVideos.push({videoId: smartSearchSelections[i].videoId, tags: smartSearchSelections[i].tags});
+                }
               }
-
-              //to avoid resorting the results, create a copy and sort.
-              //sort by relevance to improve relevance of the input for the smart search.
-              var sorted = $scope.filteredResults.sort(function(a,b){
-                return a.matchPercentage < b.matchPercentage ? 1 : a.matchPercentage > b.matchPercentage ? -1 : 0;
-              });
-              var limit = Math.min(100, sorted.length);
-              for(var i = 0; i < limit; i++){
-                $scope.smartSearchInputVideos.push({videoId: sorted[i].videoId, tags: sorted[i].tags});
+              else{
+                //to avoid resorting the results, create a copy and sort.
+                //sort by relevance to improve relevance of the input for the smart search.
+                var sorted = $scope.filteredResults.sort(function(a,b){
+                  return a.matchPercentage < b.matchPercentage ? 1 : a.matchPercentage > b.matchPercentage ? -1 : 0;
+                });
+                var limit = Math.min(100, sorted.length);
+                for(var i = 0; i < limit; i++){
+                  $scope.smartSearchInputVideos.push({videoId: sorted[i].videoId, tags: sorted[i].tags});
+                }
               }
 
               $scope.smartSearchCounter = 0;

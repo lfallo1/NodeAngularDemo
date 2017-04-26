@@ -44,6 +44,10 @@
         <input ng-disabled="smartSearchSelections().length < 1" name="smartSearchIncludeSelectedCheckbox" type="checkbox" ng-model="smartSearchIncludeSelected" />
         Only match on selected videos
       </label>
+      <label for="smartSearchKeepOriginalList" ng-show="smartSearchSelections().length > 0">
+        <input ng-disabled="smartSearchSelections().length < 1 || !smartSearchIncludeSelected" name="smartSearchKeepOriginalList" type="checkbox" ng-model="smartSearchKeepOriginalList" />
+        Keep current results
+      </label>
       <div id="smartSearchSelection" ng-show="smartSearchSelections().length > 0">
         <div ng-repeat="v in smartSearchSelections() track by $index">
           {{v.title}}
