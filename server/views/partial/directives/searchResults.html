@@ -37,9 +37,21 @@
     </div>
 
     <div id="search-similar-videos" ng-show="filteredResults.length > 0 && !fetching">
-      <button class="btn btn-sm btn-success" ng-click="smartSearch()" title="Search for videos similar to your filtered results">
+      <button id="smart-search-button" class="btn btn-sm btn-success" ng-click="smartSearch()" title="Search for videos similar to your filtered results">
         <span class="glyphicon glyphicon-flash"></span> SmartSearch
       </button>
+      <label for="smartSearchIncludeSelectedCheckbox">
+        <input ng-disabled="smartSearchSelections().length < 1" name="smartSearchIncludeSelectedCheckbox" type="checkbox" ng-model="smartSearchIncludeSelected" />
+        Only match on selected videos
+      </label>
+      <div id="smartSearchSelection" ng-show="smartSearchSelections().length > 0">
+        <div ng-repeat="v in smartSearchSelections() track by $index">
+          {{v.title}}
+        </div>
+      </div>
+      <div id="clear-smart-search-selections" ng-show="smartSearchSelections().length > 0">
+        <button class="btn btn-danger" ng-click="clearSmartSearchSelections()">Clear</button>
+      </div>
     </div>
 
     <!-- <button class="btn btn-warn" ng-click="removeLyricalDuplicates()">Lyrics duplicate remover</button> -->
@@ -92,6 +104,12 @@
                       <span ng-repeat="i in rating(video.pctLikes) track by $index" class="glyphicon glyphicon-star"></span>
                       <span class="empty-stars"><span ng-repeat="i in rating(video.pctLikes, true) track by $index" class="glyphicon glyphicon-star-empty"></span></span>
                       <span class="rating-value">{{video.pctLikes | number:2}}%</span>
+                    </div>
+                    <div class="smart-search-checkbox text-success">
+                      <label for="smartSearchCheckbox">
+                        <input type="checkbox" ng-model="video.smartSearch" />
+                        Include in SmartSearch
+                      </label>
                     </div>
                     <div class="video-buttons row">
                         <div class="col-md-12">

@@ -1220,7 +1220,7 @@
               } else if(pct > 10){
                 return 'text-info relevance-rating';
               } else{
-                return 'text-danger relevance-rating';
+                return 'text-warning relevance-rating';
               }
             };
 
@@ -1232,11 +1232,11 @@
               pct = pct.toFixed(1);
               // var relevance = video.matchPercentage.toFixed(1)
               if(pct > 40){
-                return 'Strong match ('+ (pct > 100 ? 100.00 : pct) +'%)';
+                return 'Excellent match ('+ (pct > 100 ? 100.00 : pct) +'%)';
               } else if(pct > 10){
-                return 'Medium match ('+ pct +'%)';
+                return 'Good match ('+ pct +'%)';
               } else{
-                return 'Low match ('+ pct +'%)';
+                return 'Match ('+ pct +'%)';
               }
             };
 
@@ -1751,9 +1751,11 @@
                 } else{
                     sortObject = $scope.sortOptions.filter(function(d){if(d.id === $scope.sortField.id){return d;}})[0];
                 }
+
+                //default sort by relevance
                 if(!sortObject){
-                  sortObject = $scope.sortOptions[0];
-                  $scope.sortField = {id : 1};
+                  sortObject = $scope.sortOptions[8];
+                  $scope.sortField = {id : 9};
                 }
 
                 $scope.searchResults = $scope.searchResults.sort(function(a,b){
@@ -2040,6 +2042,20 @@
               return deferred.promise;
             };
 
+            //Clear the smart search flag on videos
+            $scope.clearSmartSearchSelections = function(){
+              var selections = $scope.smartSearchSelections();
+              for(var i = 0; i < selections.length; i++){
+                selections[i].smartSearch = false;
+              }
+            };
+
+            //return only videos with the smart search flag enabled
+            $scope.smartSearchSelections = function(){
+              return $scope.filteredResults.filter(function(d){return d.smartSearch});
+            };
+
+
             $scope.smartSearchCounter = 0;
             $scope.smartSearch = function(){
 
@@ -2062,15 +2078,23 @@
 
               $scope.smartSearchInputVideos = [];
 
+              //if only including the selected videos, set the entire list to the selected videos
+              if($scope.smartSearchIncludeSelected && $scope.smartSearchSelections().length > 0){
+                $scope.searchResults = $scope.smartSearchSelections();
+                updateTags();
+                $scope.finalizeMatchPercentage();
+              }
+
               //to avoid resorting the results, create a copy and sort.
               //sort by relevance to improve relevance of the input for the smart search.
-              var sorted = $scope.filteredResults.slice().sort(function(a,b){
+              var sorted = $scope.filteredResults.sort(function(a,b){
                 return a.matchPercentage < b.matchPercentage ? 1 : a.matchPercentage > b.matchPercentage ? -1 : 0;
               });
               var limit = Math.min(100, sorted.length);
               for(var i = 0; i < limit; i++){
                 $scope.smartSearchInputVideos.push({videoId: sorted[i].videoId, tags: sorted[i].tags});
               }
+
               $scope.smartSearchCounter = 0;
               // $scope.searchParam = $scope.smartSearchInputVideos[$scope.smartSearchCounter].tags.slice(0,3).toString().replace(/,/g , " ").substring(0,40);
               $scope.searchParam = '';

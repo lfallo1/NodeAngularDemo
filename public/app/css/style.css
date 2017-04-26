@@ -1390,14 +1390,14 @@ div.report-modal .modal-content {
     border: 1px solid #ccc !important;
 }
 
-#search-similar-videos .btn{
+#search-similar-videos #smart-search-button.btn{
     background: white;
     color: #5cb85c;
     font-size: 24px;
     margin-top: 10px;
 }
 
-#search-similar-videos .btn:hover{
+#search-similar-videos #smart-search-button.btn:hover{
     background: #5cb85c;
     color: white;
 }
@@ -1453,4 +1453,41 @@ div#video-id-select.input-group input{
 
 div#video-id-select.input-group .input-group-addon{
     background: white !important;
+}
+
+#search-similar-videos label{
+    display: block;
+    margin-top: 5px;
+    color: rgb(92, 184, 92);
+    font-weight: bold;
+    font-size: 18px;
+}
+
+#smartSearchSelection div{
+    font-weight: bold;
+    width: 55%;
+    margin: 0px auto;
+}
+
+#search-similar-videos{
+    border: 1px solid rgba(92, 184, 92, 0.3);
+    border-radius: 20px;
+    width: 75%;
+    margin: 0px auto;
+}
+
+.smart-search-checkbox{
+    margin-top: 3px;
+    font-size: 16px;
+    margin-bottom: -10px;
+    color: rgb(92, 184, 92);
+}
+
+#clear-smart-search-selections{
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+#clear-smart-search-selections button{
+    width: 125px;
 }
