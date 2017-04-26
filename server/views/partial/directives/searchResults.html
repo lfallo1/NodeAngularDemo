@@ -22,7 +22,7 @@
         </li>
     </ul>
 
-    <div id="show-hide-addl-options" ng-click="showAdditionalOptions = !showAdditionalOptions">
+    <div id="show-hide-addl-options" ng-click="showAdditionalOptions = !showAdditionalOptions; refreshSlider()">
       <span class="glyphicon glyphicon-cog"></span>
       {{showAdditionalOptions ? 'Hide options -' : 'Show options +'}}
     </div>
