@@ -1565,3 +1565,10 @@ div#video-id-select.input-group .input-group-addon{
     border-radius: 10px;
     background: #5cb85c;
 }
+
+pre{
+    margin-top: 5px;
+    max-width: 600px;
+    max-height: 200px;
+    overflow-x: scroll;
+}

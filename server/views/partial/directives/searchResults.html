@@ -109,11 +109,8 @@
                             {{video.title}}
                         </div>
                     </a>
-                    <button class="toggle-description-toggle btn btn-default" ng-show="!video.descriptionVisible" ng-click="video.descriptionVisible = true">Show description</button>
-                    <div class="video-description well well-sm" ng-show="video.descriptionVisible" ng-click="video.descriptionVisible = false">
-                      <button class="btn btn-default">Hide</button>
-                      {{video.description}}
-                    </div>
+                    <button class="toggle-description-toggle btn btn-default" ng-click="video.descriptionVisible = !video.descriptionVisible">{{video.descriptionVisible ? 'Hide description' : 'Show description'}}</button>
+                    <pre ng-show="video.descriptionVisible">{{video.description}}</pre>
                     <div class="created"><a href="https://www.youtube.com/channel/{{video.channelId}}" target="_blank">
                         {{video.channelTitle}}</a> - {{video.created | date:'MM-dd-yyyy'}}
                         <!-- <input type="text" class="form-control" ng-model="video.videoId" readonly="readonly" select-on-click/> -->
