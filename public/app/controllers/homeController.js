@@ -2318,8 +2318,8 @@
 
             };
 
-            $scope.getAutocompleteOptions = function(){
-              var searchParam = $scope.searchParam ? $scope.searchParam.replace(/#/g,'') : '';
+            $scope.getAutocompleteOptions = function(str){
+              var searchParam = str ? str.replace(/#/g,'') : '';
               if(searchParam && !$scope.smartSearchExecuting){
                 $http.get('api/autocomplete?q=' + searchParam).then(function(res){
                   $scope.autocompleteOptions = res.data;

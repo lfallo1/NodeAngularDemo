@@ -1572,3 +1572,10 @@ pre{
     max-height: 200px;
     overflow-x: scroll;
 }
+
+
+#quick-filter-container .autocomplete ul{
+    margin-top: -70px;
+    width: 92%;
+    border: none;
+}
