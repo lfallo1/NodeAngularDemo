@@ -124,41 +124,46 @@
 
         service.getVideosInPlaylist = function(id, callback, pageToken, deferred){
           var deferred = deferred || $q.defer();
-          AuthService.getAccessToken({pageToken : pageToken}).then(function(response){
-            var accessToken = response.token ? '&access_token=' + response.token : '';
-            var pageToken = response.extra.pageToken ? '&pageToken=' + response.extra.pageToken : '';
-            var playlistId = '&playlistId=' + id;
-            var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50' + playlistId + pageToken + accessToken;
+          if(!AuthService.isLoggedIn()){
+            deferred.reject();
+          }
+          else{
+            AuthService.getAccessToken({pageToken : pageToken}).then(function(response){
+              var accessToken = response.token ? '&access_token=' + response.token : '';
+              var pageToken = response.extra.pageToken ? '&pageToken=' + response.extra.pageToken : '';
+              var playlistId = '&playlistId=' + id;
+              var url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50' + playlistId + pageToken + accessToken;
 
-            //make request
-            $http.get(url).then(function(res){
-              AuthService.setPendingGoogleActivation(false);
-              //execute callback / forces ui updates
-              callback(new Array(res)).then(function(){
+              //make request
+              $http.get(url).then(function(res){
+                AuthService.setPendingGoogleActivation(false);
+                //execute callback / forces ui updates
+                callback(new Array(res)).then(function(){
 
-                //if a next page exists
-                if(res.data.nextPageToken){
-                  service.getVideosInPlaylist(id, callback, res.data.nextPageToken, deferred);
-                  return;
-                }
+                  //if a next page exists
+                  if(res.data.nextPageToken){
+                    service.getVideosInPlaylist(id, callback, res.data.nextPageToken, deferred);
+                    return;
+                  }
 
-                //otherwise resolve
-                deferred.resolve();
+                  //otherwise resolve
+                  deferred.resolve();
+                }, function(err){
+
+                  //if error occurs here, just resolve (i'll write an explanation later)
+                  deferred.resolve();
+                });
               }, function(err){
 
-                //if error occurs here, just resolve (i'll write an explanation later)
-                deferred.resolve();
+                if(err.status === 401 || err.status === 403){
+                  AuthService.setPendingGoogleActivation(true);
+                }
+
+                //if error here, it's because the playlist is not available (auth) or does not exist
+                deferred.reject(err);
               });
-            }, function(err){
-
-              if(err.status === 401 || err.status === 403){
-                AuthService.setPendingGoogleActivation(true);
-              }
-
-              //if error here, it's because the playlist is not available (auth) or does not exist
-              deferred.reject(err);
             });
-          });
+          }
           return deferred.promise;
         };
 
