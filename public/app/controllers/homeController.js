@@ -2032,6 +2032,21 @@
               return deferred.promise;
             };
 
+            $scope.addAllToPlaylist = function(){
+              if($scope.filteredResults.length <= 100){
+                var toSave = [];
+                for(var i = 0; i < $scope.filteredResults.length; i++){
+                  toSave.push({videoId : $scope.filteredResults[i].videoId});
+                }
+                $scope.savingAllToPlaylist = true;
+                $scope.playlistService.addMultipleToPlaylist(toSave).then(function(){
+                  $scope.savingAllToPlaylist = false;
+                }, function(){
+                  $scope.savingAllToPlaylist = false;
+                })
+              }
+            };
+
             var getVideosInPlaylist = function(searchParam){
               var searchParam = searchParam || $scope.searchParam;
               var deferred = $q.defer();

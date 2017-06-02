@@ -75,6 +75,10 @@
       </div>
     </div>
 
+    <div ng-show="AuthService.isLoggedIn()" id="add-all-to-playlist">
+      <button class="btn btn-info" ng-disabled="savingAllToPlaylist" ng-click="addAllToPlaylist()">{{savingAllToPlaylist ? 'Saving...' : 'Add all to playlist (Beta)'}}</button>
+    </div>
+
     <!-- <button class="btn btn-warn" ng-click="removeLyricalDuplicates()">Lyrics duplicate remover</button> -->
 
     <!-- <div ng-class="autoplay ? 'toggle-autoplay text-success' : 'toggle-autoplay text-danger'" ng-click="toggleAutoplay()"><span class="glyphicon glyphicon-play-circle"></span>{{autoplay ? 'Autoplay enabled' : 'Autoplay disabled'}}</div> -->

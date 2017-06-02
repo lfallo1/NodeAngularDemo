@@ -516,7 +516,7 @@ body{
 
 #quick-filter-title{
     text-align: center;
-    background-color: #222;
+    background-color: rgb(1,87,155);
     color: white;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
@@ -1188,7 +1188,7 @@ div.report-modal .modal-content {
 }
 
 .quick-filter-mode-label{
-    color: #aaa;
+    color: #fff;
     font-size: 24px;
     text-align: center;
 }
@@ -1204,7 +1204,7 @@ div.report-modal .modal-content {
 }
 
 #quick-filter-container{
-    background: #222;
+    background: rgb(1,87,155);
     border-radius: 8px;
 }
 
