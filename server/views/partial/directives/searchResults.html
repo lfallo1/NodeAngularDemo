@@ -76,7 +76,7 @@
     </div>
 
     <div ng-show="AuthService.isLoggedIn()" id="add-all-to-playlist">
-      <button class="btn btn-info" ng-disabled="savingAllToPlaylist" ng-click="addAllToPlaylist()">{{savingAllToPlaylist ? 'Saving...' : 'Add all to playlist (Beta)'}}</button>
+      <button class="btn btn-success" ng-disabled="savingAllToPlaylist" ng-click="addAllToPlaylist()"><span class="glyphicon glyphicon-cloud-upload"></span> {{savingAllToPlaylist ? 'Saving...' : 'Save all to playlist (Beta)'}}</button>
     </div>
 
     <!-- <button class="btn btn-warn" ng-click="removeLyricalDuplicates()">Lyrics duplicate remover</button> -->
