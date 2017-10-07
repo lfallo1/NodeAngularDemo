@@ -5,7 +5,32 @@
     angular.module('youtubeSearchApp').controller('HomeCtrl', [
         '$rootScope', '$scope', '$http', '$q', '$routeParams', '$log', '$timeout', '$location', 'TimeService', 'toaster', '$window', '$uibModal', 'AuthService', 'PlaylistService', '$sce', 'CountriesService', '$anchorScroll', '$cookies', 'DirectionsService', 'FileSaver', 'Blob', 'NgMap',
         function($rootScope, $scope, $http, $q, $routeParams, $log, $timeout, $location, TimeService, toaster, $window, $uibModal, AuthService, PlaylistService, $sce, CountriesService, $anchorScroll, $cookies, DirectionsService, FileSaver, Blob, NgMap){
-
+            //
+            //
+            // $.ajaxSetup({xhrFields: { withCredentials: true } });
+            //
+            // $scope.downloadTest = function(){
+            //
+            //     $.ajax({
+            //         url: 'url',
+            //         type: 'POST',
+            //         dataType: 'binary',
+            //         headers: {'X-Auth-Token' : 'token'},
+            //         data: $scope.downloadToken,
+            //         contentType: 'application/octet-stream',
+            //         success: function(blob) {
+            //             var windowUrl = window.URL || window.webkitURL;
+            //             var url = windowUrl.createObjectURL(blob);
+            //             anchor.prop('href', url);
+            //             anchor.prop('download', 'YourFile.png');
+            //             anchor.get(0).click();
+            //             windowUrl.revokeObjectURL(url);
+            //         },
+            //         error: function(err){
+            //             console.log(err);
+            //         }
+            //     });
+            // }
 
             //*********** START LANGUAGE / MAP LOGIC ****************
 
