@@ -1,3 +1,6 @@
 node_modules/
 .idea/*
+.idea/
 .idea/workspace.xml
+.idea/NodeAngular.iml
+.idea/vcs.xml
