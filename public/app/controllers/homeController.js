@@ -2033,7 +2033,7 @@
             };
 
             $scope.addAllToPlaylist = function(){
-              if($scope.filteredResults.length <= 100){
+              if($scope.filteredResults.length){
                 var toSave = [];
                 for(var i = 0; i < $scope.filteredResults.length; i++){
                   toSave.push({videoId : $scope.filteredResults[i].videoId});

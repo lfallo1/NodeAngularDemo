@@ -150,6 +150,15 @@
                         <div class="col-md-12">
                             <div ng-if="AuthService.isLoggedIn()" class="add-playlist-button btn btn-success" ng-click="playlistService.addToPlaylist(video)"><span class="glyphicon glyphicon-plus"></span> Youtube playlist</div>
                         </div>
+
+                        <div class="list-controls" ng-show="video.playing">
+                            <div ng-if="!isVideoInList(video, watchlist)" class="add-to-watchlist text-info" ng-click="toggleVideoInList(video, watchlist)"><span class="glyphicon glyphicon-plus"></span>Add to watchlist</div>
+                            <div ng-if="isVideoInList(video, watchlist)" class="add-to-watchlist text-danger" ng-click="toggleVideoInList(video, watchlist)"><span class="glyphicon glyphicon-remove"></span>Remove from watchlist</div>
+                            <div ng-if="!isVideoInList(video, selectedVideos) && AuthService.isLoggedIn()" class="add-to-multivid-playlist text-success" ng-click="toggleVideoInList(video, selectedVideos)"><span class="glyphicon glyphicon-plus"></span>Add to playlist queue</div>
+                            <div ng-if="isVideoInList(video, selectedVideos) && AuthService.isLoggedIn()" class="add-to-multivid-playlist text-danger" ng-click="toggleVideoInList(video, selectedVideos)"><span class="glyphicon glyphicon-remove"></span>Remove from queue</div>
+                            <div class="remove-from-results text-danger" ng-click="removeVideoFromList(video)"><span class="glyphicon glyphicon-remove"></span> Remove from results</div>
+                        </div>
+
                     </div>
 
                     <!--<div id="youtube-members-only" ng-if="AuthService.isLoggedIn()">-->
