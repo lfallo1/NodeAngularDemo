@@ -22,7 +22,7 @@ body{
 
     color: rgb(150,150,150);
     margin-left: 5px;
-  }
+}
 #you{
     margin-right: 2px;
 }
@@ -771,21 +771,21 @@ div.report-modal .modal-content {
 }
 
 .fileUpload {
-	position: relative;
-	overflow: hidden;
-	margin: 20px;
-	width: 90%;
+    position: relative;
+    overflow: hidden;
+    margin: 20px;
+    width: 90%;
 }
 .fileUpload input.upload {
-	position: absolute;
-	top: 0;
-	right: 0;
-	margin: 0;
-	padding: 0;
-	font-size: 20px;
-	cursor: pointer;
-	opacity: 0;
-	filter: alpha(opacity=0);
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
 }
 
 #download-json-results{
@@ -1245,8 +1245,8 @@ div.report-modal .modal-content {
 }
 
 #suggested-tags span{
-  margin-left: 3px;
-  background: #337ab7;
+    margin-left: 3px;
+    background: #337ab7;
 }
 
 #select-terms-modal-body div{
@@ -1289,7 +1289,7 @@ div.report-modal .modal-content {
 }
 
 .select-terms-footer .btn-link:hover{
-  text-decoration: none;
+    text-decoration: none;
 }
 
 .select-terms-footer:hover{
@@ -1314,9 +1314,9 @@ div.report-modal .modal-content {
 }
 
 .translate-text input[type=checkbox] {
-  transform: scale(2);
-  margin-left: 15px;
-  margin-right: 4px;
+    transform: scale(2);
+    margin-left: 15px;
+    margin-right: 4px;
 }
 
 .translate-text label{
@@ -1548,7 +1548,7 @@ div#video-id-select.input-group .input-group-addon{
 
 
 .rzslider .rz-pointer.rz-active:after {
-  background-color: white;
+    background-color: white;
 }
 
 #smart-search-label-faster, #smart-search-label-less-results {
@@ -1578,4 +1578,8 @@ pre{
     margin-top: -70px;
     width: 92%;
     border: none;
+}
+
+.video-buttons .list-controls{
+    margin-left: 20px;
 }
