@@ -1193,7 +1193,7 @@
                               pctLikes = 0;
                           }
                           else {
-                              pctLikes = undefined;
+                              pctLikes = 100;
                           }
 
                           viewCount = datastats.statistics.viewCount;

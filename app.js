@@ -11,7 +11,7 @@ var autocompleteAPI = require('./server/services/autocompleteApi.js');
 
 var app = express();
 
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 4000;
 var clientId = process.env.CLIENT_ID || "232820042865-5jhlraag8ku4s0i5a7fh3q51nnvngaqh.apps.googleusercontent.com";
 var authCallbackUrl = process.env.AUTH_CALLBACK_URL || "http://localhost:3000/oauthcallback";
 
