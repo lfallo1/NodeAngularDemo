@@ -538,6 +538,7 @@
             var resetPostFilters = function(){
               $scope.minViews = undefined;
               $scope.minDislikes = undefined;
+              $scope.minLikes = undefined;
               $scope.minDate = undefined;
               $scope.maxDate = undefined;
               $scope.minRating = undefined;
@@ -1823,6 +1824,7 @@
                 $scope.sortField.id = sortField.id;
                 $scope.minViews = $cookies.get('youtubeagent_minViews') ? Number($cookies.get('youtubeagent_minViews')) : null;
                 $scope.minDislikes = $cookies.get('youtubeagent_minDislikes') ? Number($cookies.get('youtubeagent_minDislikes')) : null;
+                $scope.minLikes = $cookies.get('youtubeagent_minLikes') ? Number($cookies.get('youtubeagent_minLikes')) : null;
                 $scope.minDate = checkDate($cookies.get('youtubeagent_minDate')) ? new Date($cookies.get('youtubeagent_minDate')) : null;
                 $scope.maxDate = checkDate($cookies.get('youtubeagent_maxDate')) ? new Date($cookies.get('youtubeagent_maxDate')) : null;
                 $scope.minRating = $cookies.get('youtubeagent_minRating') ? Number($cookies.get('youtubeagent_minRating')) : null;
@@ -1841,6 +1843,7 @@
                 $cookies.put('youtubeagent_sortField',$scope.sortField.id);
                 $cookies.put('youtubeagent_minViews',$scope.minViews);
                 $cookies.put('youtubeagent_minDislikes',$scope.minDislikes);
+                $cookies.put('youtubeagent_minDislikes',$scope.minLikes);
                 $cookies.put('youtubeagent_minDate',$scope.minDate || null);
                 $cookies.put('youtubeagent_maxDate',$scope.maxDate || null);
                 $cookies.put('youtubeagent_minRating',$scope.minRating);
@@ -1859,6 +1862,7 @@
                 'filterText': $scope.filterText,
                 'minViews': $scope.minViews,
                 'minDislikes': $scope.minDislikes,
+                  'minLikes': $scope.minLikes,
                 'minDate': $scope.minDate,
                 'maxDate': $scope.maxDate,
                 'minRating': $scope.minRating,
@@ -1898,6 +1902,7 @@
               $scope.filterText = json.filterText;
               $scope.minViews = json.minViews;
               $scope.minDislikes = json.minDislikes;
+              $scope.minLikes = json.minLikes;
               $scope.minDate = json.minDate ? new Date(json.minDate) : null;
               $scope.maxDate = json.maxDate ? new Date(json.maxDate) : null;
               $scope.minRating = json.minRating;
@@ -1941,6 +1946,7 @@
                 else{
                     $scope.filteredResults = $scope.searchResults.filter(function(d){
                         if(((!$scope.minDislikes && $scope.minDislikes !== 0) || d.dislikes <= $scope.minDislikes) &&
+                            ((!$scope.minLikes && $scope.minLikes !== 0) || d.likes >= $scope.minLikes) &&
                             (!$scope.minViews || d.viewCount >= $scope.minViews) &&
                             (!$scope.minRating || d.pctLikes >= $scope.minRating) &&
                             (!$scope.maxDate || d.created <= $scope.maxDate) &&
