@@ -36,7 +36,7 @@
 
             //map variables
             $scope.googleMapsUrl={
-              url: 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDE3EI_Yy2IKmN7aL0tVug3w-sR1tVnGwY',
+              url: 'https://maps.googleapis.com/maps/api/js?key=AIzaSyA7LaNRDxuFf2hvRX2q4kvaUaFitbQlcI0',
             };
 
             // $scope.googleMapsUrl={
