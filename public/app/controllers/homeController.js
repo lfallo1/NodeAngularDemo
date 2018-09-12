@@ -1948,7 +1948,7 @@
 
             $scope.filter = function(relevancePending){
 
-                if((!$scope.enableChannelFilter || !$scope.channelFilter || $scope.channelFilter.length === 0) && !$scope.minRelevance && !hasQuickFilter() && !$scope.minViews && (!$scope.minDislikes && $scope.minDislikes !== 0) && !$scope.minDate && !$scope.shorterThanFilter && !$scope.longerThanFilter && !$scope.minRating){
+                if((!$scope.enableChannelFilter || !$scope.channelFilter || $scope.channelFilter.length === 0) && !$scope.minRelevance && !hasQuickFilter() && !$scope.minViews && (!$scope.minDislikes && $scope.minDislikes !== 0) && !$scope.minDate && !$scope.shorterThanFilter && !$scope.longerThanFilter && !$scope.minRating && !$scope.liveEvents){
                     $scope.filteredResults = $scope.searchResults;
                 }
                 else{
@@ -1956,6 +1956,7 @@
                         if(((!$scope.minDislikes && $scope.minDislikes !== 0) || d.dislikes <= $scope.minDislikes) &&
                             ((!$scope.minLikes && $scope.minLikes !== 0) || d.likes >= $scope.minLikes) &&
                             (!$scope.minViews || d.viewCount >= $scope.minViews) &&
+                            (!$scope.liveEvents || d.live) &&
                             (!$scope.minRating || d.pctLikes >= $scope.minRating) &&
                             (!$scope.maxDate || d.created <= $scope.maxDate) &&
                             (!$scope.minRelevance || d.matchPercentage >= $scope.minRelevance || relevancePending) &&
