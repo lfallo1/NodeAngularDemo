@@ -1583,3 +1583,24 @@ pre{
 .video-buttons .list-controls{
     margin-left: 20px;
 }
+
+.live-search-wrapper{
+    margin-top: 10px;
+}
+
+.live-search-wrapper button{
+    color: #c9302c;
+}
+
+.live-search-wrapper .btn-default:hover, .live-search-wrapper .btn-default:active{
+    color: white;
+    background-color: #c9302c !important;
+}
+
+.live-search-wrapper .btn-default.active{
+    background: #e15b58 !important;
+}
+
+.live-search-wrapper .glyphicon{
+    margin-right: 5px;
+}
