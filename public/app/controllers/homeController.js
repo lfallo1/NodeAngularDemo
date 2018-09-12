@@ -361,6 +361,7 @@
             var related= '';
             var videoDuration= '';
             var videoCategoryId= '';
+            var liveEvents = '';
             var safeSearch= '';
             var latlng= '';
 
@@ -470,6 +471,7 @@
                 $scope.selectedIntervalType = $scope.dateIntervalTypes.BIENNIAL;
                 $scope.intervalSearch = false;
                 $scope.extendedSearch = false;
+                $scope.liveEvents = false;
 
                 $scope.videoDuration = $scope.videoDurationOptions[0];
                 $scope.safeSearch = $scope.safeSearchOptions[0];
@@ -740,6 +742,7 @@
 
                     videoDuration = $scope.videoDuration ? '&videoDuration=' + $scope.videoDuration : '';
                     safeSearch = $scope.safeSearch ? '&safeSearch=' + $scope.safeSearch : '';
+                    liveEvents = $scope.liveEvents ? '&eventType=live' : '';
 
                     latlng = ($scope.pos.lat && $scope.searchLocation) ? '&location=' + $scope.pos.lat + "," + $scope.pos.lng + '&locationRadius=' + $scope.locationDiameter/2 + 'mi': '';
 
@@ -838,7 +841,7 @@
                         var token = sortOrders[i].token ? '&pageToken=' + sortOrders[i].token : '';
 
                         promises.push($http.post('api/youtube/get', {'url' : encodeURI(youtubeSearchBase + $scope.searchParam + "&type=video&maxResults=50" +
-                        dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + latlng + safeSearch +
+                        dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + latlng + safeSearch + liveEvents +
                         "&order=" + sortOrders[i].order + related  + token)}));
                     }
                   }
@@ -849,7 +852,7 @@
                         var token = sortOrders[i].token ? '&pageToken=' + sortOrders[i].token : '';
 
                         promises.push($http.post('api/youtube/get', {'url' : encodeURI(youtubeSearchBase + $scope.searchParam + "&type=video&maxResults=50" +
-                        dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + latlng + safeSearch +
+                        dateSmall + dateLarge + regionCode + videoDuration + videoCategoryId + latlng + safeSearch + liveEvents +
                         "&order=" + sortOrders[i].order + related  + token)}));
                     }
                 }
@@ -1223,6 +1226,7 @@
                             "duration": duration.formatted || null,
                             "durationMinutes": duration.approxMinutes || null,
                             "description" : datastats.snippet.description,
+                            "live" : datastats.snippet.liveBroadcastContent === 'live',
                             "tags" : datastats.snippet.tags,
                             "index" : Math.ceil(Math.random()*1000000),
                             "matchPercentage" : $scope.getMatchPercentage(datastats),
@@ -1834,6 +1838,7 @@
                 $scope.preSearchMinDate = checkDate($cookies.get('youtubeagent_preSearchMinDate')) ? new Date($cookies.get('youtubeagent_preSearchMinDate')) : null;
                 $scope.safeSearch = $cookies.get('youtubeagent_safeSearch');
                 $scope.extendedSearch = $cookies.get('youtubeagent_extendedSearch') === 'true';
+                $scope.liveEvents = $cookies.get('youtubeagent_liveEvents') === 'true';
               }
             };
 
@@ -1853,6 +1858,7 @@
                 $cookies.put('youtubeagent_preSearchMinDate',$scope.preSearchMinDate || null);
                 $cookies.put('youtubeagent_safeSearch',$scope.safeSearch);
                 $cookies.put('youtubeagent_extendedSearch',$scope.extendedSearch);
+                $cookies.put('youtubeagent_liveEvents',$scope.liveEvents);
             };
 
             var createJsonObjectForFile = function(){
@@ -1873,7 +1879,8 @@
                 'hashedResults' : $scope.hashedResults,
                 'quickFilterObjects' : $scope.quickFilterObjects,
                 'tagsArray' : $scope.tagsArray,
-                'minRelevance': $scope.minRelevance
+                'minRelevance': $scope.minRelevance,
+                  'liveEvents': $scope.liveEvents
               }
             };
 
@@ -1913,6 +1920,7 @@
               $scope.hashedResults = json.hashedResults;
               $scope.minRelevance = json.minRelevance;
               $scope.returnedIndex = json.returnedIndex || new Date().getTime() + "_" + Math.floor(Math.random() * 10000000);
+              $scope.liveEvents = !!json.liveEvents;
 
               if(json.quickFilterObjects){
                 $scope.quickFilterObjects = json.quickFilterObjects;

@@ -94,6 +94,17 @@
                               <span class="glyphicon glyphicon-forward"></span>Interval Search
                           </button>
                       </div>
+                      <div class="live-search-wrapper">
+                          <button ng-disabled="searchMode !== TEXT_SEARCH"
+                                  type="button"
+                                  class="btn btn-default"
+                                  ng-model="liveEvents"
+                                  uib-btn-checkbox btn-checkbox-true="true"
+                                  btn-checkbox-false="false"
+                                  title="Search for live events">
+                              <span class="glyphicon glyphicon-record"></span>Live Events
+                          </button>
+                      </div>
 
                       <!-- <div id="interval-search-wrapper">
                         <div class="btn-group" uib-dropdown>
@@ -147,8 +158,8 @@
                               <td class="filter-input"><input ng-model="minDislikes" type="number" class="form-control" ng-blur="filter()" placeholder="Maximum dislikes" /></td>
                           </tr>
                           <tr class="row-padding">
-                              <td class="filter-label"><span class="glyphicon glyphicon-thumbs-down"></span>Likes</td>
-                              <td class="filter-input"><input ng-model="minLikes" type="number" class="form-control" ng-blur="filter()" placeholder="Minimum dislikes" /></td>
+                              <td class="filter-label"><span class="glyphicon glyphicon-thumbs-up"></span>Likes</td>
+                              <td class="filter-input"><input ng-model="minLikes" type="number" class="form-control" ng-blur="filter()" placeholder="Minimum likes" /></td>
                           </tr>
                           <tr class="row-padding">
                               <td class="filter-label"><span class="glyphicon glyphicon-user"></span>Min Views</td>
